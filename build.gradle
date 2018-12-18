@@ -1,11 +1,23 @@
 plugins {
   id 'scala'
-}
-
-dependencies {
-  compile "org.scala-lang:scala-library:2.12.8"
+  id 'org.hidetake.swagger.generator' version '2.15.1'
 }
 
 repositories {
   jcenter()
+}
+
+dependencies {
+  compile "org.scala-lang:scala-library:2.12.8"
+  // swaggerCodegen 'io.swagger:swagger-codegen-cli:2.4.0'
+  swaggerCodegen 'io.swagger.codegen.v3:swagger-codegen-cli:3.0.3'
+}
+
+swaggerSources {
+  dataaccess {
+    inputFile = file('data-access-api.yaml')
+    code {
+      language = 'scala-akka-http-server'
+    }
+  }
 }
