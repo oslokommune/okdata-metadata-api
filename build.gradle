@@ -1,0 +1,11 @@
+plugins {
+  id 'scala'
+}
+
+dependencies {
+  compile "org.scala-lang:scala-library:2.12.8"
+}
+
+repositories {
+  jcenter()
+}
