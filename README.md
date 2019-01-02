@@ -34,6 +34,7 @@ Allowed frequencies:
 * Manual / irregular
 * Periodic (frequency = yearly, monthly, weekly, daily, hourly)
 * Continuous
+* https://publications.europa.eu/en/web/eu-vocabularies/at-concept-scheme/-/resource/authority/frequency/?target=Browse
 
 ### Create a new version
 

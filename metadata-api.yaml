@@ -1,0 +1,55 @@
+openapi: 3.0.0
+info:
+  version: 0.0.1
+  title: Metadata API
+  description: Metadata API for registering and accessing metadata about datasets and distributions
+  contact:
+    name: Dataplatform team
+    email: dataplattform@oslo.kommune.no
+
+paths:
+  /datasets:
+    get:
+      summary: Returns a list of datasets
+      description: Returns a list of datasets
+      operationId: list_datasets
+      responses:
+        '200':
+          description: A JSON array of datasets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      summary: Create a new dataset
+      operation_id: create_dataset
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dataset'
+      responses:
+        '201':
+          description: Dataset created
+
+components:
+  schemas:
+    Dataset:
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        frequency:
+          type: string
+          enum: ["ANNUAL", "MONTHLY", "WEEKLY", "DAILY", "HOURLY", "CONT", "IRREG"]
+        access_rights:
+          type: string
+          enum: [":public", ":restricted", ":non-public"]
+
