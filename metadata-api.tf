@@ -2,23 +2,45 @@ data "template_file" "metadata-api-spec" {
   template = "${file("metadata-api.yaml")}"
 
   vars {
-    lambda_uri = "${aws_lambda_function.list_datasets.invoke_arn}"
-    lambda_role = "${aws_iam_role.list_datasets_exec.arn}"
+    list_datasets_lambda_uri = "${aws_lambda_function.list_datasets.invoke_arn}"
+    create_dataset_lambda_uri = "${aws_lambda_function.create_dataset.invoke_arn}"
+    get_dataset_lambda_uri = "${aws_lambda_function.get_dataset.invoke_arn}"
+    lambda_role = "${aws_iam_role.metadata_api_exec.arn}"
   }
 }
 
 resource "aws_lambda_function" "list_datasets" {
   function_name = "list_datasets"
-  filename = "hello.zip"
+  filename = "lambda.zip"
 
-  handler = "main.hello"
-  runtime = "python3.6"
+  handler = "main.list_datasets"
+  runtime = "python3.7"
 
-  role = "${aws_iam_role.list_datasets_exec.arn}"
+  role = "${aws_iam_role.metadata_api_exec.arn}"
 }
 
-resource "aws_iam_role" "list_datasets_exec" {
-  name = "listDatasetsLambdaRole"
+resource "aws_lambda_function" "create_dataset" {
+  function_name = "create_dataset"
+  filename = "lambda.zip"
+
+  handler = "main.create_dataset"
+  runtime = "python3.7"
+
+  role = "${aws_iam_role.metadata_api_exec.arn}"
+}
+
+resource "aws_lambda_function" "get_dataset" {
+  function_name = "get_dataset"
+  filename = "lambda.zip"
+
+  handler = "main.get_dataset"
+  runtime = "python3.7"
+
+  role = "${aws_iam_role.metadata_api_exec.arn}"
+}
+
+resource "aws_iam_role" "metadata_api_exec" {
+  name = "MetadataAPILambdaRole"
 
   assume_role_policy = "${file("lambda_assume_role_policy.json")}"
 }
@@ -40,7 +62,25 @@ resource "aws_lambda_permission" "list_datasets" {
   function_name = "${aws_lambda_function.list_datasets.arn}"
   principal = "apigateway.amazonaws.com"
 
-  source_arn = "${replace(aws_api_gateway_deployment.MetadataAPIDeployment.execution_arn, "/v1", "/*")}/GET/datasets"
+  source_arn = "${aws_api_gateway_deployment.MetadataAPIDeployment.execution_arn}/GET/datasets"
+}
+
+resource "aws_lambda_permission" "create_dataset" {
+  statement_id = "AllowAPIGatewayInvoke"
+  action = "lambda:InvokeFunction"
+  function_name = "${aws_lambda_function.create_dataset.arn}"
+  principal = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_api_gateway_deployment.MetadataAPIDeployment.execution_arn}/POST/datasets"
+}
+
+resource "aws_lambda_permission" "get_dataset" {
+  statement_id = "AllowAPIGatewayInvoke"
+  action = "lambda:InvokeFunction"
+  function_name = "${aws_lambda_function.get_dataset.arn}"
+  principal = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_api_gateway_deployment.MetadataAPIDeployment.execution_arn}/GET/datasets/*"
 }
 
 output "base_url" {

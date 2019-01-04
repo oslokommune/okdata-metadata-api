@@ -22,10 +22,79 @@ paths:
                 type: array
                 items:
                   type: string
+        '401':
+          description: User is not authenticated.
+        '403':
+          description: User is not authorized to list datasets.
       x-amazon-apigateway-integration:
         type: aws_proxy
-        uri: ${lambda_uri}
+        uri: ${list_datasets_lambda_uri}
         httpMethod: POST
         responses:
           default:
             statusCode: '200'
+
+    post:
+      summary: Create a new dataset
+      operation: create_dataset
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dataset'
+      responses:
+        '201':
+          description: New dataset created.
+        '401':
+          description: User is not authenticated.
+        '403':
+          description: User is not authorized to create new datasets.
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        uri: ${create_dataset_lambda_uri}
+        httpMethod: POST
+        responses:
+          default:
+            statusCode: '200'
+
+  /datasets/{dataset-id}:
+    get:
+      summary: Get the dataset information
+      operationId: get_dataset
+      responses:
+        '200':
+          description: A JSON representation of the dataset metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+        '401':
+          description: User is not authenticated.
+        '403':
+          description: User is not authorized to retrieve dataset information.
+      x-amazon-apigateway-integration:
+        type: aws_proxy
+        uri: ${get_dataset_lambda_uri}
+        httpMethod: POST
+        responses:
+          default:
+            statusCode: '200'
+
+components:
+  schemas:
+    Dataset:
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        frequency:
+          type: string
+          enum: ["ANNUAL", "MONTHLY", "WEEKLY", "DAILY", "HOURLY", "CONT", "IRREG"]
+        access_rights:
+          type: string
+          enum: [":public", ":restricted", ":non-public"]
