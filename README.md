@@ -2,6 +2,12 @@
 
 Prototype for data upload API / service
 
+## Running the Terraform script
+
+Make sure to create a new deployable zip-file with the lambda code first before deploying: `zip lambda.zip main.py`
+
+Deploy the functions as normal using `terraform apply`
+
 ## Register new dataset and upload new distribution flow
 
 ### Register dataset
