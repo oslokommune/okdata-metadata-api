@@ -9,7 +9,7 @@ events:
         requestBody:
           description: "A dataset object"
         requestModels:
-          application/json: "PutDocumentRequest"
+          application/json: "Request"
         pathParams:
           - name: "dataset-id"
             description: "The dataset for which to create a new edition"

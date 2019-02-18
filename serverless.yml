@@ -9,6 +9,8 @@ provider:
     name: ok-origo-dataplatform-config-${self:provider.stage}
     serverSideEncryption: AES256
   deploymentPrefix: deploy
+  iamManagedPolicies:
+    - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
 
 plugins:
   - serverless-aws-documentation
@@ -31,8 +33,8 @@ functions:
   get_datasets: ${file(serverless/functions/get_datasets.yaml)}
   get_dataset:  ${file(serverless/functions/get_dataset.yaml)}
   put_dataset: ${file(serverless/functions/put_dataset.yaml)}
-  post_version: ${file(serverless/functions/post_dataset.yaml)}
-  put_version: ${file(serverless/functions/put_dataset.yaml)}
+  post_version: ${file(serverless/functions/post_version.yaml)}
+  put_version: ${file(serverless/functions/put_version.yaml)}
   get_versions: ${file(serverless/functions/get_versions.yaml)}
   get_version: ${file(serverless/functions/get_version.yaml)}
   post_edition: ${file(serverless/functions/post_edition.yaml)}
