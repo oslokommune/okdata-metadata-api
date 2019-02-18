@@ -1,0 +1,17 @@
+handler: dataset_handler.get_datasets
+events:
+  - http:
+      path: "datasets"
+      method: "get"
+      documentation:
+        summary: "Get all datasets"
+        description: "Retrieves all datasets"
+        methodResponses:
+          - statusCode: "200"
+            responseBody:
+              description: "Datasets retrieved successfully"
+          - statusCode: "500"
+            responseBody:
+              description: "Was not able to retrieve the datasets. Internal server error."
+            responseModels:
+              application/json: "ErrorResponse"

@@ -1,0 +1,34 @@
+handler: distribution_handler.post_distribution
+events:
+  - http:
+      path: "datasets/{dataset-id}/versions/{version-id}/editions/{edition-id}/distributions"
+      method: "post"
+      documentation:
+        summary: "Post a dataset"
+        description: "Posts a new dataset"
+        requestBody:
+          description: "A dataset object"
+        requestModels:
+          application/json: "Request"
+        pathParams:
+          - name: "dataset-id"
+            description: "The dataset for which to create a new distribution"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+          - name: "version-id"
+            description: "The version of the given dataset for which to create a new distribution"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+          - name: "edition-id"
+            description: "The edition of the given dataset for which to create a new distribution"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+        methodResponses:
+          - statusCode: "500"
+            responseBody:
+              description: "Was not able to post the distribution. Internal server error."
+            responseModels:
+              application/json: "ErrorResponse"

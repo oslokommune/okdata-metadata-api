@@ -1,0 +1,13 @@
+name: ErrorResponse
+description: An error response
+contentType: application/json
+schema:
+  type: object
+  required:
+    - statusCode
+    - body
+  properties:
+    statusCode:
+      type: number
+    body:
+      type: string

@@ -1,0 +1,42 @@
+handler: distribution_handler.update_distribution
+events:
+  - http:
+      path: "datasets/{dataset-id}/versions/{version-id}/editions/{edition-id}/distributions/{distribution-id}"
+      method: "put"
+      documentation:
+        summary: "Update a distribution"
+        description: "Updates an existing distribution"
+        pathParams:
+          - name: "dataset-id"
+            description: "The dataset which contains the distribution you want to update"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+          - name: "version-id"
+            description: "The version which contains the distribution you want to update"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+          - name: "edition-id"
+            description: "The edition which contains the distribution you want to update"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+          - name: "distribution-id"
+            description: "The distribution you want to update"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+        requestBody:
+          description: "The new object"
+        requestModels:
+          application/json: Request
+        methodResponses:
+          - statusCode: "200"
+            responseBody:
+              description: "Distribution updated successfully"
+          - statusCode: "500"
+            responseBody:
+              description: "Was not able to update the distribution. Internal server error."
+            responseModels:
+              application/json: "ErrorResponse"

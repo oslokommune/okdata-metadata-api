@@ -1,0 +1,32 @@
+handler: version_handler.update_version
+events:
+  - http:
+      path: "datasets/{dataset-id}/versions/{version-id}"
+      method: "put"
+      documentation:
+        summary: "Update a version"
+        description: "Updates an existing version"
+        pathParams:
+          - name: "dataset-id"
+            description: "The dataset which contains the version you want to update"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+          - name: "version-id"
+            description: "The version you wish to update"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+        requestBody:
+          description: "The new object"
+        requestModels:
+          application/json: Request
+        methodResponses:
+          - statusCode: "200"
+            responseBody:
+              description: "Dataset updated successfully"
+          - statusCode: "500"
+            responseBody:
+              description: "Was not able to update the dataset. Internal server error."
+            responseModels:
+              application/json: "ErrorResponse"

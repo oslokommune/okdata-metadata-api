@@ -1,0 +1,13 @@
+name: Response
+description: Response from post or put
+contentType: application/json
+schema:
+  type: object
+  required:
+    - statusCode
+    - body
+  properties:
+    statusCode:
+      type: number
+    body:
+      type: string

@@ -1,0 +1,24 @@
+handler: version_handler.post_version
+events:
+  - http:
+      path: "datasets/{dataset-id}/versions"
+      method: "post"
+      documentation:
+        summary: "Create new version"
+        description: "Creates a version"
+        requestBody:
+          description: "A user information object"
+        requestModels:
+          application/json: "Request"
+        pathParams:
+          - name: "dataset-id"
+            description: "The dataset for which to create a new version"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+        methodResponses:
+          - statusCode: "500"
+            responseBody:
+              description: "Was not able to create a new version"
+            responseModels:
+              application/json: "ErrorResponse"

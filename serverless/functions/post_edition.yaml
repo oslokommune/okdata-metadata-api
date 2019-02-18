@@ -1,0 +1,29 @@
+handler: edition_handler.post_edition
+events:
+  - http:
+      path: "datasets/{dataset-id}/versions/{version-id}/editions"
+      method: "post"
+      documentation:
+        summary: "Post an edition"
+        description: "Posts a new edition"
+        requestBody:
+          description: "A dataset object"
+        requestModels:
+          application/json: "PutDocumentRequest"
+        pathParams:
+          - name: "dataset-id"
+            description: "The dataset for which to create a new edition"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+          - name: "version-id"
+            description: "The version of the given dataset for which to create a new edition"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+        methodResponses:
+          - statusCode: "500"
+            responseBody:
+              description: "Was not able to post the edition. Internal server error."
+            responseModels:
+              application/json: "ErrorResponse"

@@ -1,0 +1,28 @@
+handler: version_handler.get_version
+events:
+  - http:
+      path: "datasets/{dataset-id}/versions/{version-id}"
+      method: "get"
+      documentation:
+        summary: "Get a version"
+        description: "Retrieves a specific version"
+        pathParams:
+          - name: "dataset-id"
+            description: "The dataset containing the version you want to retrieve"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+          - name: "version-id"
+            description: "The version you wish to retrieve"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+        methodResponses:
+          - statusCode: "200"
+            responseBody:
+              description: "Dataset retrieved successfully"
+          - statusCode: "500"
+            responseBody:
+              description: "Was not able to retrieve the dataset. Internal server error."
+            responseModels:
+              application/json: "ErrorResponse"

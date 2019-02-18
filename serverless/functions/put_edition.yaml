@@ -1,0 +1,37 @@
+handler: edition_handler.update_edition
+events:
+  - http:
+      path: "datasets/{dataset-id}/versions/{version-id}/editions/{edition-id}"
+      method: "put"
+      documentation:
+        summary: "Update an edition"
+        description: "Updates an existing edition"
+        pathParams:
+          - name: "dataset-id"
+            description: "The dataset which contains the edition you want to update"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+          - name: "version-id"
+            description: "The version which contains the edition you want to update"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+          - name: "edition-id"
+            description: "The edition you want to update"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+        requestBody:
+          description: "The new object"
+        requestModels:
+          application/json: Request
+        methodResponses:
+          - statusCode: "200"
+            responseBody:
+              description: "Edition updated successfully"
+          - statusCode: "500"
+            responseBody:
+              description: "Was not able to update the edition. Internal server error."
+            responseModels:
+              application/json: "ErrorResponse"

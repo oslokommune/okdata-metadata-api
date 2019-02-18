@@ -1,0 +1,21 @@
+handler: dataset_handler.post_dataset
+events:
+  - http:
+      path: "datasets"
+      method: "post"
+      documentation:
+        summary: "Post a dataset"
+        description: "Posts a new dataset"
+        requestBody:
+          description: "A dataset object"
+        requestModels:
+          application/json: "Request"
+        methodResponses:
+        - statusCode: "200"
+          responseBody:
+            description: "Dataset posted successfully"
+        - statusCode: "500"
+          responseBody:
+            description: "Was not able to post the dataset. Internal server error."
+          responseModels:
+            application/json: "ErrorResponse"

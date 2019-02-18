@@ -1,14 +1,31 @@
-# Upload experiment
+# Metadata-api
 
-Prototype for data upload API / service
+API for posting, updating and retrieving metadata. 
 
-## Running the Terraform script
+Feel free to add any fields you'd like/need. We do not currently validate input data, so what you put in,
+ you'll get out. 
+ 
+## Setup
 
-Make sure to create a new deployable zip-file with the lambda code first before deploying: `zip lambda.zip main.py`
+1. [Install Serverless Framework](https://serverless.com/framework/docs/getting-started/)
+2. Install plugins: 
+```
+sls plugin install -n serverless-python-requirements
+sls plugin install -n serverless-aws-documentation
 
-Deploy the functions as normal using `terraform apply`
+*or* 
 
-## Register new dataset and upload new distribution flow
+npm install
+
+```
+
+## Running tests
+
+Tests are run using [tox](https://pypi.org/project/tox/).
+
+```
+$ tox
+```
 
 ### Register dataset
 
@@ -32,15 +49,12 @@ POST /datasets
 }
 ```
 
-Questions:
-* Should we ask the user to categorise the datasets directly, i.e. according to https://publications.europa.eu/en/web/eu-vocabularies/at-concept-scheme/-/resource/authority/data-theme/?target=Browse and http://psi.norge.no/los/struktur.html ? Or better to automatically derive category/theme from title, description and keywords, as recommended here https://guidance.data.gov.uk/theme.html ?
-* How to specify contact point, publisher? Use JSON versions of https://www.w3.org/TR/vcard-rdf/ and http://xmlns.com/foaf/spec/#term_Agent ?
+###Update dataset
 
-Allowed frequencies:
-* Manual / irregular
-* Periodic (frequency = yearly, monthly, weekly, daily, hourly)
-* Continuous
-* https://publications.europa.eu/en/web/eu-vocabularies/at-concept-scheme/-/resource/authority/frequency/?target=Browse
+
+```
+PUT datasets/:dataset-id
+```
 
 ### Create a new version
 
@@ -48,15 +62,11 @@ Allowed frequencies:
 POST /datasets/:dataset-id/versions
 
 {
-    "version": "1", // optional, defaults to '1'?
-    "schema": {}, // optional schema, e.g. inline JSON schema?
-    "transformation": {} // optional cleanup transformation, e.g. JSLT?
+    "version": "1",
+    "schema": {},
+    "transformation": {}
 }
 ```
-
-Questions:
-* Should versions be explicit in URL? Or another (related) dataset id?
-* Upload schemas and transformation separately? How to handle changes/fixes in transformations?
 
 ### Create new edition
 
@@ -70,12 +80,6 @@ POST /datasets/:dataset-id/versions/:version-id/editions
 }
 ```
 
-Returns an edition with current timestamp (in UTC) as ID, e.g. `20181221T081523` (and sequence number / random id?).
-
-Alternatively, allow creating a new edition with a known ID directly? E.g. for a known timestamp we can use
-
-`POST /datasets/:dataset-id/versions/:version-id/editions/20181221T070000` (or `PUT`?)
-
 ### Create new distribution
 
 ```
@@ -84,16 +88,33 @@ POST /datasets/:dataset-id/versions/:version-id/editions/:edition-id/distributio
 {
     "filename": "visitors.csv",
     "format": "text/csv",
-    "checksum": "..." // optional MD5 checksum
+    "checksum": "..."
 }
 ```
 
-which returns a payload containing a signed S3 URL to be used for uploading the actual content.
+### TODO's
 
-For a periodic/continuous dataset, data will be stored in S3 at (skipping hour, day, month levels if not applicable):
+- Validering av json som kommer inn
+- Cleanup-jobber
 
-`/incoming/:privacy-level/:dataset-id/version=:version-id/year=:year/month=:month/day=:day/hour=:hour/:filename`
+***
+## Status utvikling
 
-For manual/irregular dataset, data will be stored in S3 at:
+| Objekt        | POST | PUT | GET 1 | GET ALL | DELETE |TESTER  | EGNE FILER | ERRORS | PATH |
+| ------------- |:-----|----:| -----:|--------:|------ :|-------:|-----------:|-------:|-----:|
+| Datasett      | ✓DRA |  ✓DR| ✓DR   | ✓DR     |   V    | ✓      |   ✓        |   ✓    |/datasets |
+| Versjon       | ✓DRA |  ✓DR| ✓DR   | ✓DR     |   V    | ✓      |   ✓        |   ✓    |/datasets/:dataset-id/versions |
+| Edition       | ✓DRA |  ✓DR| ✓DR   | ✓DR     |   V    | ✓      |   ✓        |   ✓    |/datasets/:dataset-id/versions/:version-id/editions |
+| Distribution  | ✓DRA |  ✓DR| ✓DR   | ✓DR     |   V    | ✓      |   ✓        |   ✓    |/datasets/:dataset-id/versions/:version-id/editions/:edition-id/distributions |
 
-`/incoming/:privacy-level/:dataset-id/version=:version-id/:edition-id/:filename`
+[ ✓ ] = Implementert
+
+[ R ] = Gode returverdier
+
+[ T ] = Testet
+
+[ D ] = Dokumentert
+
+[ A ] = Autogenerert ID (Kun POST)
+
+[ V ] = Venter med implementasjon

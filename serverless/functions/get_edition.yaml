@@ -1,0 +1,33 @@
+handler: edition_handler.get_edition
+events:
+  - http:
+      path: "datasets/{dataset-id}/versions/{version-id}/editions/{edition-id}"
+      method: "get"
+      documentation:
+        summary: "Get an edition"
+        description: "Retrieves a specific edition"
+        pathParams:
+          - name: "dataset-id"
+            description: "The dataset containing the edition you want to retrieve"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+          - name: "version-id"
+            description: "The version containing the edition you want to retrieve"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+          - name: "edition-id"
+            description: "The edition you want to retrieve."
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+        methodResponses:
+          - statusCode: "200"
+            responseBody:
+              description: "Edition retrieved successfully"
+          - statusCode: "500"
+            responseBody:
+              description: "Was not able to retrieve the edition. Internal server error."
+            responseModels:
+              application/json: "ErrorResponse"

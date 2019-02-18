@@ -1,0 +1,10 @@
+{
+  "name": "metadata-api-serverless-testing",
+  "description": "",
+  "version": "0.1.0",
+  "dependencies": {},
+  "devDependencies": {
+    "serverless-aws-documentation": "^1.1.0",
+    "serverless-python-requirements": "^4.3.0"
+  }
+}

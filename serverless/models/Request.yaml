@@ -1,0 +1,10 @@
+name: Request
+description: PUT Document request.
+contentType: "application/json"
+schema:
+  type: object
+  required:
+    - attribute
+  properties:
+    attribute:
+      type: string

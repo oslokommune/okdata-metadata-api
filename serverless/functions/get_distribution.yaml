@@ -1,0 +1,38 @@
+handler: distribution_handler.get_distribution
+events:
+  - http:
+      path: "datasets/{dataset-id}/versions/{version-id}/editions/{edition-id}/distributions/{distribution-id}"
+      method: "get"
+      documentation:
+        summary: "Get a distribution"
+        description: "Retrieves a specific distribution"
+        pathParams:
+          - name: "dataset-id"
+            description: "The dataset containing the distribution you want to retrieve"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+          - name: "version-id"
+            description: "The version containing the distribution you want to retrieve"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+          - name: "edition-id"
+            description: "The edition containing the distribution you want to retrieve"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+          - name: "distribution-id"
+            description: "The distribution you want to retrieve"
+            schema:
+              type: "string"
+              pattern: "^[-a-z0-9_]+$"
+        methodResponses:
+          - statusCode: "200"
+            responseBody:
+              description: "Distribution retrieved successfully"
+          - statusCode: "500"
+            responseBody:
+              description: "Was not able to retrieve the distribution. Internal server error."
+            responseModels:
+              application/json: "ErrorResponse"

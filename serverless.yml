@@ -1,0 +1,46 @@
+service: metadata-api-serverless-testing
+
+provider:
+  name: aws
+  runtime: python3.6
+  region: ${opt:region, 'eu-west-1'}
+  stage: ${opt:stage, 'dev'}
+  deploymentBucket:
+    name: ok-origo-dataplatform-config-${self:provider.stage}
+    serverSideEncryption: AES256
+  deploymentPrefix: deploy
+
+plugins:
+  - serverless-aws-documentation
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+  documentation:
+    version: '0.5.0'
+    title: 'Metadata-api'
+    description: 'Metadata-api for dataplattform'
+    models:
+      - ${file(serverless/models/ErrorResponse.yaml)}
+      - ${file(serverless/models/Response.yaml)}
+      - ${file(serverless/models/Request.yaml)}
+
+functions:
+  post_dataset: ${file(serverless/functions/post_dataset.yaml)}
+  get_datasets: ${file(serverless/functions/get_datasets.yaml)}
+  get_dataset:  ${file(serverless/functions/get_dataset.yaml)}
+  put_dataset: ${file(serverless/functions/put_dataset.yaml)}
+  post_version: ${file(serverless/functions/post_dataset.yaml)}
+  put_version: ${file(serverless/functions/put_dataset.yaml)}
+  get_versions: ${file(serverless/functions/get_versions.yaml)}
+  get_version: ${file(serverless/functions/get_version.yaml)}
+  post_edition: ${file(serverless/functions/post_edition.yaml)}
+  put_edition: ${file(serverless/functions/put_edition.yaml)}
+  get_editions: ${file(serverless/functions/get_editions.yaml)}
+  get_edition: ${file(serverless/functions/get_edition.yaml)}
+  post_distribution: ${file(serverless/functions/post_distribution.yaml)}
+  put_distribution: ${file(serverless/functions/put_distribution.yaml)}
+  get_distributions: ${file(serverless/functions/get_distributions.yaml)}
+  get_distribution: ${file(serverless/functions/get_distribution.yaml)}
+
