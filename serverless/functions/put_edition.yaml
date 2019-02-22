@@ -1,4 +1,8 @@
 handler: edition_handler.update_edition
+package:
+  include:
+    - edition_handler.py
+    - common.py
 events:
   - http:
       path: "datasets/{dataset-id}/versions/{version-id}/editions/{edition-id}"

@@ -1,4 +1,8 @@
 handler: edition_handler.get_editions
+package:
+  include:
+    - edition_handler.py
+    - common.py
 events:
   - http:
       path: "datasets/{dataset-id}/versions/{version-id}/editions"

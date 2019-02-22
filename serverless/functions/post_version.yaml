@@ -1,4 +1,8 @@
 handler: version_handler.post_version
+package:
+  include:
+    - version_handler.py
+    - common.py
 events:
   - http:
       path: "datasets/{dataset-id}/versions"
