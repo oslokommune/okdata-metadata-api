@@ -12,7 +12,7 @@ String test = """
               """
 
 PythonConfiguration.instance.setContainerRepository("python")
-PythonConfiguration.instance.setPythonVersion("3.6")
+PythonConfiguration.instance.setPythonVersion("3.7")
 
 
 Pipeline pipeline = new Pipeline(this)

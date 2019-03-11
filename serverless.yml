@@ -2,7 +2,7 @@ service: metadata-api-serverless-testing
 
 provider:
   name: aws
-  runtime: python3.6
+  runtime: python3.7
   region: ${opt:region, 'eu-west-1'}
   stage: ${opt:stage, 'dev'}
   deploymentBucket:
@@ -10,7 +10,11 @@ provider:
     serverSideEncryption: AES256
   deploymentPrefix: deploy
   iamManagedPolicies:
-    - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+    - Fn::Join:
+      - ':'
+      - - 'arn:aws:iam:'
+        - Ref: AWS::AccountId
+        - 'policy/metadata-api-policy'
 
 plugins:
   - serverless-aws-documentation
