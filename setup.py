@@ -15,6 +15,7 @@ setuptools.setup(
     url="https://github.oslo.kommune.no/origo-dataplatform/metadata-api",
     packages=setuptools.find_packages(),
     install_requires=[
-        'simplejson==3.16.0'
+        'simplejson==3.16.0',
+        'shortuuid==0.5.0'
     ]
 )
