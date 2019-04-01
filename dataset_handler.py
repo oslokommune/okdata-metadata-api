@@ -68,7 +68,10 @@ def get_dataset(event, context):
         KeyConditionExpression=Key(common.DATASET_ID).eq(dataset_id)
     )
 
-    body = db_response["Items"]
+    if len(db_response["Items"]) == 0:
+        return common.response(404, "Selected dataset does not exist.")
+
+    body = db_response["Items"][0]
 
     return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"],
                            body)

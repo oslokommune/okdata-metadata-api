@@ -76,7 +76,10 @@ def get_version(event, context):
         FilterExpression=Key(table.VERSION_ID).eq(version_id) & Key(table.DATASET_ID).eq(dataset_id)
     )
 
-    body = db_response["Items"]
+    if len(db_response["Items"]) == 0:
+        return common.response(404, "Selected version does not exist.")
+
+    body = db_response["Items"][0]
 
     return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"], body)
 

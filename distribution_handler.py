@@ -112,7 +112,7 @@ def get_distribution(event, context):
     if len(db_response["Items"]) == 0:
         return common.response(404, "Selected distribution does not exist.")
 
-    body = db_response["Items"]
+    body = db_response["Items"][0]
 
     return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"],
                            body)
