@@ -99,8 +99,7 @@ class EditionTest(unittest.TestCase):
 
         response_from_get_as_json = json.loads(edition_handler.get_edition(path_parameter_for_get_event, None)["body"])
 
-        assert len(response_from_get_as_json) == 1
-        assert response_from_get_as_json[0][table.EDITION_ID] == common_test_helper.read_result_body(
+        assert response_from_get_as_json[table.EDITION_ID] == common_test_helper.read_result_body(
             response_from_edition_post)
 
 

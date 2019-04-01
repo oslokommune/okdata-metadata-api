@@ -76,7 +76,7 @@ def get_version(event, context):
         FilterExpression=Key(table.VERSION_ID).eq(version_id) & Key(table.DATASET_ID).eq(dataset_id)
     )
 
-    body = db_response["Items"]
+    body = db_response["Items"][0]
 
     return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"], body)
 

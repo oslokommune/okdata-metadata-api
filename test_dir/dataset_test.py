@@ -92,8 +92,7 @@ class DatasetTest(unittest.TestCase):
 
         response_from_get_as_json = json.loads(dataset_handler.get_dataset(event_for_get, None)["body"])
 
-        assert len(response_from_get_as_json) == 1
-        assert response_from_get_as_json[0][table.DATASET_ID] == response_from_post_as_json
+        assert response_from_get_as_json[table.DATASET_ID] == response_from_post_as_json
 
 
 if __name__ == '__main__':

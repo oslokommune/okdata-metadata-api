@@ -123,8 +123,7 @@ class DistributionTest(unittest.TestCase):
 
         response_from_get_as_json = common_test_helper.read_result_body(get_all_response)
 
-        assert len(response_from_get_as_json) == 1
-        assert response_from_get_as_json[0][table.DISTRIBUTION_ID] == common_test_helper.read_result_body(response_from_post)
+        assert response_from_get_as_json[table.DISTRIBUTION_ID] == common_test_helper.read_result_body(response_from_post)
 
 
 if __name__ == '__main__':

@@ -90,7 +90,7 @@ def get_edition(event, context):
     fe = Key(table.EDITION_ID).eq(edition_id) & Key(table.DATASET_ID).eq(dataset_id) & Key(table.VERSION_ID).eq(version_id)
     db_response = edition_table.scan(FilterExpression=fe)
 
-    body = db_response["Items"]
+    body = db_response["Items"][0]
 
     return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"],
                            body)

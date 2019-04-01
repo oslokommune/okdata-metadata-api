@@ -68,7 +68,7 @@ def get_dataset(event, context):
         KeyConditionExpression=Key(common.DATASET_ID).eq(dataset_id)
     )
 
-    body = db_response["Items"]
+    body = db_response["Items"][0]
 
     return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"],
                            body)

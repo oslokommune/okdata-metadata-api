@@ -99,8 +99,7 @@ class VersionTest(unittest.TestCase):
         response_from_get_as_json = common_test_helper.read_result_body(
             version_handler.get_version(path_parameter_for_get_event, None))
 
-        assert len(response_from_get_as_json) == 1
-        assert response_from_get_as_json[0][table.VERSION_ID] == common_test_helper.read_result_body(
+        assert response_from_get_as_json[table.VERSION_ID] == common_test_helper.read_result_body(
             response_from_post_as_json)
 
 
