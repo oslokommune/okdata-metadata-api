@@ -125,6 +125,27 @@ class DistributionTest(unittest.TestCase):
 
         assert response_from_get_as_json[table.DISTRIBUTION_ID] == common_test_helper.read_result_body(response_from_post)
 
+    @mock_dynamodb2
+    def test_distribution_not_found(self):
+        dynamodb = boto3.resource('dynamodb', 'eu-west-1')
+        common_test_helper.create_dataset_table(dynamodb)
+        common_test_helper.create_version_table(dynamodb)
+        common_test_helper.create_edition_table(dynamodb)
+        common_test_helper.create_distribution_table(dynamodb)
+
+        event_for_get = {
+            "pathParameters": {
+                "dataset-id": "1234",
+                "version-id": "1",
+                "edition-id": "20190401T133700",
+                "distribution-id": "file.txt"
+            }
+        }
+
+        response = distribution_handler.get_distribution(event_for_get, None)
+
+        assert response["statusCode"] == 404
+
 
 if __name__ == '__main__':
     unittest.main()

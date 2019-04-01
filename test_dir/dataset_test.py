@@ -94,6 +94,21 @@ class DatasetTest(unittest.TestCase):
 
         assert response_from_get_as_json[table.DATASET_ID] == response_from_post_as_json
 
+    @mock_dynamodb2
+    def test_dataset_not_found(self):
+        dynamodb = boto3.resource('dynamodb', 'eu-west-1')
+        common.create_dataset_table(dynamodb)
+
+        event_for_get = {
+            "pathParameters": {
+                "dataset-id": "1234"
+            }
+        }
+
+        response = dataset_handler.get_dataset(event_for_get, None)
+
+        assert response["statusCode"] == 404
+
 
 if __name__ == '__main__':
     unittest.main()
