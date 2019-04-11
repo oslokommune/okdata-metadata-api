@@ -87,8 +87,11 @@ def dataset_exists(dataset_name):
 
 
 def generate_unique_id_based_on_title(title):
-    return (title.replace(" ", "-").replace("ø", "oe").replace("å", "aa").replace("æ", "ae"))[
-           :30] + "-" + shortuuid.ShortUUID().random(length=5)
+    id = slugify(title)[:50]
+    if dataset_exists(id):
+        return id + "-" + shortuuid.ShortUUID().random(length=5)
+    else:
+        return id
 
 
 def slugify(title):

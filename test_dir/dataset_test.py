@@ -23,6 +23,7 @@ class DatasetTest(unittest.TestCase):
         response = dataset_handler.post_dataset(event, None)
 
         assert response["statusCode"] == 200
+        assert response["body"] == 'antall-besokende-pa-gjenbruksstasjoner'
 
     @mock_dynamodb2
     def test_update_dataset(self):
