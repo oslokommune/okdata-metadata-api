@@ -1,6 +1,7 @@
 from difflib import SequenceMatcher
 
 import boto3
+import re
 import shortuuid
 import simplejson as json
 from boto3.dynamodb.conditions import Key
@@ -88,6 +89,18 @@ def dataset_exists(dataset_name):
 def generate_unique_id_based_on_title(title):
     return (title.replace(" ", "-").replace("ø", "oe").replace("å", "aa").replace("æ", "ae"))[
            :30] + "-" + shortuuid.ShortUUID().random(length=5)
+
+
+def slugify(title):
+    a = 'àáäâãåăçèéëêæǵḧìíïîḿńǹñòóöôœøṕŕßśșțùúüûǘẃẍÿź_'
+    b = 'aaaaaaaceeeeeghiiiimnnnooooooprssstuuuuuwxyz '
+    tr = str.maketrans(a, b)
+    t = re.sub('\W+', '-', title.lower().translate(tr))
+    if t[0] == '-':
+        t = t[1:]
+    if t[-1] == '-':
+        t = t[0:-1]
+    return t
 
 
 def check_similarity_to_other_datasets(input_json):
