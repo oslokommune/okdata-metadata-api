@@ -23,6 +23,7 @@ class DatasetTest(unittest.TestCase):
         response = dataset_handler.post_dataset(event, None)
 
         assert response["statusCode"] == 200
+        assert response["body"] == '\"antall-besokende-pa-gjenbruksstasjoner\"'
 
     @mock_dynamodb2
     def test_update_dataset(self):
@@ -109,6 +110,12 @@ class DatasetTest(unittest.TestCase):
 
         assert response["statusCode"] == 404
 
+
+    def test_slugify(self):
+        title = '  Tittel på datasett 42 med spesialtegn :+*/\_[](){} og norske tegn ÆØÅ  '
+        result = dataset_handler.slugify(title)
+
+        assert result == 'tittel-pa-datasett-42-med-spesialtegn-og-norske-tegn-eoa'
 
 if __name__ == '__main__':
     unittest.main()
