@@ -20,11 +20,6 @@ plugins:
   - serverless-aws-documentation
   - serverless-python-requirements
 
-package:
-  individually: true
-  exclude:
-    - './**'
-
 custom:
   pythonRequirements:
     dockerizePip: non-linux

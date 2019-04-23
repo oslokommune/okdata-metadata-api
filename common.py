@@ -1,4 +1,4 @@
-import simplejson as json
+import json
 
 DATASET_ID = "datasetID"
 VERSION_ID = "versionID"
