@@ -46,9 +46,12 @@ def create_dataset(content):
 
 
 def update_dataset(dataset_id, content):
+    if not dataset_exists(dataset_id):
+        return False
+
     content[common.DATASET_ID] = dataset_id
-    db_response = dataset_table.put_item(Item=content)
-    return db_response
+    dataset_table.put_item(Item=content)
+    return True
 
 
 def generate_unique_id_based_on_title(title):

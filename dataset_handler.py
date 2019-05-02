@@ -19,15 +19,13 @@ def post_dataset(event, context):
 def update_dataset(event, context):
     """PUT /datasets/:dataset-id"""
 
-    body_as_json = json.loads(event["body"])
+    content = json.loads(event["body"])
     dataset_id = event["pathParameters"]["dataset-id"]
 
-    if not dataset_repository.dataset_exists(dataset_id):
+    if dataset_repository.update_dataset(dataset_id, content):
+        return common.response(200, dataset_id)
+    else:
         return common.response(404, "Selected dataset does not exist. Could not update dataset.")
-
-    dataset_repository.update_dataset(dataset_id, body_as_json)
-
-    return common.response(200, dataset_id)
 
 
 def get_datasets(event, context):
