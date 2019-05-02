@@ -1,8 +1,4 @@
 handler: distribution_handler.post_distribution
-package:
-  include:
-    - distribution_handler.py
-    - common.py
 events:
   - http:
       path: "datasets/{dataset-id}/versions/{version-id}/editions/{edition-id}/distributions"

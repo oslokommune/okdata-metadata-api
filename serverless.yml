@@ -21,9 +21,10 @@ plugins:
   - serverless-python-requirements
 
 package:
-  individually: true
   exclude:
     - './**'
+  include:
+    - './*.py'
 
 custom:
   pythonRequirements:

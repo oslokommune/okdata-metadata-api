@@ -1,8 +1,4 @@
 handler: dataset_handler.get_dataset
-package:
-  include:
-    - dataset_handler.py
-    - common.py
 events:
   - http:
       path: "/datasets/{dataset-id}"
