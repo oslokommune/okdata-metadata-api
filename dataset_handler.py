@@ -31,9 +31,9 @@ def update_dataset(event, context):
 def get_datasets(event, context):
     """GET /datasets"""
 
-    body = dataset_repository.get_datasets()
+    datasets = dataset_repository.get_datasets()
 
-    return common.response(200, body)
+    return common.response(200, datasets)
 
 
 def get_dataset(event, context):
