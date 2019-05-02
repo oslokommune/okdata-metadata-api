@@ -1,16 +1,11 @@
 from difflib import SequenceMatcher
 
-import boto3
 import re
 import shortuuid
 import simplejson as json
-from boto3.dynamodb.conditions import Key
 
 import common
-
-dynamodb = boto3.resource('dynamodb', 'eu-west-1')
-table_name_prefix = "metadata-api"
-dataset_table = dynamodb.Table(table_name_prefix + "-dataset")
+import dataset_repository
 
 
 def post_dataset(event, context):
@@ -19,76 +14,49 @@ def post_dataset(event, context):
     body_as_json = json.loads(event["body"])
     title_from_body = body_as_json["title"]
     unique_id = generate_unique_id_based_on_title(title_from_body)
-    body_as_json[common.DATASET_ID] = unique_id
-    db_response = dataset_table.put_item(Item=body_as_json)
-    body = unique_id
 
-    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"],
-                           body)
+    db_response = dataset_repository.create_dataset(unique_id, body_as_json)
+
+    return common.response(200, unique_id)
 
 
 def update_dataset(event, context):
-    """PUT /datasets:dataset-id"""
+    """PUT /datasets/:dataset-id"""
 
     body_as_json = json.loads(event["body"])
     dataset_id = event["pathParameters"]["dataset-id"]
 
-    if not dataset_exists(dataset_id):
+    if not dataset_repository.dataset_exists(dataset_id):
         return common.response(404, "Selected dataset does not exist. Could not update dataset.")
 
-    body_as_json[common.DATASET_ID] = dataset_id
+    dataset_repository.update_dataset(dataset_id, body_as_json)
 
-    db_response = dataset_table.put_item(Item=body_as_json)
-
-    body = dataset_id
-
-    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"],
-                           body)
+    return common.response(200, dataset_id)
 
 
 def get_datasets(event, context):
     """GET /datasets"""
 
-    db_response = dataset_table.scan()
+    body = dataset_repository.get_datasets()
 
-    body = db_response["Items"]
-
-    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"],
-                           body)
+    return common.response(200, body)
 
 
 def get_dataset(event, context):
     """GET /datasets/:dataset-id"""
 
     dataset_id = event["pathParameters"]["dataset-id"]
+    dataset = dataset_repository.get_dataset(dataset_id)
 
-    if not dataset_exists(dataset_id):
+    if dataset:
+        return common.response(200, dataset)
+    else:
         return common.response(404, "Selected dataset does not exist.")
-
-    db_response = dataset_table.query(
-        KeyConditionExpression=Key(common.DATASET_ID).eq(dataset_id)
-    )
-
-    if len(db_response["Items"]) == 0:
-        return common.response(404, "Selected dataset does not exist.")
-
-    body = db_response["Items"][0]
-
-    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"],
-                           body)
-
-
-def dataset_exists(dataset_name):
-    db_response = dataset_table.query(
-        KeyConditionExpression=Key(common.DATASET_ID).eq(dataset_name)
-    )
-
-    return len(db_response["Items"]) > 0
 
 
 def generate_unique_id_based_on_title(title):
     id = slugify(title)[:50]
-    if dataset_exists(id):
+    if dataset_repository.dataset_exists(id):
         return id + "-" + shortuuid.ShortUUID().random(length=5)
     else:
         return id

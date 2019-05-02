@@ -5,6 +5,8 @@ VERSION_ID = "versionID"
 EDITION_ID = "editionID"
 DISTRIBUTION_ID = "distributionID"
 
+table_name_prefix = "metadata-api"
+
 
 def response(statusCode, body):
     return {
