@@ -1,56 +1,43 @@
 # -*- coding: utf-8 -*-
 
-import boto3
-import shortuuid
 import simplejson as json
-from boto3.dynamodb.conditions import Key
 
 import common
-import common as table
-
-dynamodb = boto3.resource('dynamodb', 'eu-west-1')
-
-table_name_prefix = "metadata-api"
-version_table = dynamodb.Table(table_name_prefix + "-version")
-dataset_table = dynamodb.Table(table_name_prefix + "-dataset")
+import dataset_repository
+import version_repository
 
 
 def post_version(event, context):
     """POST /datasets/:dataset-id/versions"""
 
-    body_as_json = json.loads(event["body"])
+    content = json.loads(event["body"])
     dataset_id = event["pathParameters"]["dataset-id"]
-    body_as_json[table.DATASET_ID] = dataset_id
 
-    version_from_body = body_as_json["version"]
-    unique_id = generate_unique_id(version_from_body)
-    body_as_json[table.VERSION_ID] = unique_id
-    if not dataset_exists(dataset_id):
-        return common.response(404, "Selected dataset does not exist. Could not post version.")
+    if not dataset_repository.dataset_exists(dataset_id):
+        return common.response(404, "Selected dataset does not exist. Could not create version.")
 
-    db_response = version_table.put_item(Item=body_as_json)
+    version_id = version_repository.create_version(dataset_id, content)
 
-    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"], unique_id)
+    if version_id:
+        return common.response(200, version_id)
+    else:
+        return common.response(400, "Error creating version.")
 
 
 def update_version(event, context):
     """PUT /datasets/:dataset-id/versions/:version-id"""
 
-    body_as_json = json.loads(event["body"])
+    content = json.loads(event["body"])
     dataset_id = event["pathParameters"]["dataset-id"]
     version_id = event["pathParameters"]["version-id"]
 
-    if not dataset_exists(dataset_id):
+    if not dataset_repository.dataset_exists(dataset_id):
         return common.response(404, "Selected dataset does not exist. Could not update version.")
 
-    if not version_exists(version_id):
+    if version_repository.update_version(version_id, content):
+        return common.response(200, version_id)
+    else:
         return common.response(404, "Selected version does not exist. Could not update version.")
-
-    body_as_json[table.DATASET_ID] = dataset_id
-    body_as_json[table.VERSION_ID] = version_id
-    db_response = version_table.put_item(Item=body_as_json)
-
-    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"], version_id)
 
 
 def get_versions(event, context):
@@ -58,12 +45,9 @@ def get_versions(event, context):
 
     dataset_id = event["pathParameters"]["dataset-id"]
 
-    db_response = version_table.scan(
-        FilterExpression=Key(table.DATASET_ID).eq(dataset_id)
-    )
+    versions = version_repository.get_versions(dataset_id)
 
-    body = db_response["Items"]
-    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"], body)
+    return common.response(200, versions)
 
 
 def get_version(event, context):
@@ -72,35 +56,9 @@ def get_version(event, context):
     dataset_id = event["pathParameters"]["dataset-id"]
     version_id = event["pathParameters"]["version-id"]
 
-    db_response = version_table.scan(
-        FilterExpression=Key(table.VERSION_ID).eq(version_id) & Key(table.DATASET_ID).eq(dataset_id)
-    )
+    version = version_repository.get_version(version_id)
 
-    if len(db_response["Items"]) == 0:
+    if version:
+        return common.response(200, version)
+    else:
         return common.response(404, "Selected version does not exist.")
-
-    body = db_response["Items"][0]
-
-    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"], body)
-
-
-def version_exists(version_name):
-    version_table = dynamodb.Table(table_name_prefix + "-version")
-
-    db_response = version_table.query(
-        KeyConditionExpression=Key(table.VERSION_ID).eq(version_name)
-    )
-
-    return len(db_response["Items"]) > 0
-
-
-def dataset_exists(dataset_name):
-    db_response = dataset_table.query(
-        KeyConditionExpression=Key(table.DATASET_ID).eq(dataset_name)
-    )
-
-    return len(db_response["Items"]) > 0
-
-
-def generate_unique_id(type_string):
-    return type_string + "-" + shortuuid.ShortUUID().random(length=8)
