@@ -160,23 +160,54 @@ dataset_event_updated = {
 }
 
 version_event = {
-    "body": '{\n    "version": "6",\n    "schema": {},\n    "transformation": {}\n}'
+    "body": """
+{
+  "version": "6",
+  "schema": {},
+  "transformation": {}
+}"""
 }
 version_event_updated = {
-    "body": '{\n    "version": "6-TEST",\n    "schema": {},\n    "transformation": {}\n}'
+    "body": """
+{
+  "version": "6-TEST",
+  "schema": {},
+  "transformation": {}
+}"""
 }
 
 edition_event = {
-    "body": '{\n    "description": "Data for one hour",\n    "startTime": "2018-12-21T08:00:00+01:00",\n    "endTime": "2018-12-21T09:00:00+01:00"\n}'
+    "body": """
+{
+  "description": "Data for one hour",
+  "startTime": "2018-12-21T08:00:00+01:00",
+  "endTime": "2018-12-21T09:00:00+01:00"
+}"""
 }
 
 edition_event_updated = {
-    "body": '{\n    "description": "CHANGED",\n    "startTime": "2018-12-21T08:00:00+01:00",\n    "endTime": "2018-12-21T09:00:00+01:00"\n}'
+    "body": """
+{
+  "description": "CHANGED",
+  "startTime": "2018-12-21T08:00:00+01:00",
+  "endTime": "2018-12-21T09:00:00+01:00"
+}"""
 }
 
 distribution_event = {
-    "body": '{\n    "filename": "BOOOM.csv",\n    "format": "text/csv",\n    "checksum": "..."\n}'
+    "body": """
+{
+  "filename": "BOOOM.csv",
+  "format": "text/csv",
+  "checksum": "..."
+}"""
 }
+
 distribution_event_updated = {
-    "body": '{\n    "filename": "UPDATED.csv",\n    "format": "text/csv",\n    "checksum": "..."\n}'
+    "body": """
+{
+  "filename": "UPDATED.csv",
+  "format": "text/csv",
+  "checksum": "..."
+}"""
 }
