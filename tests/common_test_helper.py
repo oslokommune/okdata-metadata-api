@@ -114,21 +114,49 @@ def create_table(dynamodb, table_name, hashkey, rangekey=None):
 
 
 dataset_event = {
-    "body": '{\n  "title": "Antall besøkende på gjenbruksstasjoner",'
-    '\n  "description": "Sensordata fra tellere på gjenbruksstasjonene",\n  "keywords": [\n    '
-    '"avfall",\n    "besøkende",\n    "gjenbruksstasjon"\n  ],\n  "frequency": "hourly",\n  '
-    '"accessRights": ":non-public",\n  "privacyLevel": "green",\n  "objective": '
-    '"Formålsbeskrivelse",\n  "contactPoint": {\n    "name": "Tim",\n    "email": '
-    '"tim@oslo.kommune.no",\n    "phone": "98765432"\n  },\n  "publisher": "REN"\n}'
+    "body": """
+{
+  "title": "Antall besøkende på gjenbruksstasjoner",
+  "description": "Sensordata fra tellere på gjenbruksstasjonene",
+  "keywords": [
+    "avfall",
+    "besøkende",
+    "gjenbruksstasjon"
+  ],
+  "frequency": "hourly",
+  "accessRights": ":non-public",
+  "privacyLevel": "green",
+  "objective": "Formålsbeskrivelse",
+  "contactPoint": {
+    "name": "Tim",
+    "email": "tim@oslo.kommune.no",
+    "phone": "98765432"
+  },
+  "publisher": "REN"
+}"""
 }
 
 dataset_event_updated = {
-    "body": '{\n  "title": "UPDATED TITLE",'
-    '\n  "description": "Sensordata fra tellere på gamle gjenbruksstasjoner",\n  "keywords": [\n    '
-    '"avfall",\n    "besøkende",\n    "gjenbruksstasjon"\n  ],\n  "frequency": "hourly",\n  '
-    '"accessRights": ":restricted",\n  "privacyLevel": "red",\n  "objective": '
-    '"Formålsbeskrivelse",\n  "contactPoint": {\n    "name": "Tim",\n    "email": '
-    '"tim@oslo.kommune.no",\n    "phone": "12345678"\n  },\n  "publisher": "REN"\n}'
+    "body": """
+{
+  "title": "UPDATED TITLE",
+  "description": "Sensordata fra tellere på gamle gjenbruksstasjoner",
+  "keywords": [
+    "avfall",
+    "besøkende",
+    "gjenbruksstasjon"
+  ],
+  "frequency": "hourly",
+  "accessRights": ":restricted",
+  "privacyLevel": "red",
+  "objective": "Formålsbeskrivelse",
+  "contactPoint": {
+    "name": "Tim",
+    "email": "tim@oslo.kommune.no",
+    "phone": "12345678"
+  },
+  "publisher": "REN"
+}"""
 }
 
 version_event = {
