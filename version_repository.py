@@ -5,7 +5,7 @@ import shortuuid
 import common
 
 
-dynamodb = boto3.resource('dynamodb', 'eu-west-1')
+dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
 version_table = dynamodb.Table(common.table_name_prefix + "-version")
 
@@ -45,7 +45,7 @@ def create_version(dataset_id, content):
     content[common.VERSION_ID] = version_id
     db_response = version_table.put_item(Item=content)
 
-    http_status = db_response['ResponseMetadata']['HTTPStatusCode']
+    http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
 
     if http_status == 200:
         return version_id
@@ -63,7 +63,7 @@ def update_version(version_id, content):
 
     db_response = version_table.put_item(Item=content)
 
-    http_status = db_response['ResponseMetadata']['HTTPStatusCode']
+    http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
 
     return http_status == 200
 

@@ -11,8 +11,6 @@ table_name_prefix = "metadata-api"
 def response(statusCode, body):
     return {
         "statusCode": statusCode,
-        "headers": {
-            "Access-Control-Allow-Origin": "*"
-        },
-        "body": json.dumps(body)
+        "headers": {"Access-Control-Allow-Origin": "*"},
+        "body": json.dumps(body),
     }
