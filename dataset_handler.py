@@ -13,7 +13,10 @@ def post_dataset(event, context):
 
     dataset_id = dataset_repository.create_dataset(content)
 
-    return common.response(200, dataset_id)
+    if dataset_id:
+        return common.response(200, dataset_id)
+    else:
+        return common.response(400, "Error creating dataset.")
 
 
 def update_dataset(event, context):

@@ -41,8 +41,14 @@ def create_dataset(content):
     dataset_id = generate_unique_id_based_on_title(title)
 
     content[common.DATASET_ID] = dataset_id
-    dataset_table.put_item(Item=content)
-    return dataset_id
+    db_response = dataset_table.put_item(Item=content)
+
+    http_status = db_response['ResponseMetadata']['HTTPStatusCode']
+
+    if http_status == 200:
+        return dataset_id
+    else:
+        return None
 
 
 def update_dataset(dataset_id, content):
@@ -50,8 +56,11 @@ def update_dataset(dataset_id, content):
         return False
 
     content[common.DATASET_ID] = dataset_id
-    dataset_table.put_item(Item=content)
-    return True
+    db_response = dataset_table.put_item(Item=content)
+
+    http_status = db_response['ResponseMetadata']['HTTPStatusCode']
+
+    return http_status == 200
 
 
 def generate_unique_id_based_on_title(title):
