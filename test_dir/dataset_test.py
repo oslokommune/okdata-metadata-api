@@ -9,6 +9,7 @@ from moto import mock_dynamodb2
 
 import common as table
 import dataset_handler
+import dataset_repository
 import test_dir.common_test_helper as common
 
 
@@ -113,7 +114,7 @@ class DatasetTest(unittest.TestCase):
 
     def test_slugify(self):
         title = '  Tittel på datasett 42 med spesialtegn :+*/\_[](){} og norske tegn ÆØÅ  '
-        result = dataset_handler.slugify(title)
+        result = dataset_repository.slugify(title)
 
         assert result == 'tittel-pa-datasett-42-med-spesialtegn-og-norske-tegn-eoa'
 
