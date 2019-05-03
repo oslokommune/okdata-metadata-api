@@ -45,6 +45,9 @@ def get_versions(event, context):
 
     dataset_id = event["pathParameters"]["dataset-id"]
 
+    if not dataset_repository.dataset_exists(dataset_id):
+        return common.response(404, "Selected dataset does not exist. Could not get versions.")
+
     versions = version_repository.get_versions(dataset_id)
 
     return common.response(200, versions)
@@ -55,6 +58,9 @@ def get_version(event, context):
 
     dataset_id = event["pathParameters"]["dataset-id"]
     version_id = event["pathParameters"]["version-id"]
+
+    if not dataset_repository.dataset_exists(dataset_id):
+        return common.response(404, "Selected dataset does not exist. Could not get version.")
 
     version = version_repository.get_version(version_id)
 
