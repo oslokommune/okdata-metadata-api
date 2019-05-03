@@ -16,10 +16,11 @@ setuptools.setup(
     py_modules=[
         'common',
         'dataset_handler',
-        'dataset_repository',
         'version_handler',
         'edition_handler',
-        'distribution_handler'
+        'distribution_handler',
+        'dataset_repository',
+        'version_repository',
     ],
     install_requires=[
         'simplejson==3.16.0',
