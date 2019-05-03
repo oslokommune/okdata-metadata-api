@@ -1,5 +1,3 @@
-from difflib import SequenceMatcher
-
 import simplejson as json
 
 import common
@@ -49,16 +47,3 @@ def get_dataset(event, context):
         return common.response(200, dataset)
     else:
         return common.response(404, "Selected dataset does not exist.")
-
-
-def check_similarity_to_other_datasets(input_json):
-    already_existing_datasets = dataset_table.scan()["Items"]
-    print("--- Datasets ---")
-    for dataset in already_existing_datasets:
-        print("-----" + dataset["title"])
-        for item in input_json:
-            print(item + ": " + str(similar(str(dataset[item]), str(input_json[item]))))
-
-
-def similar(a, b):
-    return SequenceMatcher(None, a, b).ratio()

@@ -3,6 +3,8 @@ from boto3.dynamodb.conditions import Key
 import re
 import shortuuid
 
+from difflib import SequenceMatcher
+
 import common
 
 
@@ -75,9 +77,22 @@ def slugify(title):
     a = 'àáäâãåăçèéëêæǵḧìíïîḿńǹñòóöôœøṕŕßśșțùúüûǘẃẍÿź_'
     b = 'aaaaaaaceeeeeghiiiimnnnooooooprssstuuuuuwxyz '
     tr = str.maketrans(a, b)
-    t = re.sub('\W+', '-', title.lower().translate(tr))
+    t = re.sub('\\W+', '-', title.lower().translate(tr))
     if t[0] == '-':
         t = t[1:]
     if t[-1] == '-':
         t = t[0:-1]
     return t
+
+
+def check_similarity_to_other_datasets(input_json):
+    already_existing_datasets = dataset_table.scan()["Items"]
+    print("--- Datasets ---")
+    for dataset in already_existing_datasets:
+        print("-----" + dataset["title"])
+        for item in input_json:
+            print(item + ": " + str(similar(str(dataset[item]), str(input_json[item]))))
+
+
+def similar(a, b):
+    return SequenceMatcher(None, a, b).ratio()
