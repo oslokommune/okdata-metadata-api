@@ -10,7 +10,7 @@ from moto import mock_dynamodb2
 import common as table
 import dataset_handler
 import dataset_repository
-import test_dir.common_test_helper as common
+import common_test_helper as common
 
 
 class DatasetTest(unittest.TestCase):

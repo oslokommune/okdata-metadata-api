@@ -7,7 +7,7 @@ from moto import mock_dynamodb2
 
 import common as table
 import version_handler
-from test_dir import common_test_helper
+import common_test_helper
 
 
 class VersionTest(unittest.TestCase):
