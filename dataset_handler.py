@@ -26,7 +26,9 @@ def update_dataset(event, context):
     if dataset_repository.update_dataset(dataset_id, content):
         return common.response(200, dataset_id)
     else:
-        return common.response(404, "Selected dataset does not exist. Could not update dataset.")
+        return common.response(
+            404, "Selected dataset does not exist. Could not update dataset."
+        )
 
 
 def get_datasets(event, context):

@@ -14,7 +14,9 @@ def post_version(event, context):
     dataset_id = event["pathParameters"]["dataset-id"]
 
     if not dataset_repository.dataset_exists(dataset_id):
-        return common.response(404, "Selected dataset does not exist. Could not create version.")
+        return common.response(
+            404, "Selected dataset does not exist. Could not create version."
+        )
 
     version_id = version_repository.create_version(dataset_id, content)
 
@@ -32,12 +34,16 @@ def update_version(event, context):
     version_id = event["pathParameters"]["version-id"]
 
     if not dataset_repository.dataset_exists(dataset_id):
-        return common.response(404, "Selected dataset does not exist. Could not update version.")
+        return common.response(
+            404, "Selected dataset does not exist. Could not update version."
+        )
 
     if version_repository.update_version(version_id, content):
         return common.response(200, version_id)
     else:
-        return common.response(404, "Selected version does not exist. Could not update version.")
+        return common.response(
+            404, "Selected version does not exist. Could not update version."
+        )
 
 
 def get_versions(event, context):
@@ -46,7 +52,9 @@ def get_versions(event, context):
     dataset_id = event["pathParameters"]["dataset-id"]
 
     if not dataset_repository.dataset_exists(dataset_id):
-        return common.response(404, "Selected dataset does not exist. Could not get versions.")
+        return common.response(
+            404, "Selected dataset does not exist. Could not get versions."
+        )
 
     versions = version_repository.get_versions(dataset_id)
 
@@ -60,7 +68,9 @@ def get_version(event, context):
     version_id = event["pathParameters"]["version-id"]
 
     if not dataset_repository.dataset_exists(dataset_id):
-        return common.response(404, "Selected dataset does not exist. Could not get version.")
+        return common.response(
+            404, "Selected dataset does not exist. Could not get version."
+        )
 
     version = version_repository.get_version(version_id)
 

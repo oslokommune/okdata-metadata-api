@@ -14,16 +14,13 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.oslo.kommune.no/origo-dataplatform/metadata-api",
     py_modules=[
-        'common',
-        'dataset_handler',
-        'version_handler',
-        'edition_handler',
-        'distribution_handler',
-        'dataset_repository',
-        'version_repository',
+        "common",
+        "dataset_handler",
+        "version_handler",
+        "edition_handler",
+        "distribution_handler",
+        "dataset_repository",
+        "version_repository",
     ],
-    install_requires=[
-        'simplejson==3.16.0',
-        'shortuuid==0.5.0'
-    ]
+    install_requires=["simplejson==3.16.0", "shortuuid==0.5.0"],
 )

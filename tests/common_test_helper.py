@@ -36,7 +36,9 @@ def post_version(d_event, *version_events):
 
 
 def post_edition(d_event, v_event, *edition_events):
-    response_from_dataset_post, response_from_version_post = post_version(d_event, v_event)
+    response_from_dataset_post, response_from_version_post = post_version(
+        d_event, v_event
+    )
     response_from_version_post = response_from_version_post[0]
     assert response_from_version_post["statusCode"] == 200
 
@@ -45,10 +47,7 @@ def post_edition(d_event, v_event, *edition_events):
 
     edition_responses = []
     for e_event in edition_events:
-        e_event["pathParameters"] = {
-            "version-id": version_id,
-            "dataset-id": dataset_id
-        }
+        e_event["pathParameters"] = {"version-id": version_id, "dataset-id": dataset_id}
         edition_responses.append(edition_handler.post_edition(e_event, None))
     return response_from_dataset_post, response_from_version_post, edition_responses
 
@@ -67,113 +66,148 @@ def post_distribution(d_event, v_event, e_event, *distribution_events):
         distribution_event["pathParameters"] = {
             "version-id": version_id,
             "dataset-id": dataset_id,
-            "edition-id": edition_id
+            "edition-id": edition_id,
         }
-        distribution_responses.append(distribution_handler.post_distribution(distribution_event, None))
+        distribution_responses.append(
+            distribution_handler.post_distribution(distribution_event, None)
+        )
 
     return d_res, v_res, e_res, distribution_responses
 
 
 def create_dataset_table(dynamodb):
-    return create_table(dynamodb,
-                        dataset_table_name,
-                        table.DATASET_ID)
+    return create_table(dynamodb, dataset_table_name, table.DATASET_ID)
 
 
 def create_version_table(dynamodb):
-    return create_table(dynamodb,
-                        version_table_name,
-                        table.VERSION_ID,
-                        table.DATASET_ID)
+    return create_table(
+        dynamodb, version_table_name, table.VERSION_ID, table.DATASET_ID
+    )
 
 
 def create_edition_table(dynamodb):
-    return create_table(dynamodb,
-                        edition_table_name,
-                        table.EDITION_ID,
-                        table.DATASET_ID)
+    return create_table(
+        dynamodb, edition_table_name, table.EDITION_ID, table.DATASET_ID
+    )
 
 
 def create_distribution_table(dynamodb):
-    return create_table(dynamodb,
-                        distribution_table_name,
-                        table.DISTRIBUTION_ID,
-                        table.DATASET_ID)
+    return create_table(
+        dynamodb, distribution_table_name, table.DISTRIBUTION_ID, table.DATASET_ID
+    )
 
 
-def create_table(dynamodb,
-                 table_name,
-                 hashkey,
-                 rangekey=None
-                 ):
-    keyschema = [
-        {
-            'AttributeName': hashkey,
-            'KeyType': 'HASH'
-        }
-    ]
+def create_table(dynamodb, table_name, hashkey, rangekey=None):
+    keyschema = [{"AttributeName": hashkey, "KeyType": "HASH"}]
 
-    attributes = [
-        {
-            'AttributeName': hashkey,
-            'AttributeType': 'S'
-        }
-    ]
+    attributes = [{"AttributeName": hashkey, "AttributeType": "S"}]
     if rangekey:
-        keyschema.append({
-            'AttributeName': hashkey,
-            'KeyType': 'RANGE'
-        })
-        attributes.append({
-            'AttributeName': rangekey,
-            'AttributeType': 'S'
-        })
+        keyschema.append({"AttributeName": hashkey, "KeyType": "RANGE"})
+        attributes.append({"AttributeName": rangekey, "AttributeType": "S"})
 
     return dynamodb.create_table(
         TableName=table_name,
         KeySchema=keyschema,
         AttributeDefinitions=attributes,
-        ProvisionedThroughput={
-            'ReadCapacityUnits': 5,
-            'WriteCapacityUnits': 5
-        }
+        ProvisionedThroughput={"ReadCapacityUnits": 5, "WriteCapacityUnits": 5},
     )
 
 
 dataset_event = {
-    "body": "{\n  \"title\": \"Antall besøkende på gjenbruksstasjoner\","
-            "\n  \"description\": \"Sensordata fra tellere på gjenbruksstasjonene\",\n  \"keywords\": [\n    "
-            "\"avfall\",\n    \"besøkende\",\n    \"gjenbruksstasjon\"\n  ],\n  \"frequency\": \"hourly\",\n  "
-            "\"accessRights\": \":non-public\",\n  \"privacyLevel\": \"green\",\n  \"objective\": "
-            "\"Formålsbeskrivelse\",\n  \"contactPoint\": {\n    \"name\": \"Tim\",\n    \"email\": "
-            "\"tim@oslo.kommune.no\",\n    \"phone\": \"98765432\"\n  },\n  \"publisher\": \"REN\"\n}"
+    "body": """
+{
+  "title": "Antall besøkende på gjenbruksstasjoner",
+  "description": "Sensordata fra tellere på gjenbruksstasjonene",
+  "keywords": [
+    "avfall",
+    "besøkende",
+    "gjenbruksstasjon"
+  ],
+  "frequency": "hourly",
+  "accessRights": ":non-public",
+  "privacyLevel": "green",
+  "objective": "Formålsbeskrivelse",
+  "contactPoint": {
+    "name": "Tim",
+    "email": "tim@oslo.kommune.no",
+    "phone": "98765432"
+  },
+  "publisher": "REN"
+}"""
 }
 
 dataset_event_updated = {
-    "body": "{\n  \"title\": \"UPDATED TITLE\","
-            "\n  \"description\": \"Sensordata fra tellere på gamle gjenbruksstasjoner\",\n  \"keywords\": [\n    "
-            "\"avfall\",\n    \"besøkende\",\n    \"gjenbruksstasjon\"\n  ],\n  \"frequency\": \"hourly\",\n  "
-            "\"accessRights\": \":restricted\",\n  \"privacyLevel\": \"red\",\n  \"objective\": "
-            "\"Formålsbeskrivelse\",\n  \"contactPoint\": {\n    \"name\": \"Tim\",\n    \"email\": "
-            "\"tim@oslo.kommune.no\",\n    \"phone\": \"12345678\"\n  },\n  \"publisher\": \"REN\"\n}"
+    "body": """
+{
+  "title": "UPDATED TITLE",
+  "description": "Sensordata fra tellere på gamle gjenbruksstasjoner",
+  "keywords": [
+    "avfall",
+    "besøkende",
+    "gjenbruksstasjon"
+  ],
+  "frequency": "hourly",
+  "accessRights": ":restricted",
+  "privacyLevel": "red",
+  "objective": "Formålsbeskrivelse",
+  "contactPoint": {
+    "name": "Tim",
+    "email": "tim@oslo.kommune.no",
+    "phone": "12345678"
+  },
+  "publisher": "REN"
+}"""
 }
 
 version_event = {
-    "body": "{\n    \"version\": \"6\",\n    \"schema\": {},\n    \"transformation\": {}\n}"
+    "body": """
+{
+  "version": "6",
+  "schema": {},
+  "transformation": {}
+}"""
 }
 version_event_updated = {
-    "body": "{\n    \"version\": \"6-TEST\",\n    \"schema\": {},\n    \"transformation\": {}\n}"
+    "body": """
+{
+  "version": "6-TEST",
+  "schema": {},
+  "transformation": {}
+}"""
 }
 
 edition_event = {
-    "body": "{\n    \"description\": \"Data for one hour\",\n    \"startTime\": \"2018-12-21T08:00:00+01:00\",\n    \"endTime\": \"2018-12-21T09:00:00+01:00\"\n}"
+    "body": """
+{
+  "description": "Data for one hour",
+  "startTime": "2018-12-21T08:00:00+01:00",
+  "endTime": "2018-12-21T09:00:00+01:00"
+}"""
 }
 
 edition_event_updated = {
-    "body": "{\n    \"description\": \"CHANGED\",\n    \"startTime\": \"2018-12-21T08:00:00+01:00\",\n    \"endTime\": \"2018-12-21T09:00:00+01:00\"\n}"
+    "body": """
+{
+  "description": "CHANGED",
+  "startTime": "2018-12-21T08:00:00+01:00",
+  "endTime": "2018-12-21T09:00:00+01:00"
+}"""
 }
 
 distribution_event = {
-    "body": "{\n    \"filename\": \"BOOOM.csv\",\n    \"format\": \"text/csv\",\n    \"checksum\": \"...\"\n}", }
+    "body": """
+{
+  "filename": "BOOOM.csv",
+  "format": "text/csv",
+  "checksum": "..."
+}"""
+}
+
 distribution_event_updated = {
-    "body": "{\n    \"filename\": \"UPDATED.csv\",\n    \"format\": \"text/csv\",\n    \"checksum\": \"...\"\n}", }
+    "body": """
+{
+  "filename": "UPDATED.csv",
+  "format": "text/csv",
+  "checksum": "..."
+}"""
+}

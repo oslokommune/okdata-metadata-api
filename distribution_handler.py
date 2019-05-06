@@ -9,7 +9,7 @@ from boto3.dynamodb.conditions import Key
 import common
 import common as table
 
-dynamodb = boto3.resource('dynamodb', 'eu-west-1')
+dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
 table_name_prefix = "metadata-api"
 distribution_table = dynamodb.Table(table_name_prefix + "-distribution")
@@ -44,8 +44,7 @@ def post_distribution(event, context):
 
     body = unique_id
 
-    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"],
-                           body)
+    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"], body)
 
 
 def update_distribution(event, context):
@@ -76,8 +75,9 @@ def update_distribution(event, context):
 
     db_response = distribution_table.put_item(Item=body_as_json)
 
-    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"],
-                           distribution_id)
+    return common.response(
+        db_response["ResponseMetadata"]["HTTPStatusCode"], distribution_id
+    )
 
 
 def get_distributions(event, context):
@@ -87,14 +87,17 @@ def get_distributions(event, context):
     version_id = event["pathParameters"]["version-id"]
     edition_id = event["pathParameters"]["edition-id"]
 
-    fe = Key(table.EDITION_ID).eq(edition_id) & Key(table.DATASET_ID).eq(dataset_id) & Key(table.VERSION_ID).eq(version_id)
+    fe = (
+        Key(table.EDITION_ID).eq(edition_id)
+        & Key(table.DATASET_ID).eq(dataset_id)
+        & Key(table.VERSION_ID).eq(version_id)
+    )
 
     db_response = distribution_table.scan(FilterExpression=fe)
 
     body = db_response["Items"]
 
-    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"],
-                           body)
+    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"], body)
 
 
 def get_distribution(event, context):
@@ -105,8 +108,12 @@ def get_distribution(event, context):
     edition_id = event["pathParameters"]["edition-id"]
     distribution_id = event["pathParameters"]["distribution-id"]
 
-    fe = Key(table.DISTRIBUTION_ID).eq(distribution_id) & Key(table.EDITION_ID).eq(edition_id) & Key(table.DATASET_ID).eq(
-        dataset_id) & Key(table.VERSION_ID).eq(version_id)
+    fe = (
+        Key(table.DISTRIBUTION_ID).eq(distribution_id)
+        & Key(table.EDITION_ID).eq(edition_id)
+        & Key(table.DATASET_ID).eq(dataset_id)
+        & Key(table.VERSION_ID).eq(version_id)
+    )
     db_response = distribution_table.scan(FilterExpression=fe)
 
     if len(db_response["Items"]) == 0:
@@ -114,8 +121,7 @@ def get_distribution(event, context):
 
     body = db_response["Items"][0]
 
-    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"],
-                           body)
+    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"], body)
 
 
 def distribution_exists(distribution_name):
@@ -159,7 +165,9 @@ def dataset_exists(dataset_name):
 
 
 def random_char(number_of_characters):
-    return ''.join(random.choice(string.ascii_letters) for x in range(number_of_characters))
+    return "".join(
+        random.choice(string.ascii_letters) for x in range(number_of_characters)
+    )
 
 
 def generate_unique_id(type_string):

@@ -6,7 +6,7 @@ from boto3.dynamodb.conditions import Key
 import common
 import common as table
 
-dynamodb = boto3.resource('dynamodb', 'eu-west-1')
+dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
 table_name_prefix = "metadata-api"
 edition_table = dynamodb.Table(table_name_prefix + "-edition")
@@ -34,8 +34,7 @@ def post_edition(event, context):
     db_response = edition_table.put_item(Item=body_as_json)
     body = unique_id
 
-    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"],
-                           body)
+    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"], body)
 
 
 def update_edition(event, context):
@@ -60,8 +59,9 @@ def update_edition(event, context):
     body_as_json[table.EDITION_ID] = edition_id
     db_response = edition_table.put_item(Item=body_as_json)
 
-    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"],
-                           version_id)
+    return common.response(
+        db_response["ResponseMetadata"]["HTTPStatusCode"], version_id
+    )
 
 
 def get_editions(event, context):
@@ -76,8 +76,7 @@ def get_editions(event, context):
 
     body = db_response["Items"]
 
-    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"],
-                           body)
+    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"], body)
 
 
 def get_edition(event, context):
@@ -87,7 +86,11 @@ def get_edition(event, context):
     version_id = event["pathParameters"]["version-id"]
     edition_id = event["pathParameters"]["edition-id"]
 
-    fe = Key(table.EDITION_ID).eq(edition_id) & Key(table.DATASET_ID).eq(dataset_id) & Key(table.VERSION_ID).eq(version_id)
+    fe = (
+        Key(table.EDITION_ID).eq(edition_id)
+        & Key(table.DATASET_ID).eq(dataset_id)
+        & Key(table.VERSION_ID).eq(version_id)
+    )
     db_response = edition_table.scan(FilterExpression=fe)
 
     if len(db_response["Items"]) == 0:
@@ -95,8 +98,7 @@ def get_edition(event, context):
 
     body = db_response["Items"][0]
 
-    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"],
-                           body)
+    return common.response(db_response["ResponseMetadata"]["HTTPStatusCode"], body)
 
 
 def edition_exists(edition_name):

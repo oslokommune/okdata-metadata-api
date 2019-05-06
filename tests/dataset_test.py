@@ -16,7 +16,7 @@ import common_test_helper as common
 class DatasetTest(unittest.TestCase):
     @mock_dynamodb2
     def test_post_dataset(self):
-        dynamodb = boto3.resource('dynamodb', 'eu-west-1')
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
         common.create_dataset_table(dynamodb)
 
         event = common.dataset_event
@@ -24,11 +24,11 @@ class DatasetTest(unittest.TestCase):
         response = dataset_handler.post_dataset(event, None)
 
         assert response["statusCode"] == 200
-        assert response["body"] == '\"antall-besokende-pa-gjenbruksstasjoner\"'
+        assert response["body"] == '"antall-besokende-pa-gjenbruksstasjoner"'
 
     @mock_dynamodb2
     def test_update_dataset(self):
-        dynamodb = boto3.resource('dynamodb', 'eu-west-1')
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
         dataset_table = common.create_dataset_table(dynamodb)
 
@@ -50,14 +50,15 @@ class DatasetTest(unittest.TestCase):
         assert response_from_post["statusCode"] == 200
 
         db_response = dataset_table.query(
-            KeyConditionExpression=Key(table.DATASET_ID).eq(response_from_first_post_as_json)
-
+            KeyConditionExpression=Key(table.DATASET_ID).eq(
+                response_from_first_post_as_json
+            )
         )
         assert db_response["Items"][0]["privacyLevel"] == "red"
 
     @mock_dynamodb2
     def test_get_all_datasets(self):
-        dynamodb = boto3.resource('dynamodb', 'eu-west-1')
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
         common.create_dataset_table(dynamodb)
 
@@ -77,7 +78,7 @@ class DatasetTest(unittest.TestCase):
 
     @mock_dynamodb2
     def test_get_one_dataset(self):
-        dynamodb = boto3.resource('dynamodb', 'eu-west-1')
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
         common.create_dataset_table(dynamodb)
 
@@ -86,37 +87,33 @@ class DatasetTest(unittest.TestCase):
         response_from_post = dataset_handler.post_dataset(event_for_post, None)["body"]
         response_from_post_as_json = json.loads(response_from_post)
 
-        event_for_get = {
-            "pathParameters": {
-                "dataset-id": response_from_post_as_json
-            }
-        }
+        event_for_get = {"pathParameters": {"dataset-id": response_from_post_as_json}}
 
-        response_from_get_as_json = json.loads(dataset_handler.get_dataset(event_for_get, None)["body"])
+        response_from_get_as_json = json.loads(
+            dataset_handler.get_dataset(event_for_get, None)["body"]
+        )
 
         assert response_from_get_as_json[table.DATASET_ID] == response_from_post_as_json
 
     @mock_dynamodb2
     def test_dataset_not_found(self):
-        dynamodb = boto3.resource('dynamodb', 'eu-west-1')
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
         common.create_dataset_table(dynamodb)
 
-        event_for_get = {
-            "pathParameters": {
-                "dataset-id": "1234"
-            }
-        }
+        event_for_get = {"pathParameters": {"dataset-id": "1234"}}
 
         response = dataset_handler.get_dataset(event_for_get, None)
 
         assert response["statusCode"] == 404
 
     def test_slugify(self):
-        title = '  Tittel på datasett 42 med spesialtegn :+*/\\_[](){} og norske tegn ÆØÅ  '
+        title = (
+            "  Tittel på datasett 42 med spesialtegn :+*/\\_[](){} og norske tegn ÆØÅ  "
+        )
         result = dataset_repository.slugify(title)
 
-        assert result == 'tittel-pa-datasett-42-med-spesialtegn-og-norske-tegn-eoa'
+        assert result == "tittel-pa-datasett-42-med-spesialtegn-og-norske-tegn-eoa"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
