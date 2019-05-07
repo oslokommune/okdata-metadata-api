@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from copy import deepcopy
 import json
 import unittest
 
@@ -19,7 +20,9 @@ class DatasetTest(unittest.TestCase):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
         common.create_dataset_table(dynamodb)
 
-        event = common.dataset_event
+        dataset = deepcopy(common.dataset)
+        dataset.pop(table.DATASET_ID)
+        event = {"body": json.dumps(common.dataset)}
 
         response = dataset_handler.post_dataset(event, None)
 
@@ -31,69 +34,55 @@ class DatasetTest(unittest.TestCase):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
         dataset_table = common.create_dataset_table(dynamodb)
+        dataset_table.put_item(Item=common.dataset)
 
-        event = common.dataset_event
-
-        response_from_post = dataset_handler.post_dataset(event, None)
-        response_from_first_post_as_json = json.loads(response_from_post["body"])
-
-        event_for_update = common.dataset_event_updated
-        event_for_update["pathParameters"] = {
-            "dataset-id": response_from_first_post_as_json
+        dataset_id = common.dataset[table.DATASET_ID]
+        event_for_update = {
+            "body": json.dumps(common.dataset_updated),
+            "pathParameters": {"dataset-id": dataset_id},
         }
 
-        assert response_from_post["statusCode"] == 200
-        response_from_post = dataset_handler.update_dataset(event_for_update, None)
-        response_from_second_post_as_json = json.loads(response_from_post["body"])
+        response = dataset_handler.update_dataset(event_for_update, None)
+        body = json.loads(response["body"])
 
-        assert response_from_first_post_as_json == response_from_second_post_as_json
-        assert response_from_post["statusCode"] == 200
+        assert body == dataset_id
+        assert response["statusCode"] == 200
 
         db_response = dataset_table.query(
-            KeyConditionExpression=Key(table.DATASET_ID).eq(
-                response_from_first_post_as_json
-            )
+            KeyConditionExpression=Key(table.DATASET_ID).eq(dataset_id)
         )
-        assert db_response["Items"][0]["privacyLevel"] == "red"
+        item = db_response["Items"][0]
+        assert item["title"] == "UPDATED TITLE"
+        assert item["privacyLevel"] == "red"
 
     @mock_dynamodb2
     def test_get_all_datasets(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
-        common.create_dataset_table(dynamodb)
-
-        event1 = common.dataset_event
-
-        event2 = common.dataset_event_updated
-
-        dataset_handler.post_dataset(event1, None)
-        dataset_handler.post_dataset(event2, None)
+        dataset_table = common.create_dataset_table(dynamodb)
+        dataset_table.put_item(Item=common.dataset)
+        dataset_table.put_item(Item=common.dataset_updated)
 
         response = dataset_handler.get_datasets(None, None)
-
-        response_body_as_json = json.loads(response["body"])
+        datasets = json.loads(response["body"])
 
         assert response["statusCode"] == 200
-        assert len(response_body_as_json) == 2
+        assert len(datasets) == 2
 
     @mock_dynamodb2
     def test_get_one_dataset(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
-        common.create_dataset_table(dynamodb)
+        dataset_table = common.create_dataset_table(dynamodb)
+        dataset_table.put_item(Item=common.dataset)
 
-        event_for_post = common.dataset_event
+        dataset_id = common.dataset[table.DATASET_ID]
+        event_for_get = {"pathParameters": {"dataset-id": dataset_id}}
 
-        response_from_post = dataset_handler.post_dataset(event_for_post, None)["body"]
-        response_from_post_as_json = json.loads(response_from_post)
+        response = dataset_handler.get_dataset(event_for_get, None)
+        dataset_from_db = json.loads(response["body"])
 
-        event_for_get = {"pathParameters": {"dataset-id": response_from_post_as_json}}
-
-        response_from_get_as_json = json.loads(
-            dataset_handler.get_dataset(event_for_get, None)["body"]
-        )
-
-        assert response_from_get_as_json[table.DATASET_ID] == response_from_post_as_json
+        assert dataset_from_db == common.dataset
 
     @mock_dynamodb2
     def test_dataset_not_found(self):

@@ -149,8 +149,6 @@ dataset_updated = {
 
 dataset_event = {"body": json.dumps(dataset)}
 
-dataset_updated_event = {"body": json.dumps(dataset_updated)}
-
 version_event = {
     "body": """
 {
