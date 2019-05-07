@@ -3,6 +3,7 @@ from boto3.dynamodb.conditions import Key
 import shortuuid
 
 import common
+import dataset_repository
 
 
 dynamodb = boto3.resource("dynamodb", "eu-west-1")
@@ -38,6 +39,9 @@ def get_versions(dataset_id):
 
 
 def create_version(dataset_id, content):
+    if not dataset_repository.dataset_exists(dataset_id):
+        return None
+
     version = content["version"]
     version_id = generate_unique_id(version)
 

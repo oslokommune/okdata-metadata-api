@@ -3,7 +3,6 @@
 import simplejson as json
 
 import common
-import dataset_repository
 import version_repository
 
 
@@ -12,11 +11,6 @@ def post_version(event, context):
 
     content = json.loads(event["body"])
     dataset_id = event["pathParameters"]["dataset-id"]
-
-    if not dataset_repository.dataset_exists(dataset_id):
-        return common.response(
-            404, "Selected dataset does not exist. Could not create version."
-        )
 
     version_id = version_repository.create_version(dataset_id, content)
 
@@ -30,13 +24,7 @@ def update_version(event, context):
     """PUT /datasets/:dataset-id/versions/:version-id"""
 
     content = json.loads(event["body"])
-    dataset_id = event["pathParameters"]["dataset-id"]
     version_id = event["pathParameters"]["version-id"]
-
-    if not dataset_repository.dataset_exists(dataset_id):
-        return common.response(
-            404, "Selected dataset does not exist. Could not update version."
-        )
 
     if version_repository.update_version(version_id, content):
         return common.response(200, version_id)
@@ -51,11 +39,6 @@ def get_versions(event, context):
 
     dataset_id = event["pathParameters"]["dataset-id"]
 
-    if not dataset_repository.dataset_exists(dataset_id):
-        return common.response(
-            404, "Selected dataset does not exist. Could not get versions."
-        )
-
     versions = version_repository.get_versions(dataset_id)
 
     return common.response(200, versions)
@@ -64,13 +47,7 @@ def get_versions(event, context):
 def get_version(event, context):
     """GET /datasets/:dataset-id/versions/:version-id"""
 
-    dataset_id = event["pathParameters"]["dataset-id"]
     version_id = event["pathParameters"]["version-id"]
-
-    if not dataset_repository.dataset_exists(dataset_id):
-        return common.response(
-            404, "Selected dataset does not exist. Could not get version."
-        )
 
     version = version_repository.get_version(version_id)
 

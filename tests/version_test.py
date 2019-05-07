@@ -28,7 +28,7 @@ class VersionTest(unittest.TestCase):
 
         response = version_handler.post_version(bad_version_event, None)
 
-        assert response["statusCode"] == 404
+        assert response["statusCode"] == 400
 
     @mock_dynamodb2
     def test_update_version(self):
