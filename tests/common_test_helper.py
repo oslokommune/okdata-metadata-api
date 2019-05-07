@@ -113,51 +113,43 @@ def create_table(dynamodb, table_name, hashkey, rangekey=None):
     )
 
 
-dataset_event = {
-    "body": """
-{
-  "title": "Antall besøkende på gjenbruksstasjoner",
-  "description": "Sensordata fra tellere på gjenbruksstasjonene",
-  "keywords": [
-    "avfall",
-    "besøkende",
-    "gjenbruksstasjon"
-  ],
-  "frequency": "hourly",
-  "accessRights": ":non-public",
-  "privacyLevel": "green",
-  "objective": "Formålsbeskrivelse",
-  "contactPoint": {
-    "name": "Tim",
-    "email": "tim@oslo.kommune.no",
-    "phone": "98765432"
-  },
-  "publisher": "REN"
-}"""
+dataset = {
+    "datasetID": "antall-besokende-pa-gjenbruksstasjoner",
+    "title": "Antall besøkende på gjenbruksstasjoner",
+    "description": "Sensordata fra tellere på gjenbruksstasjonene",
+    "keywords": ["avfall", "besøkende", "gjenbruksstasjon"],
+    "frequency": "hourly",
+    "accessRights": ":non-public",
+    "privacyLevel": "green",
+    "objective": "Formålsbeskrivelse",
+    "contactPoint": {
+        "name": "Tim",
+        "email": "tim@oslo.kommune.no",
+        "phone": "98765432",
+    },
+    "publisher": "REN",
 }
 
-dataset_event_updated = {
-    "body": """
-{
-  "title": "UPDATED TITLE",
-  "description": "Sensordata fra tellere på gamle gjenbruksstasjoner",
-  "keywords": [
-    "avfall",
-    "besøkende",
-    "gjenbruksstasjon"
-  ],
-  "frequency": "hourly",
-  "accessRights": ":restricted",
-  "privacyLevel": "red",
-  "objective": "Formålsbeskrivelse",
-  "contactPoint": {
-    "name": "Tim",
-    "email": "tim@oslo.kommune.no",
-    "phone": "12345678"
-  },
-  "publisher": "REN"
-}"""
+dataset_updated = {
+    "datasetID": "updated-title",
+    "title": "UPDATED TITLE",
+    "description": "Sensordata fra tellere på gamle gjenbruksstasjoner",
+    "keywords": ["avfall", "besøkende", "gjenbruksstasjon"],
+    "frequency": "hourly",
+    "accessRights": ":restricted",
+    "privacyLevel": "red",
+    "objective": "Formålsbeskrivelse",
+    "contactPoint": {
+        "name": "Tim",
+        "email": "tim@oslo.kommune.no",
+        "phone": "12345678",
+    },
+    "publisher": "REN",
 }
+
+dataset_event = {"body": json.dumps(dataset)}
+
+dataset_updated_event = {"body": json.dumps(dataset_updated)}
 
 version_event = {
     "body": """
