@@ -203,20 +203,26 @@ edition_updated = {
 
 edition_event = {"body": json.dumps(edition)}
 
-distribution_event = {
-    "body": """
-{
-  "filename": "BOOOM.csv",
-  "format": "text/csv",
-  "checksum": "..."
-}"""
+distribution = {
+    "datasetID": "antall-besokende-pa-gjenbruksstasjoner",
+    "versionID": "6-TEST",
+    "editionID": "EDITION-id",
+    "distributionID": "DISTRIBUTION-xyz",
+    "filename": "BOOOM.csv",
+    "format": "text/csv",
+    "checksum": "...",
 }
 
-distribution_event_updated = {
-    "body": """
-{
-  "filename": "UPDATED.csv",
-  "format": "text/csv",
-  "checksum": "..."
-}"""
+new_distribution = remove_ids(distribution)
+
+distribution_updated = {
+    "datasetID": "antall-besokende-pa-gjenbruksstasjoner",
+    "versionID": "6-TEST",
+    "editionID": "EDITION-id",
+    "distributionID": "DISTRIBUTION-abc",
+    "filename": "UPDATED.csv",
+    "format": "text/csv",
+    "checksum": "...",
 }
+
+distribution_event = {"body": json.dumps(distribution)}
