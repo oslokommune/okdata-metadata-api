@@ -161,22 +161,25 @@ dataset_updated = {
 
 dataset_event = {"body": json.dumps(dataset)}
 
-version_event = {
-    "body": """
-{
-  "version": "6",
-  "schema": {},
-  "transformation": {}
-}"""
+version = {
+    "datasetID": "antall-besokende-pa-gjenbruksstasjoner",
+    "versionID": "6-TEST",
+    "version": "6",
+    "schema": {},
+    "transformation": {},
 }
-version_event_updated = {
-    "body": """
-{
-  "version": "6-TEST",
-  "schema": {},
-  "transformation": {}
-}"""
+
+new_version = remove_ids(version)
+
+version_updated = {
+    "datasetID": "antall-besokende-pa-gjenbruksstasjoner",
+    "versionID": "6-UPDATED",
+    "version": "6-TEST",
+    "schema": {},
+    "transformation": {},
 }
+
+version_event = {"body": json.dumps(version)}
 
 edition_event = {
     "body": """
