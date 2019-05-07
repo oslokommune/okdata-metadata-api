@@ -99,10 +99,10 @@ def create_distribution_table(dynamodb):
 
 def create_table(dynamodb, table_name, hashkey, rangekey=None):
     keyschema = [{"AttributeName": hashkey, "KeyType": "HASH"}]
-
     attributes = [{"AttributeName": hashkey, "AttributeType": "S"}]
+
     if rangekey:
-        keyschema.append({"AttributeName": hashkey, "KeyType": "RANGE"})
+        keyschema.append({"AttributeName": rangekey, "KeyType": "RANGE"})
         attributes.append({"AttributeName": rangekey, "AttributeType": "S"})
 
     return dynamodb.create_table(
