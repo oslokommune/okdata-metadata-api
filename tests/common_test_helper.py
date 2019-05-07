@@ -1,3 +1,4 @@
+from copy import deepcopy
 import json
 
 import common as table
@@ -113,6 +114,15 @@ def create_table(dynamodb, table_name, hashkey, rangekey=None):
     )
 
 
+def remove_ids(item):
+    result = deepcopy(item)
+    result.pop(table.DATASET_ID, None)
+    result.pop(table.VERSION_ID, None)
+    result.pop(table.EDITION_ID, None)
+    result.pop(table.DISTRIBUTION_ID, None)
+    return result
+
+
 dataset = {
     "datasetID": "antall-besokende-pa-gjenbruksstasjoner",
     "title": "Antall besøkende på gjenbruksstasjoner",
@@ -129,6 +139,8 @@ dataset = {
     },
     "publisher": "REN",
 }
+
+new_dataset = remove_ids(dataset)
 
 dataset_updated = {
     "datasetID": "updated-title",

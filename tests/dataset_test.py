@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from copy import deepcopy
 import json
 import unittest
 
@@ -18,16 +17,21 @@ class DatasetTest(unittest.TestCase):
     @mock_dynamodb2
     def test_post_dataset(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        common.create_dataset_table(dynamodb)
+        dataset_table = common.create_dataset_table(dynamodb)
 
-        dataset = deepcopy(common.dataset)
-        dataset.pop(table.DATASET_ID)
-        event = {"body": json.dumps(common.dataset)}
-
-        response = dataset_handler.post_dataset(event, None)
+        create_event = {"body": json.dumps(common.new_dataset)}
+        response = dataset_handler.post_dataset(create_event, None)
+        dataset_id = json.loads(response["body"])
 
         assert response["statusCode"] == 200
-        assert response["body"] == '"antall-besokende-pa-gjenbruksstasjoner"'
+        assert dataset_id == "antall-besokende-pa-gjenbruksstasjoner"
+
+        db_response = dataset_table.query(
+            KeyConditionExpression=Key(table.DATASET_ID).eq(dataset_id)
+        )
+        item = db_response["Items"][0]
+        assert item["title"] == "Antall besøkende på gjenbruksstasjoner"
+        assert item["privacyLevel"] == "green"
 
     @mock_dynamodb2
     def test_update_dataset(self):
