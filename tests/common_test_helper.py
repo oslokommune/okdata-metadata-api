@@ -181,23 +181,27 @@ version_updated = {
 
 version_event = {"body": json.dumps(version)}
 
-edition_event = {
-    "body": """
-{
-  "description": "Data for one hour",
-  "startTime": "2018-12-21T08:00:00+01:00",
-  "endTime": "2018-12-21T09:00:00+01:00"
-}"""
+edition = {
+    "datasetID": "antall-besokende-pa-gjenbruksstasjoner",
+    "versionID": "6-TEST",
+    "editionID": "EDITION-id",
+    "description": "Data for one hour",
+    "startTime": "2018-12-21T08:00:00+01:00",
+    "endTime": "2018-12-21T09:00:00+01:00",
 }
 
-edition_event_updated = {
-    "body": """
-{
-  "description": "CHANGED",
-  "startTime": "2018-12-21T08:00:00+01:00",
-  "endTime": "2018-12-21T09:00:00+01:00"
-}"""
+new_edition = remove_ids(edition)
+
+edition_updated = {
+    "datasetID": "antall-besokende-pa-gjenbruksstasjoner",
+    "versionID": "6-TEST",
+    "editionID": "EDITION-id-updated",
+    "description": "CHANGED",
+    "startTime": "2018-12-21T08:00:00+01:00",
+    "endTime": "2018-12-21T09:00:00+01:00",
 }
+
+edition_event = {"body": json.dumps(edition)}
 
 distribution_event = {
     "body": """
