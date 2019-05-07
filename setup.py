@@ -22,6 +22,7 @@ setuptools.setup(
         "dataset_repository",
         "version_repository",
         "edition_repository",
+        "distribution_repository",
     ],
     install_requires=["simplejson==3.16.0", "shortuuid==0.5.0"],
 )

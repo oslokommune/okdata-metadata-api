@@ -36,7 +36,7 @@ class DistributionTest(unittest.TestCase):
         }
 
         response = distribution_handler.post_distribution(distribution_event, None)
-        assert response["statusCode"] == 404
+        assert response["statusCode"] == 400
 
     @mock_dynamodb2
     def test_update_distribution(self):
