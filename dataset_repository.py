@@ -11,6 +11,7 @@ import common
 dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
 dataset_table = dynamodb.Table(common.table_name_prefix + "-dataset")
+metadata_table = dynamodb.Table("dataset-metadata")
 
 
 def dataset_exists(dataset_id):

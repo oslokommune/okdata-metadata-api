@@ -6,6 +6,13 @@ dataset_table_name = "metadata-api-dataset"
 version_table_name = "metadata-api-version"
 edition_table_name = "metadata-api-edition"
 distribution_table_name = "metadata-api-distribution"
+metadata_table_name = "dataset-metadata"
+
+
+def create_metadata_table(dynamodb):
+    return create_table(
+        dynamodb, metadata_table_name, table.ID_COLUMN, table.TYPE_COLUMN
+    )
 
 
 def create_dataset_table(dynamodb):
