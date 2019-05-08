@@ -44,11 +44,26 @@ def get_edition(dataset_id, version_id, edition_id):
 
 
 def get_editions(dataset_id, version_id):
-    fe = Key(common.DATASET_ID).eq(dataset_id) & Key(common.VERSION_ID).eq(version_id)
+    try:
+        type_cond = Key(common.TYPE_COLUMN).eq("Edition")
+        id_cond = Key(common.ID_COLUMN).begins_with(f"{dataset_id}#{version_id}#")
 
-    db_response = edition_table.scan(FilterExpression=fe)
+        db_response = metadata_table.query(
+            IndexName="IdByTypeIndex", KeyConditionExpression=type_cond & id_cond
+        )
+        items = db_response["Items"]
+    except Exception:
+        items = []
 
-    return db_response["Items"]
+    if not items:
+        # Fall back to legacy edition table
+        dataset_cond = Key(common.DATASET_ID).eq(dataset_id)
+        version_cond = Key(common.VERSION_ID).eq(version_id)
+
+        db_response = edition_table.scan(FilterExpression=dataset_cond & version_cond)
+        items = db_response["Items"]
+
+    return items
 
 
 def create_edition(dataset_id, version_id, content):
