@@ -164,8 +164,11 @@ edition = {
 
 new_edition = remove_ids(edition)
 
+edition_id_new = (
+    f"{dataset[table.DATASET_ID]}#{version['version']}#{edition['edition']}"
+)
 edition_new_format = remove_ids(edition)
-edition_new_format[table.ID_COLUMN] = f"{dataset[table.DATASET_ID]}#6#1557273600"
+edition_new_format[table.ID_COLUMN] = edition_id_new
 edition_new_format[table.TYPE_COLUMN] = "Edition"
 
 edition_updated = {
@@ -186,6 +189,11 @@ distribution = {
     "format": "text/csv",
     "checksum": "...",
 }
+
+distribution_id_new = f"{dataset[table.DATASET_ID]}#{version['version']}#{edition['edition']}#{distribution['filename']}"
+distribution_new_format = remove_ids(distribution)
+distribution_new_format[table.ID_COLUMN] = distribution_id_new
+distribution_new_format[table.TYPE_COLUMN] = "Distribution"
 
 new_distribution = remove_ids(distribution)
 
