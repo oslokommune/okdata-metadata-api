@@ -46,15 +46,30 @@ def get_distribution(dataset_id, version_id, edition_id, distribution_id):
 
 
 def get_distributions(dataset_id, version_id, edition_id):
-    fe = (
-        Key(common.EDITION_ID).eq(edition_id)
-        & Key(common.DATASET_ID).eq(dataset_id)
-        & Key(common.VERSION_ID).eq(version_id)
-    )
+    try:
+        type_cond = Key(common.TYPE_COLUMN).eq("Distribution")
+        id_prefix = f"{dataset_id}#{version_id}#{edition_id}#"
+        id_cond = Key(common.ID_COLUMN).begins_with(id_prefix)
 
-    db_response = distribution_table.scan(FilterExpression=fe)
+        db_response = metadata_table.query(
+            IndexName="IdByTypeIndex", KeyConditionExpression=type_cond & id_cond
+        )
+        items = db_response["Items"]
+    except Exception:
+        items = []
 
-    return db_response["Items"]
+    if not items:
+        # Fall back to legacy edition table
+        fe = (
+            Key(common.EDITION_ID).eq(edition_id)
+            & Key(common.DATASET_ID).eq(dataset_id)
+            & Key(common.VERSION_ID).eq(version_id)
+        )
+
+        db_response = distribution_table.scan(FilterExpression=fe)
+        items = db_response["Items"]
+
+    return items
 
 
 def create_distribution(dataset_id, version_id, edition_id, content):

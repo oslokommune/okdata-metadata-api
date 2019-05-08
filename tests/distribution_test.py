@@ -69,7 +69,31 @@ class DistributionTest(unittest.TestCase):
         assert db_response["Items"][0]["filename"] == "UPDATED.csv"
 
     @mock_dynamodb2
-    def test_get_all_distributions(self):
+    def test_get_all_distributions_new_table(self):
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        distribution_table = common_test_helper.create_distribution_table(dynamodb)
+        metadata_table = common_test_helper.create_metadata_table(dynamodb)
+
+        distribution_table.put_item(Item=common_test_helper.distribution)
+        metadata_table.put_item(Item=common_test_helper.distribution_new_format)
+
+        get_all_event = {
+            "pathParameters": {
+                "dataset-id": common_test_helper.dataset[table.DATASET_ID],
+                "version-id": common_test_helper.version["version"],
+                "edition-id": common_test_helper.edition["edition"],
+            }
+        }
+
+        response = distribution_handler.get_distributions(get_all_event, None)
+        distributions_from_db = json.loads(response["body"])
+
+        assert response["statusCode"] == 200
+        assert len(distributions_from_db) == 1
+        assert distributions_from_db[0] == common_test_helper.distribution_new_format
+
+    @mock_dynamodb2
+    def test_get_all_distributions_legacy(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
         distribution_table = common_test_helper.create_distribution_table(dynamodb)
         distribution_table.put_item(Item=common_test_helper.distribution)
