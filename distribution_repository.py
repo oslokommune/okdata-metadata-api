@@ -10,18 +10,30 @@ import edition_repository
 dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
 distribution_table = dynamodb.Table(common.table_name_prefix + "-distribution")
+metadata_table = dynamodb.Table("dataset-metadata")
 
 
-def distribution_exists(distribution_id):
-    distribution = get_distribution(distribution_id)
+def distribution_exists(dataset_id, version_id, edition_id, distribution_id):
+    distribution = get_distribution(dataset_id, version_id, edition_id, distribution_id)
     return distribution is not None
 
 
-def get_distribution(distribution_id):
-    db_response = distribution_table.query(
-        KeyConditionExpression=Key(common.DISTRIBUTION_ID).eq(distribution_id)
-    )
-    items = db_response["Items"]
+def get_distribution(dataset_id, version_id, edition_id, distribution_id):
+    try:
+        id = f"{dataset_id}#{version_id}#{edition_id}#{distribution_id}"
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(common.ID_COLUMN).eq(id)
+        )
+        items = db_response["Items"]
+    except Exception:
+        items = []
+
+    if not items:
+        # Fall back to legacy distribution table
+        db_response = distribution_table.query(
+            KeyConditionExpression=Key(common.DISTRIBUTION_ID).eq(distribution_id)
+        )
+        items = db_response["Items"]
 
     if len(items) == 0:
         return None
@@ -72,8 +84,10 @@ def create_distribution(dataset_id, version_id, edition_id, content):
         return None
 
 
-def update_distribution(distribution_id, content):
-    old_distribution = get_distribution(distribution_id)
+def update_distribution(dataset_id, version_id, edition_id, distribution_id, content):
+    old_distribution = get_distribution(
+        dataset_id, version_id, edition_id, distribution_id
+    )
     if not old_distribution:
         return False
 

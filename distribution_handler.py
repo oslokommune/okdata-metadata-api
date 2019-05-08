@@ -27,9 +27,15 @@ def update_distribution(event, context):
     """PUT /datasets/:dataset-id/versions/:version-id/editions/:edition-id/distributions/:distribution-id"""
 
     content = json.loads(event["body"])
+
+    dataset_id = event["pathParameters"]["dataset-id"]
+    version_id = event["pathParameters"]["version-id"]
+    edition_id = event["pathParameters"]["edition-id"]
     distribution_id = event["pathParameters"]["distribution-id"]
 
-    if distribution_repository.update_distribution(distribution_id, content):
+    if distribution_repository.update_distribution(
+        dataset_id, version_id, edition_id, distribution_id, content
+    ):
         return common.response(200, distribution_id)
     else:
         return common.response(
@@ -54,9 +60,14 @@ def get_distributions(event, context):
 def get_distribution(event, context):
     """GET /datasets/:dataset-id/versions/:version-id/editions/:edition-id/distributions/:distribution-id"""
 
+    dataset_id = event["pathParameters"]["dataset-id"]
+    version_id = event["pathParameters"]["version-id"]
+    edition_id = event["pathParameters"]["edition-id"]
     distribution_id = event["pathParameters"]["distribution-id"]
 
-    distribution = distribution_repository.get_distribution(distribution_id)
+    distribution = distribution_repository.get_distribution(
+        dataset_id, version_id, edition_id, distribution_id
+    )
 
     if distribution:
         return common.response(200, distribution)
