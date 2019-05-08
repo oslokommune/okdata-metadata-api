@@ -14,81 +14,68 @@ class EditionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_post_edition(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        common_test_helper.create_dataset_table(dynamodb)
-        common_test_helper.create_version_table(dynamodb)
+        dataset_table = common_test_helper.create_dataset_table(dynamodb)
+        version_table = common_test_helper.create_version_table(dynamodb)
         common_test_helper.create_edition_table(dynamodb)
-        _, _, response = common_test_helper.post_edition(
-            common_test_helper.dataset_event,
-            common_test_helper.version_event,
-            common_test_helper.edition_event,
-        )
-        assert response[0]["statusCode"] == 200
+
+        dataset_table.put_item(Item=common_test_helper.dataset)
+        version_table.put_item(Item=common_test_helper.version)
+
+        create_event = {
+            "body": json.dumps(common_test_helper.new_edition),
+            "pathParameters": {
+                "dataset-id": common_test_helper.edition[table.DATASET_ID],
+                "version-id": common_test_helper.edition[table.VERSION_ID],
+            },
+        }
+
+        response = edition_handler.post_edition(create_event, None)
+        assert response["statusCode"] == 200
 
     @mock_dynamodb2
     def test_update_edition(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        common_test_helper.create_dataset_table(dynamodb)
-        common_test_helper.create_version_table(dynamodb)
         edition_table = common_test_helper.create_edition_table(dynamodb)
 
-        response_from_dataset_post, response_from_version_post, response_from_edition_post = common_test_helper.post_edition(
-            common_test_helper.dataset_event,
-            common_test_helper.version_event,
-            common_test_helper.edition_event,
-        )
-        response_from_edition_post = response_from_edition_post[0]
+        edition = common_test_helper.edition
+        edition_id = edition[table.EDITION_ID]
 
-        assert response_from_edition_post["statusCode"] == 200
+        edition_table.put_item(Item=edition)
 
-        edition_event_for_put = common_test_helper.edition_event_updated
-        edition_event_for_put["pathParameters"] = {
-            "version-id": common_test_helper.read_result_body(
-                response_from_version_post
-            ),
-            "dataset-id": common_test_helper.read_result_body(
-                response_from_dataset_post
-            ),
-            "edition-id": common_test_helper.read_result_body(
-                response_from_edition_post
-            ),
+        update_event = {
+            "body": json.dumps(common_test_helper.edition_updated),
+            "pathParameters": {
+                "dataset-id": edition[table.DATASET_ID],
+                "version-id": edition[table.VERSION_ID],
+                "edition-id": edition_id,
+            },
         }
 
-        response = edition_handler.update_edition(edition_event_for_put, None)
+        response = edition_handler.update_edition(update_event, None)
         assert response["statusCode"] == 200
 
         db_response = edition_table.query(
-            KeyConditionExpression=Key(table.EDITION_ID).eq(
-                common_test_helper.read_result_body(response_from_edition_post)
-            )
+            KeyConditionExpression=Key(table.EDITION_ID).eq(edition_id)
         )
         assert db_response["Items"][0]["description"] == "CHANGED"
 
     @mock_dynamodb2
     def test_get_all_editions(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        common_test_helper.create_dataset_table(dynamodb)
-        common_test_helper.create_version_table(dynamodb)
-        common_test_helper.create_edition_table(dynamodb)
+        edition_table = common_test_helper.create_edition_table(dynamodb)
 
-        response_from_dataset_post, response_from_version_post, _ = common_test_helper.post_edition(
-            common_test_helper.dataset_event,
-            common_test_helper.version_event,
-            common_test_helper.edition_event,
-            common_test_helper.edition_event_updated,
-        )
+        edition = common_test_helper.edition
+        edition_table.put_item(Item=edition)
+        edition_table.put_item(Item=common_test_helper.edition_updated)
 
-        path_parameter_for_get_event = {
+        get_all_event = {
             "pathParameters": {
-                "dataset-id": common_test_helper.read_result_body(
-                    response_from_dataset_post
-                ),
-                "version-id": common_test_helper.read_result_body(
-                    response_from_version_post
-                ),
+                "dataset-id": edition[table.DATASET_ID],
+                "version-id": edition[table.VERSION_ID],
             }
         }
 
-        response = edition_handler.get_editions(path_parameter_for_get_event, None)
+        response = edition_handler.get_editions(get_all_event, None)
 
         response_body_as_json = json.loads(response["body"])
 
@@ -98,43 +85,29 @@ class EditionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_get_one_edition(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        common_test_helper.create_dataset_table(dynamodb)
-        common_test_helper.create_version_table(dynamodb)
-        common_test_helper.create_edition_table(dynamodb)
-        response_from_dataset_post, response_from_version_post, response_from_edition_post = common_test_helper.post_edition(
-            common_test_helper.dataset_event,
-            common_test_helper.version_event,
-            common_test_helper.edition_event,
-        )
-        response_from_edition_post = response_from_edition_post[0]
+        edition_table = common_test_helper.create_edition_table(dynamodb)
 
-        path_parameter_for_get_event = {
+        edition = common_test_helper.edition
+        edition_id = edition[table.EDITION_ID]
+
+        edition_table.put_item(Item=edition)
+
+        get_all_event = {
             "pathParameters": {
-                "dataset-id": common_test_helper.read_result_body(
-                    response_from_dataset_post
-                ),
-                "version-id": common_test_helper.read_result_body(
-                    response_from_version_post
-                ),
-                "edition-id": common_test_helper.read_result_body(
-                    response_from_edition_post
-                ),
+                "dataset-id": edition[table.DATASET_ID],
+                "version-id": edition[table.VERSION_ID],
+                "edition-id": edition_id,
             }
         }
 
-        response_from_get_as_json = json.loads(
-            edition_handler.get_edition(path_parameter_for_get_event, None)["body"]
-        )
+        response = edition_handler.get_edition(get_all_event, None)
+        body = json.loads(response["body"])
 
-        assert response_from_get_as_json[
-            table.EDITION_ID
-        ] == common_test_helper.read_result_body(response_from_edition_post)
+        assert body[table.EDITION_ID] == edition_id
 
     @mock_dynamodb2
     def test_edition_not_found(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        common_test_helper.create_dataset_table(dynamodb)
-        common_test_helper.create_version_table(dynamodb)
         common_test_helper.create_edition_table(dynamodb)
 
         event_for_get = {

@@ -14,120 +14,108 @@ class VersionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_post_version(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        common_test_helper.create_dataset_table(dynamodb)
-        common_test_helper.create_version_table(dynamodb)
+        dataset_table = common_test_helper.create_dataset_table(dynamodb)
+        version_table = common_test_helper.create_version_table(dynamodb)
 
-        _, version_response = common_test_helper.post_version(
-            common_test_helper.dataset_event, common_test_helper.version_event
+        dataset_table.put_item(Item=common_test_helper.dataset)
+        dataset_id = common_test_helper.dataset[table.DATASET_ID]
+
+        version = common_test_helper.new_version
+        create_event = {
+            "body": json.dumps(version),
+            "pathParameters": {"dataset-id": dataset_id},
+        }
+
+        response = version_handler.post_version(create_event, None)
+        version_id = json.loads(response["body"])
+
+        assert response["statusCode"] == 200
+
+        db_response = version_table.query(
+            KeyConditionExpression=Key(table.VERSION_ID).eq(version_id)
         )
-        version_response = version_response[0]
-        assert version_response["statusCode"] == 200
+        assert len(db_response["Items"]) == 1
+        version_from_db = db_response["Items"][0]
+        assert version_from_db["version"] == version["version"]
+        assert version_from_db["datasetID"] == dataset_id
+        assert version_from_db["versionID"].startswith("6-")
 
-        bad_version_event = common_test_helper.version_event
-        bad_version_event["pathParameters"] = {"dataset-id": "ID NOT PRESENT"}
+        bad_version_event = create_event
+        bad_version_event["pathParameters"]["dataset-id"] = "ID NOT PRESENT"
 
         response = version_handler.post_version(bad_version_event, None)
-
         assert response["statusCode"] == 400
 
     @mock_dynamodb2
     def test_update_version(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        common_test_helper.create_dataset_table(dynamodb)
         version_table = common_test_helper.create_version_table(dynamodb)
+        version_table.put_item(Item=common_test_helper.version)
 
-        response_from_dataset_post, response_from_version_post = common_test_helper.post_version(
-            common_test_helper.dataset_event, common_test_helper.version_event
-        )
-        response_from_version_post = response_from_version_post[0]
+        dataset_id = common_test_helper.version[table.DATASET_ID]
+        version_id = common_test_helper.version[table.VERSION_ID]
 
-        assert response_from_version_post["statusCode"] == 200
-
-        event_for_version_put = common_test_helper.version_event_updated
-        event_for_version_put["pathParameters"] = {
-            "dataset-id": common_test_helper.read_result_body(
-                response_from_dataset_post
-            ),
-            "version-id": common_test_helper.read_result_body(
-                response_from_version_post
-            ),
+        update_event = {
+            "body": json.dumps(common_test_helper.version_updated),
+            "pathParameters": {"dataset-id": dataset_id, "version-id": version_id},
         }
 
-        response_from_put = version_handler.update_version(event_for_version_put, None)
+        response = version_handler.update_version(update_event, None)
+        assert response["statusCode"] == 200
 
-        assert response_from_put["statusCode"] == 200
         db_response = version_table.query(
-            KeyConditionExpression=Key(table.VERSION_ID).eq(
-                common_test_helper.read_result_body(response_from_version_post)
-            )
+            KeyConditionExpression=Key(table.VERSION_ID).eq(version_id)
         )
-        assert db_response["Items"][0]["version"] == "6-TEST"
+        version_from_db = db_response["Items"][0]
+        assert version_from_db["version"] == "6-TEST"
 
     @mock_dynamodb2
     def test_get_all_versions(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        common_test_helper.create_dataset_table(dynamodb)
-        common_test_helper.create_version_table(dynamodb)
+        version_table = common_test_helper.create_version_table(dynamodb)
+        version_table.put_item(Item=common_test_helper.version)
+        version_table.put_item(Item=common_test_helper.version_updated)
 
-        response_from_dataset_post, _ = common_test_helper.post_version(
-            common_test_helper.dataset_event,
-            common_test_helper.version_event,
-            common_test_helper.version_event_updated,
-        )
-
-        path_parameter_for_get_event = {
+        get_all_event = {
             "pathParameters": {
-                "dataset-id": common_test_helper.read_result_body(
-                    response_from_dataset_post
-                )
+                "dataset-id": common_test_helper.version[table.DATASET_ID]
             }
         }
 
-        response = version_handler.get_versions(path_parameter_for_get_event, None)
+        response = version_handler.get_versions(get_all_event, None)
 
-        response_body_as_json = json.loads(response["body"])
+        versions = json.loads(response["body"])
 
         assert response["statusCode"] == 200
-        assert len(response_body_as_json) == 2
+        assert len(versions) == 2
 
     @mock_dynamodb2
     def test_get_one_version(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        common_test_helper.create_dataset_table(dynamodb)
-        common_test_helper.create_version_table(dynamodb)
+        version_table = common_test_helper.create_version_table(dynamodb)
+        version_table.put_item(Item=common_test_helper.version)
 
-        response_from_dataset_post, response_from_post_as_json = common_test_helper.post_version(
-            common_test_helper.dataset_event, common_test_helper.version_event
-        )
-        response_from_post_as_json = response_from_post_as_json[0]
-        path_parameter_for_get_event = {
+        version_id = common_test_helper.version[table.VERSION_ID]
+        get_event = {
             "pathParameters": {
-                "dataset-id": common_test_helper.read_result_body(
-                    response_from_dataset_post
-                ),
-                "version-id": common_test_helper.read_result_body(
-                    response_from_post_as_json
-                ),
+                "dataset-id": common_test_helper.version[table.DATASET_ID],
+                "version-id": version_id,
             }
         }
 
-        response_from_get_as_json = common_test_helper.read_result_body(
-            version_handler.get_version(path_parameter_for_get_event, None)
-        )
+        response = version_handler.get_version(get_event, None)
+        version = json.loads(response["body"])
 
-        assert response_from_get_as_json[
-            table.VERSION_ID
-        ] == common_test_helper.read_result_body(response_from_post_as_json)
+        assert version[table.VERSION_ID] == version_id
 
     @mock_dynamodb2
     def test_version_not_found(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        common_test_helper.create_dataset_table(dynamodb)
         common_test_helper.create_version_table(dynamodb)
 
-        event_for_get = {"pathParameters": {"dataset-id": "1234", "version-id": "1"}}
+        get_event = {"pathParameters": {"dataset-id": "1234", "version-id": "1"}}
 
-        response = version_handler.get_version(event_for_get, None)
+        response = version_handler.get_version(get_event, None)
 
         assert response["statusCode"] == 404
 
