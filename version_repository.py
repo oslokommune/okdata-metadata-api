@@ -9,18 +9,30 @@ import dataset_repository
 dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
 version_table = dynamodb.Table(common.table_name_prefix + "-version")
+metadata_table = dynamodb.Table("dataset-metadata")
 
 
-def version_exists(version_id):
-    version = get_version(version_id)
+def version_exists(dataset_id, version_id):
+    version = get_version(dataset_id, version_id)
     return version is not None
 
 
-def get_version(version_id):
-    db_response = version_table.query(
-        KeyConditionExpression=Key(common.VERSION_ID).eq(version_id)
-    )
-    items = db_response["Items"]
+def get_version(dataset_id, version_id):
+    try:
+        id = f"{dataset_id}#{version_id}"
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(common.ID_COLUMN).eq(id)
+        )
+        items = db_response["Items"]
+    except Exception:
+        items = None
+
+    if not items:
+        # Fall back to legacy version table
+        db_response = version_table.query(
+            KeyConditionExpression=Key(common.VERSION_ID).eq(version_id)
+        )
+        items = db_response["Items"]
 
     if len(items) == 0:
         return None
@@ -31,10 +43,24 @@ def get_version(version_id):
 
 
 def get_versions(dataset_id):
-    db_response = version_table.scan(
-        FilterExpression=Key(common.DATASET_ID).eq(dataset_id)
-    )
-    items = db_response["Items"]
+    try:
+        type_cond = Key(common.TYPE_COLUMN).eq("Version")
+        id_cond = Key(common.ID_COLUMN).begins_with(f"{dataset_id}#")
+
+        db_response = metadata_table.query(
+            IndexName="IdByTypeIndex", KeyConditionExpression=type_cond & id_cond
+        )
+        items = db_response["Items"]
+    except Exception:
+        items = []
+
+    if not items:
+        # Fall back to legacy version table
+        db_response = version_table.scan(
+            FilterExpression=Key(common.DATASET_ID).eq(dataset_id)
+        )
+        items = db_response["Items"]
+
     return items
 
 
@@ -57,8 +83,8 @@ def create_version(dataset_id, content):
         return None
 
 
-def update_version(version_id, content):
-    old_version = get_version(version_id)
+def update_version(dataset_id, version_id, content):
+    old_version = get_version(dataset_id, version_id)
     if not old_version:
         return False
 

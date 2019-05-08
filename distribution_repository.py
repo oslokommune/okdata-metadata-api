@@ -10,18 +10,30 @@ import edition_repository
 dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
 distribution_table = dynamodb.Table(common.table_name_prefix + "-distribution")
+metadata_table = dynamodb.Table("dataset-metadata")
 
 
-def distribution_exists(distribution_id):
-    distribution = get_distribution(distribution_id)
+def distribution_exists(dataset_id, version_id, edition_id, distribution_id):
+    distribution = get_distribution(dataset_id, version_id, edition_id, distribution_id)
     return distribution is not None
 
 
-def get_distribution(distribution_id):
-    db_response = distribution_table.query(
-        KeyConditionExpression=Key(common.DISTRIBUTION_ID).eq(distribution_id)
-    )
-    items = db_response["Items"]
+def get_distribution(dataset_id, version_id, edition_id, distribution_id):
+    try:
+        id = f"{dataset_id}#{version_id}#{edition_id}#{distribution_id}"
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(common.ID_COLUMN).eq(id)
+        )
+        items = db_response["Items"]
+    except Exception:
+        items = []
+
+    if not items:
+        # Fall back to legacy distribution table
+        db_response = distribution_table.query(
+            KeyConditionExpression=Key(common.DISTRIBUTION_ID).eq(distribution_id)
+        )
+        items = db_response["Items"]
 
     if len(items) == 0:
         return None
@@ -34,15 +46,30 @@ def get_distribution(distribution_id):
 
 
 def get_distributions(dataset_id, version_id, edition_id):
-    fe = (
-        Key(common.EDITION_ID).eq(edition_id)
-        & Key(common.DATASET_ID).eq(dataset_id)
-        & Key(common.VERSION_ID).eq(version_id)
-    )
+    try:
+        type_cond = Key(common.TYPE_COLUMN).eq("Distribution")
+        id_prefix = f"{dataset_id}#{version_id}#{edition_id}#"
+        id_cond = Key(common.ID_COLUMN).begins_with(id_prefix)
 
-    db_response = distribution_table.scan(FilterExpression=fe)
+        db_response = metadata_table.query(
+            IndexName="IdByTypeIndex", KeyConditionExpression=type_cond & id_cond
+        )
+        items = db_response["Items"]
+    except Exception:
+        items = []
 
-    return db_response["Items"]
+    if not items:
+        # Fall back to legacy edition table
+        fe = (
+            Key(common.EDITION_ID).eq(edition_id)
+            & Key(common.DATASET_ID).eq(dataset_id)
+            & Key(common.VERSION_ID).eq(version_id)
+        )
+
+        db_response = distribution_table.scan(FilterExpression=fe)
+        items = db_response["Items"]
+
+    return items
 
 
 def create_distribution(dataset_id, version_id, edition_id, content):
@@ -56,10 +83,10 @@ def create_distribution(dataset_id, version_id, edition_id, content):
     if not dataset_repository.dataset_exists(dataset_id):
         return None
 
-    if not version_repository.version_exists(version_id):
+    if not version_repository.version_exists(dataset_id, version_id):
         return None
 
-    if not edition_repository.edition_exists(edition_id):
+    if not edition_repository.edition_exists(dataset_id, version_id, edition_id):
         return None
 
     db_response = distribution_table.put_item(Item=content)
@@ -72,8 +99,10 @@ def create_distribution(dataset_id, version_id, edition_id, content):
         return None
 
 
-def update_distribution(distribution_id, content):
-    old_distribution = get_distribution(distribution_id)
+def update_distribution(dataset_id, version_id, edition_id, distribution_id, content):
+    old_distribution = get_distribution(
+        dataset_id, version_id, edition_id, distribution_id
+    )
     if not old_distribution:
         return False
 

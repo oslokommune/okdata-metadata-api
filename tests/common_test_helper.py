@@ -6,6 +6,17 @@ dataset_table_name = "metadata-api-dataset"
 version_table_name = "metadata-api-version"
 edition_table_name = "metadata-api-edition"
 distribution_table_name = "metadata-api-distribution"
+metadata_table_name = "dataset-metadata"
+
+
+def create_metadata_table(dynamodb):
+    return create_table(
+        dynamodb,
+        metadata_table_name,
+        table.ID_COLUMN,
+        table.TYPE_COLUMN,
+        gsi="IdByTypeIndex",
+    )
 
 
 def create_dataset_table(dynamodb):
@@ -30,19 +41,37 @@ def create_distribution_table(dynamodb):
     )
 
 
-def create_table(dynamodb, table_name, hashkey, rangekey=None):
+def create_table(dynamodb, table_name, hashkey, rangekey=None, gsi=None):
     keyschema = [{"AttributeName": hashkey, "KeyType": "HASH"}]
     attributes = [{"AttributeName": hashkey, "AttributeType": "S"}]
+    gsis = []
 
     if rangekey:
         keyschema.append({"AttributeName": rangekey, "KeyType": "RANGE"})
         attributes.append({"AttributeName": rangekey, "AttributeType": "S"})
+
+    if gsi:
+        gsis = [
+            {
+                "IndexName": gsi,
+                "KeySchema": [
+                    {"AttributeName": rangekey, "KeyType": "HASH"},
+                    {"AttributeName": hashkey, "KeyType": "RANGE"},
+                ],
+                "Projection": {"ProjectionType": "INCLUDE"},
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": 5,
+                    "WriteCapacityUnits": 5,
+                },
+            }
+        ]
 
     return dynamodb.create_table(
         TableName=table_name,
         KeySchema=keyschema,
         AttributeDefinitions=attributes,
         ProvisionedThroughput={"ReadCapacityUnits": 5, "WriteCapacityUnits": 5},
+        GlobalSecondaryIndexes=gsis,
     )
 
 
@@ -72,6 +101,10 @@ dataset = {
     "publisher": "REN",
 }
 
+dataset_new_format = remove_ids(dataset)
+dataset_new_format[table.ID_COLUMN] = dataset[table.DATASET_ID]
+dataset_new_format[table.TYPE_COLUMN] = "Dataset"
+
 new_dataset = remove_ids(dataset)
 
 dataset_updated = {
@@ -99,6 +132,11 @@ version = {
     "transformation": {},
 }
 
+version_new_format = remove_ids(version)
+version_new_format[table.ID_COLUMN] = f"{dataset[table.DATASET_ID]}#6"
+version_new_format[table.TYPE_COLUMN] = "Version"
+version_new_format.pop("version")
+
 new_version = remove_ids(version)
 
 version_updated = {
@@ -109,16 +147,29 @@ version_updated = {
     "transformation": {},
 }
 
+next_version_new_format = remove_ids(version_updated)
+next_version_new_format[table.ID_COLUMN] = f"{dataset[table.DATASET_ID]}#7"
+next_version_new_format[table.TYPE_COLUMN] = "Version"
+next_version_new_format.pop("version")
+
 edition = {
     "datasetID": "antall-besokende-pa-gjenbruksstasjoner",
     "versionID": "6-TEST",
     "editionID": "EDITION-id",
+    "edition": "1557273600",
     "description": "Data for one hour",
     "startTime": "2018-12-21T08:00:00+01:00",
     "endTime": "2018-12-21T09:00:00+01:00",
 }
 
 new_edition = remove_ids(edition)
+
+edition_id_new = (
+    f"{dataset[table.DATASET_ID]}#{version['version']}#{edition['edition']}"
+)
+edition_new_format = remove_ids(edition)
+edition_new_format[table.ID_COLUMN] = edition_id_new
+edition_new_format[table.TYPE_COLUMN] = "Edition"
 
 edition_updated = {
     "datasetID": "antall-besokende-pa-gjenbruksstasjoner",
@@ -138,6 +189,11 @@ distribution = {
     "format": "text/csv",
     "checksum": "...",
 }
+
+distribution_id_new = f"{dataset[table.DATASET_ID]}#{version['version']}#{edition['edition']}#{distribution['filename']}"
+distribution_new_format = remove_ids(distribution)
+distribution_new_format[table.ID_COLUMN] = distribution_id_new
+distribution_new_format[table.TYPE_COLUMN] = "Distribution"
 
 new_distribution = remove_ids(distribution)
 

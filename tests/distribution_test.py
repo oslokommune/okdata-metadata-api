@@ -69,7 +69,31 @@ class DistributionTest(unittest.TestCase):
         assert db_response["Items"][0]["filename"] == "UPDATED.csv"
 
     @mock_dynamodb2
-    def test_get_all_distributions(self):
+    def test_get_all_distributions_new_table(self):
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        distribution_table = common_test_helper.create_distribution_table(dynamodb)
+        metadata_table = common_test_helper.create_metadata_table(dynamodb)
+
+        distribution_table.put_item(Item=common_test_helper.distribution)
+        metadata_table.put_item(Item=common_test_helper.distribution_new_format)
+
+        get_all_event = {
+            "pathParameters": {
+                "dataset-id": common_test_helper.dataset[table.DATASET_ID],
+                "version-id": common_test_helper.version["version"],
+                "edition-id": common_test_helper.edition["edition"],
+            }
+        }
+
+        response = distribution_handler.get_distributions(get_all_event, None)
+        distributions_from_db = json.loads(response["body"])
+
+        assert response["statusCode"] == 200
+        assert len(distributions_from_db) == 1
+        assert distributions_from_db[0] == common_test_helper.distribution_new_format
+
+    @mock_dynamodb2
+    def test_get_all_distributions_legacy(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
         distribution_table = common_test_helper.create_distribution_table(dynamodb)
         distribution_table.put_item(Item=common_test_helper.distribution)
@@ -84,13 +108,38 @@ class DistributionTest(unittest.TestCase):
         }
 
         response = distribution_handler.get_distributions(get_all_event, None)
-        distributions = json.loads(response["body"])
+        distributions_from_db = json.loads(response["body"])
 
         assert response["statusCode"] == 200
-        assert len(distributions) == 2
+        assert len(distributions_from_db) == 2
 
     @mock_dynamodb2
-    def test_get_one_distribution(self):
+    def test_should_fetch_distribution_from_new_table_if_present(self):
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        distribution_table = common_test_helper.create_distribution_table(dynamodb)
+        metadata_table = common_test_helper.create_metadata_table(dynamodb)
+
+        distribution_table.put_item(Item=common_test_helper.distribution)
+        metadata_table.put_item(Item=common_test_helper.distribution_new_format)
+
+        distribution_id = common_test_helper.distribution_new_format[table.ID_COLUMN]
+        get_event = {
+            "pathParameters": {
+                "dataset-id": common_test_helper.dataset[table.DATASET_ID],
+                "version-id": common_test_helper.version["version"],
+                "edition-id": common_test_helper.edition["edition"],
+                "distribution-id": common_test_helper.distribution["filename"],
+            }
+        }
+
+        response = distribution_handler.get_distribution(get_event, None)
+        distribution_from_db = json.loads(response["body"])
+
+        assert response["statusCode"] == 200
+        assert distribution_from_db[table.ID_COLUMN] == distribution_id
+
+    @mock_dynamodb2
+    def test_get_one_distribution_legacy(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
         distribution_table = common_test_helper.create_distribution_table(dynamodb)
         distribution_table.put_item(Item=common_test_helper.distribution)
@@ -107,10 +156,10 @@ class DistributionTest(unittest.TestCase):
         }
 
         response = distribution_handler.get_distribution(get_event, None)
-        body = json.loads(response["body"])
+        distribution_from_db = json.loads(response["body"])
 
         assert response["statusCode"] == 200
-        assert body[table.DISTRIBUTION_ID] == distribution_id
+        assert distribution_from_db[table.DISTRIBUTION_ID] == distribution_id
 
     @mock_dynamodb2
     def test_distribution_not_found(self):

@@ -11,6 +11,7 @@ import common
 dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
 dataset_table = dynamodb.Table(common.table_name_prefix + "-dataset")
+metadata_table = dynamodb.Table("dataset-metadata")
 
 
 def dataset_exists(dataset_id):
@@ -19,10 +20,20 @@ def dataset_exists(dataset_id):
 
 
 def get_dataset(dataset_id):
-    db_response = dataset_table.query(
-        KeyConditionExpression=Key(common.DATASET_ID).eq(dataset_id)
-    )
-    items = db_response["Items"]
+    try:
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(common.ID_COLUMN).eq(dataset_id)
+        )
+        items = db_response["Items"]
+    except Exception:
+        items = None
+
+    if not items:
+        # Fall back to legacy dataset table
+        db_response = dataset_table.query(
+            KeyConditionExpression=Key(common.DATASET_ID).eq(dataset_id)
+        )
+        items = db_response["Items"]
 
     if len(items) == 0:
         return None
@@ -33,8 +44,20 @@ def get_dataset(dataset_id):
 
 
 def get_datasets():
-    db_response = dataset_table.scan()
-    items = db_response["Items"]
+    try:
+        db_response = metadata_table.query(
+            IndexName="IdByTypeIndex",
+            KeyConditionExpression=Key(common.TYPE_COLUMN).eq("Dataset"),
+        )
+        items = db_response["Items"]
+    except Exception:
+        items = []
+
+    if not items:
+        # Fall back to legacy dataset table
+        db_response = dataset_table.scan()
+        items = db_response["Items"]
+
     return items
 
 

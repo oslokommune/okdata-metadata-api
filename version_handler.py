@@ -24,9 +24,10 @@ def update_version(event, context):
     """PUT /datasets/:dataset-id/versions/:version-id"""
 
     content = json.loads(event["body"])
+    dataset_id = event["pathParameters"]["dataset-id"]
     version_id = event["pathParameters"]["version-id"]
 
-    if version_repository.update_version(version_id, content):
+    if version_repository.update_version(dataset_id, version_id, content):
         return common.response(200, version_id)
     else:
         return common.response(
@@ -47,9 +48,10 @@ def get_versions(event, context):
 def get_version(event, context):
     """GET /datasets/:dataset-id/versions/:version-id"""
 
+    dataset_id = event["pathParameters"]["dataset-id"]
     version_id = event["pathParameters"]["version-id"]
 
-    version = version_repository.get_version(version_id)
+    version = version_repository.get_version(dataset_id, version_id)
 
     if version:
         return common.response(200, version)
