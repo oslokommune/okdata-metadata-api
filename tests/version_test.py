@@ -1,3 +1,4 @@
+from copy import deepcopy
 import json
 import unittest
 
@@ -70,11 +71,60 @@ class VersionTest(unittest.TestCase):
         assert version_from_db["version"] == "6-TEST"
 
     @mock_dynamodb2
-    def test_get_all_versions(self):
+    def test_should_get_versions_from_new_table_if_present(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
         version_table = common_test_helper.create_version_table(dynamodb)
-        version_table.put_item(Item=common_test_helper.version)
+        metadata_table = common_test_helper.create_metadata_table(dynamodb)
+
         version_table.put_item(Item=common_test_helper.version_updated)
+        metadata_table.put_item(Item=common_test_helper.version_new_format)
+
+        get_all_event = {
+            "pathParameters": {
+                "dataset-id": common_test_helper.version[table.DATASET_ID]
+            }
+        }
+
+        response = version_handler.get_versions(get_all_event, None)
+
+        versions = json.loads(response["body"])
+
+        assert response["statusCode"] == 200
+        assert len(versions) == 1
+        assert versions[0] == common_test_helper.version_new_format
+
+    @mock_dynamodb2
+    def test_should_get_versions_from_legacy_table_if_not_present_in_new_table(self):
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        version_table = common_test_helper.create_version_table(dynamodb)
+        metadata_table = common_test_helper.create_metadata_table(dynamodb)
+
+        version_new_table = deepcopy(common_test_helper.version_new_format)
+        version_new_table[table.ID_COLUMN] = "my-dataset#6"
+
+        version_table.put_item(Item=common_test_helper.version)
+        metadata_table.put_item(Item=version_new_table)
+
+        get_all_event = {
+            "pathParameters": {
+                "dataset-id": common_test_helper.version[table.DATASET_ID]
+            }
+        }
+
+        response = version_handler.get_versions(get_all_event, None)
+
+        versions = json.loads(response["body"])
+
+        assert response["statusCode"] == 200
+        assert len(versions) == 1
+        assert versions[0] == common_test_helper.version
+
+    @mock_dynamodb2
+    def test_get_all_versions(self):
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        metadata_table = common_test_helper.create_metadata_table(dynamodb)
+        metadata_table.put_item(Item=common_test_helper.version_new_format)
+        metadata_table.put_item(Item=common_test_helper.next_version_new_format)
 
         get_all_event = {
             "pathParameters": {

@@ -28,6 +28,7 @@ def get_version(dataset_id, version_id):
         items = None
 
     if not items:
+        # Fall back to legacy version table
         db_response = version_table.query(
             KeyConditionExpression=Key(common.VERSION_ID).eq(version_id)
         )
@@ -42,10 +43,24 @@ def get_version(dataset_id, version_id):
 
 
 def get_versions(dataset_id):
-    db_response = version_table.scan(
-        FilterExpression=Key(common.DATASET_ID).eq(dataset_id)
-    )
-    items = db_response["Items"]
+    try:
+        type_cond = Key(common.TYPE_COLUMN).eq("Version")
+        id_cond = Key(common.ID_COLUMN).begins_with(f"{dataset_id}#")
+
+        db_response = metadata_table.query(
+            IndexName="IdByTypeIndex", KeyConditionExpression=type_cond & id_cond
+        )
+        items = db_response["Items"]
+    except Exception:
+        items = []
+
+    if not items:
+        # Fall back to legacy version table
+        db_response = version_table.scan(
+            FilterExpression=Key(common.DATASET_ID).eq(dataset_id)
+        )
+        items = db_response["Items"]
+
     return items
 
 
