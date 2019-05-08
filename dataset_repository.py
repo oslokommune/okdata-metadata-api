@@ -20,10 +20,20 @@ def dataset_exists(dataset_id):
 
 
 def get_dataset(dataset_id):
-    db_response = dataset_table.query(
-        KeyConditionExpression=Key(common.DATASET_ID).eq(dataset_id)
-    )
-    items = db_response["Items"]
+    try:
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(common.ID_COLUMN).eq(dataset_id)
+        )
+        items = db_response["Items"]
+    except Exception:
+        items = None
+
+    if not items:
+        # Fall back to old dataset table
+        db_response = dataset_table.query(
+            KeyConditionExpression=Key(common.DATASET_ID).eq(dataset_id)
+        )
+        items = db_response["Items"]
 
     if len(items) == 0:
         return None
