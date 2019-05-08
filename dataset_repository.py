@@ -29,7 +29,7 @@ def get_dataset(dataset_id):
         items = None
 
     if not items:
-        # Fall back to old dataset table
+        # Fall back to legacy dataset table
         db_response = dataset_table.query(
             KeyConditionExpression=Key(common.DATASET_ID).eq(dataset_id)
         )
@@ -44,8 +44,20 @@ def get_dataset(dataset_id):
 
 
 def get_datasets():
-    db_response = dataset_table.scan()
-    items = db_response["Items"]
+    try:
+        db_response = metadata_table.query(
+            IndexName="IdByTypeIndex",
+            KeyConditionExpression=Key(common.TYPE_COLUMN).eq("Dataset"),
+        )
+        items = db_response["Items"]
+    except Exception:
+        items = []
+
+    if not items:
+        # Fall back to legacy dataset table
+        db_response = dataset_table.scan()
+        items = db_response["Items"]
+
     return items
 
 

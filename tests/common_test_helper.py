@@ -11,7 +11,11 @@ metadata_table_name = "dataset-metadata"
 
 def create_metadata_table(dynamodb):
     return create_table(
-        dynamodb, metadata_table_name, table.ID_COLUMN, table.TYPE_COLUMN
+        dynamodb,
+        metadata_table_name,
+        table.ID_COLUMN,
+        table.TYPE_COLUMN,
+        gsi="IdByTypeIndex",
     )
 
 
@@ -37,19 +41,37 @@ def create_distribution_table(dynamodb):
     )
 
 
-def create_table(dynamodb, table_name, hashkey, rangekey=None):
+def create_table(dynamodb, table_name, hashkey, rangekey=None, gsi=None):
     keyschema = [{"AttributeName": hashkey, "KeyType": "HASH"}]
     attributes = [{"AttributeName": hashkey, "AttributeType": "S"}]
+    gsis = []
 
     if rangekey:
         keyschema.append({"AttributeName": rangekey, "KeyType": "RANGE"})
         attributes.append({"AttributeName": rangekey, "AttributeType": "S"})
+
+    if gsi:
+        gsis = [
+            {
+                "IndexName": gsi,
+                "KeySchema": [
+                    {"AttributeName": rangekey, "KeyType": "HASH"},
+                    {"AttributeName": hashkey, "KeyType": "RANGE"},
+                ],
+                "Projection": {"ProjectionType": "INCLUDE"},
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": 5,
+                    "WriteCapacityUnits": 5,
+                },
+            }
+        ]
 
     return dynamodb.create_table(
         TableName=table_name,
         KeySchema=keyschema,
         AttributeDefinitions=attributes,
         ProvisionedThroughput={"ReadCapacityUnits": 5, "WriteCapacityUnits": 5},
+        GlobalSecondaryIndexes=gsis,
     )
 
 

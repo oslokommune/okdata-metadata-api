@@ -60,7 +60,23 @@ class DatasetTest(unittest.TestCase):
         assert item["privacyLevel"] == "red"
 
     @mock_dynamodb2
-    def test_get_all_datasets(self):
+    def test_should_get_datasets_from_new_table_if_present(self):
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
+
+        dataset_table = common.create_dataset_table(dynamodb)
+        metadata_table = common.create_metadata_table(dynamodb)
+        dataset_table.put_item(Item=common.dataset_updated)
+        metadata_table.put_item(Item=common.dataset_new_format)
+
+        response = dataset_handler.get_datasets(None, None)
+        datasets = json.loads(response["body"])
+
+        assert response["statusCode"] == 200
+        assert len(datasets) == 1
+        assert datasets[0] == common.dataset_new_format
+
+    @mock_dynamodb2
+    def test_get_all_datasets_legacy(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
         dataset_table = common.create_dataset_table(dynamodb)
