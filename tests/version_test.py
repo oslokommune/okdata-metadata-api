@@ -90,7 +90,34 @@ class VersionTest(unittest.TestCase):
         assert len(versions) == 2
 
     @mock_dynamodb2
-    def test_get_one_version(self):
+    def test_should_fetch_version_from_new_metadata_table_if_present(self):
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        version_table = common_test_helper.create_version_table(dynamodb)
+        metadata_table = common_test_helper.create_metadata_table(dynamodb)
+
+        version_table.put_item(Item=common_test_helper.version)
+        metadata_table.put_item(Item=common_test_helper.version_new_format)
+
+        get_event = {
+            "pathParameters": {
+                "dataset-id": common_test_helper.version[table.DATASET_ID],
+                "version-id": common_test_helper.version["version"],
+            }
+        }
+
+        response = version_handler.get_version(get_event, None)
+
+        version_from_db = json.loads(response["body"])
+
+        assert response["statusCode"] == 200
+        assert (
+            version_from_db[table.ID_COLUMN]
+            == common_test_helper.version_new_format[table.ID_COLUMN]
+        )
+        assert version_from_db[table.TYPE_COLUMN] == "Version"
+
+    @mock_dynamodb2
+    def test_get_version_from_legacy_table(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
         version_table = common_test_helper.create_version_table(dynamodb)
         version_table.put_item(Item=common_test_helper.version)
@@ -104,9 +131,10 @@ class VersionTest(unittest.TestCase):
         }
 
         response = version_handler.get_version(get_event, None)
-        version = json.loads(response["body"])
+        version_from_db = json.loads(response["body"])
 
-        assert version[table.VERSION_ID] == version_id
+        assert response["statusCode"] == 200
+        assert version_from_db[table.VERSION_ID] == version_id
 
     @mock_dynamodb2
     def test_version_not_found(self):

@@ -110,6 +110,12 @@ version = {
     "transformation": {},
 }
 
+version_new_format = remove_ids(version)
+version_new_format[
+    table.ID_COLUMN
+] = f"{dataset[table.DATASET_ID]}#{version['version']}"
+version_new_format[table.TYPE_COLUMN] = "Version"
+
 new_version = remove_ids(version)
 
 version_updated = {
