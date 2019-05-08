@@ -9,18 +9,29 @@ import dataset_repository
 dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
 version_table = dynamodb.Table(common.table_name_prefix + "-version")
+metadata_table = dynamodb.Table("dataset-metadata")
 
 
-def version_exists(version_id):
-    version = get_version(version_id)
+def version_exists(dataset_id, version_id):
+    version = get_version(dataset_id, version_id)
     return version is not None
 
 
-def get_version(version_id):
-    db_response = version_table.query(
-        KeyConditionExpression=Key(common.VERSION_ID).eq(version_id)
-    )
-    items = db_response["Items"]
+def get_version(dataset_id, version_id):
+    try:
+        id = f"{dataset_id}#{version_id}"
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(common.ID_COLUMN).eq(id)
+        )
+        items = db_response["Items"]
+    except Exception:
+        items = None
+
+    if not items:
+        db_response = version_table.query(
+            KeyConditionExpression=Key(common.VERSION_ID).eq(version_id)
+        )
+        items = db_response["Items"]
 
     if len(items) == 0:
         return None
@@ -57,8 +68,8 @@ def create_version(dataset_id, content):
         return None
 
 
-def update_version(version_id, content):
-    old_version = get_version(version_id)
+def update_version(dataset_id, version_id, content):
+    old_version = get_version(dataset_id, version_id)
     if not old_version:
         return False
 

@@ -43,7 +43,7 @@ def create_edition(dataset_id, version_id, content):
     if not dataset_repository.dataset_exists(dataset_id):
         return None
 
-    if not version_repository.version_exists(version_id):
+    if not version_repository.version_exists(dataset_id, version_id):
         return None
 
     content[common.DATASET_ID] = dataset_id

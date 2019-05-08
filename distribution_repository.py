@@ -56,7 +56,7 @@ def create_distribution(dataset_id, version_id, edition_id, content):
     if not dataset_repository.dataset_exists(dataset_id):
         return None
 
-    if not version_repository.version_exists(version_id):
+    if not version_repository.version_exists(dataset_id, version_id):
         return None
 
     if not edition_repository.edition_exists(edition_id):
