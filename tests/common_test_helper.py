@@ -79,6 +79,10 @@ dataset = {
     "publisher": "REN",
 }
 
+dataset_new_format = remove_ids(dataset)
+dataset_new_format[table.ID_COLUMN] = dataset[table.DATASET_ID]
+dataset_new_format[table.TYPE_COLUMN] = "Dataset"
+
 new_dataset = remove_ids(dataset)
 
 dataset_updated = {

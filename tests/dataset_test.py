@@ -74,7 +74,25 @@ class DatasetTest(unittest.TestCase):
         assert len(datasets) == 2
 
     @mock_dynamodb2
-    def test_get_one_dataset(self):
+    def test_should_fetch_dataset_from_new_table_if_present(self):
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
+
+        dataset_table = common.create_dataset_table(dynamodb)
+        metadata_table = common.create_metadata_table(dynamodb)
+
+        dataset_id = common.dataset[table.DATASET_ID]
+        dataset_table.put_item(Item=common.dataset)
+        metadata_table.put_item(Item=common.dataset_new_format)
+
+        get_event = {"pathParameters": {"dataset-id": dataset_id}}
+
+        response = dataset_handler.get_dataset(get_event, None)
+        dataset_from_db = json.loads(response["body"])
+
+        assert dataset_from_db == common.dataset_new_format
+
+    @mock_dynamodb2
+    def test_get_dataset_from_legacy_table(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
         dataset_table = common.create_dataset_table(dynamodb)
