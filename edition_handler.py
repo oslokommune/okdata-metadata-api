@@ -25,9 +25,11 @@ def update_edition(event, context):
 
     content = json.loads(event["body"])
 
+    dataset_id = event["pathParameters"]["dataset-id"]
+    version_id = event["pathParameters"]["version-id"]
     edition_id = event["pathParameters"]["edition-id"]
 
-    if edition_repository.update_edition(edition_id, content):
+    if edition_repository.update_edition(dataset_id, version_id, edition_id, content):
         return common.response(200, edition_id)
     else:
         return common.response(
@@ -49,9 +51,11 @@ def get_editions(event, context):
 def get_edition(event, context):
     """GET /datasets/:dataset-id/versions/:version-id/editions/:edition-id"""
 
+    dataset_id = event["pathParameters"]["dataset-id"]
+    version_id = event["pathParameters"]["version-id"]
     edition_id = event["pathParameters"]["edition-id"]
 
-    edition = edition_repository.get_edition(edition_id)
+    edition = edition_repository.get_edition(dataset_id, version_id, edition_id)
 
     if edition:
         return common.response(200, edition)

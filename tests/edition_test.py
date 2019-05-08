@@ -102,6 +102,7 @@ class EditionTest(unittest.TestCase):
         response = edition_handler.get_edition(get_event, None)
         edition_from_db = json.loads(response["body"])
 
+        assert response["statusCode"] == 200
         assert edition_from_db == common_test_helper.edition_new_format
 
     @mock_dynamodb2
@@ -125,6 +126,7 @@ class EditionTest(unittest.TestCase):
         response = edition_handler.get_edition(get_event, None)
         edition_from_db = json.loads(response["body"])
 
+        assert response["statusCode"] == 200
         assert edition_from_db == edition
 
     @mock_dynamodb2

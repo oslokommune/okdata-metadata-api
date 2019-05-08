@@ -10,18 +10,30 @@ import version_repository
 dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
 edition_table = dynamodb.Table(common.table_name_prefix + "-edition")
+metadata_table = dynamodb.Table("dataset-metadata")
 
 
-def edition_exists(edition_id):
-    edition = get_edition(edition_id)
+def edition_exists(dataset_id, version_id, edition_id):
+    edition = get_edition(dataset_id, version_id, edition_id)
     return edition is not None
 
 
-def get_edition(edition_id):
-    db_response = edition_table.query(
-        KeyConditionExpression=Key(common.EDITION_ID).eq(edition_id)
-    )
-    items = db_response["Items"]
+def get_edition(dataset_id, version_id, edition_id):
+    try:
+        id = f"{dataset_id}#{version_id}#{edition_id}"
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(common.ID_COLUMN).eq(id)
+        )
+        items = db_response["Items"]
+    except Exception:
+        items = []
+
+    if not items:
+        # Fall back to legacy edition table
+        db_response = edition_table.query(
+            KeyConditionExpression=Key(common.EDITION_ID).eq(edition_id)
+        )
+        items = db_response["Items"]
 
     if len(items) == 0:
         return None
@@ -62,8 +74,8 @@ def create_edition(dataset_id, version_id, content):
         return None
 
 
-def update_edition(edition_id, content):
-    old_edition = get_edition(edition_id)
+def update_edition(dataset_id, version_id, edition_id, content):
+    old_edition = get_edition(dataset_id, version_id, edition_id)
     if not old_edition:
         return False
 
