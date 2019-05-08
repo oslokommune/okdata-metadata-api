@@ -83,7 +83,29 @@ class EditionTest(unittest.TestCase):
         assert len(response_body_as_json) == 2
 
     @mock_dynamodb2
-    def test_get_one_edition(self):
+    def test_should_fetch_edition_from_new_table_if_present(self):
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        edition_table = common_test_helper.create_edition_table(dynamodb)
+        metadata_table = common_test_helper.create_metadata_table(dynamodb)
+
+        edition_table.put_item(Item=common_test_helper.edition)
+        metadata_table.put_item(Item=common_test_helper.edition_new_format)
+
+        get_event = {
+            "pathParameters": {
+                "dataset-id": common_test_helper.edition[table.DATASET_ID],
+                "version-id": common_test_helper.version["version"],
+                "edition-id": common_test_helper.edition["edition"],
+            }
+        }
+
+        response = edition_handler.get_edition(get_event, None)
+        edition_from_db = json.loads(response["body"])
+
+        assert edition_from_db == common_test_helper.edition_new_format
+
+    @mock_dynamodb2
+    def test_get_one_edition_legacy(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
         edition_table = common_test_helper.create_edition_table(dynamodb)
 
@@ -92,7 +114,7 @@ class EditionTest(unittest.TestCase):
 
         edition_table.put_item(Item=edition)
 
-        get_all_event = {
+        get_event = {
             "pathParameters": {
                 "dataset-id": edition[table.DATASET_ID],
                 "version-id": edition[table.VERSION_ID],
@@ -100,10 +122,10 @@ class EditionTest(unittest.TestCase):
             }
         }
 
-        response = edition_handler.get_edition(get_all_event, None)
-        body = json.loads(response["body"])
+        response = edition_handler.get_edition(get_event, None)
+        edition_from_db = json.loads(response["body"])
 
-        assert body[table.EDITION_ID] == edition_id
+        assert edition_from_db == edition
 
     @mock_dynamodb2
     def test_edition_not_found(self):

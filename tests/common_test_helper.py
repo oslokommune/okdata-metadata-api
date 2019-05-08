@@ -156,12 +156,17 @@ edition = {
     "datasetID": "antall-besokende-pa-gjenbruksstasjoner",
     "versionID": "6-TEST",
     "editionID": "EDITION-id",
+    "edition": "1557273600",
     "description": "Data for one hour",
     "startTime": "2018-12-21T08:00:00+01:00",
     "endTime": "2018-12-21T09:00:00+01:00",
 }
 
 new_edition = remove_ids(edition)
+
+edition_new_format = remove_ids(edition)
+edition_new_format[table.ID_COLUMN] = f"{dataset[table.DATASET_ID]}#6#1557273600"
+edition_new_format[table.TYPE_COLUMN] = "Edition"
 
 edition_updated = {
     "datasetID": "antall-besokende-pa-gjenbruksstasjoner",
