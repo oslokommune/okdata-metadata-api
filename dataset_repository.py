@@ -53,10 +53,9 @@ def get_datasets():
     except Exception:
         items = []
 
-    if not items:
-        # Fall back to legacy dataset table
-        db_response = dataset_table.scan()
-        items = db_response["Items"]
+    # Include datasets from legacy dataset table
+    db_response = dataset_table.scan()
+    items = items + db_response["Items"]
 
     return items
 
