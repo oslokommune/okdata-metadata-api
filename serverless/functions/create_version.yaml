@@ -1,4 +1,4 @@
-handler: version_handler.post_version
+handler: version_handler.create_version
 events:
   - http:
       path: "datasets/{dataset-id}/versions"

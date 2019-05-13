@@ -6,7 +6,7 @@ import common
 import version_repository
 
 
-def post_version(event, context):
+def create_version(event, context):
     """POST /datasets/:dataset-id/versions"""
 
     content = json.loads(event["body"])

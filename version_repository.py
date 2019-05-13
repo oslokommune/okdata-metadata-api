@@ -1,6 +1,5 @@
 import boto3
 from boto3.dynamodb.conditions import Key
-import shortuuid
 
 import common
 import dataset_repository
@@ -29,10 +28,13 @@ def get_version(dataset_id, version_id):
 
     if not items:
         # Fall back to legacy version table
-        db_response = version_table.query(
-            KeyConditionExpression=Key(common.VERSION_ID).eq(version_id)
-        )
-        items = db_response["Items"]
+        try:
+            db_response = version_table.query(
+                KeyConditionExpression=Key(common.VERSION_ID).eq(version_id)
+            )
+            items = db_response["Items"]
+        except Exception:
+            pass
 
     if len(items) == 0:
         return None
@@ -69,12 +71,14 @@ def create_version(dataset_id, content):
         return None
 
     version = content["version"]
-    version_id = generate_unique_id(version)
+    if version_exists(dataset_id, version):
+        return None  # TODO return error message
 
-    content[common.DATASET_ID] = dataset_id
-    content[common.VERSION_ID] = version_id
-    db_response = version_table.put_item(Item=content)
+    version_id = f"{dataset_id}#{version}"
+    content[common.ID_COLUMN] = version_id
+    content[common.TYPE_COLUMN] = "Version"
 
+    db_response = metadata_table.put_item(Item=content)
     http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
 
     if http_status == 200:
@@ -96,7 +100,3 @@ def update_version(dataset_id, version_id, content):
     http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
 
     return http_status == 200
-
-
-def generate_unique_id(version):
-    return version + "-" + shortuuid.ShortUUID().random(length=8)
