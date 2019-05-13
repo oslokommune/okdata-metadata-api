@@ -1,7 +1,7 @@
 handler: version_handler.get_version
 events:
   - http:
-      path: "datasets/{dataset-id}/versions/{version-id}"
+      path: "datasets/{dataset-id}/versions/{version}"
       method: "get"
       documentation:
         summary: "Get a version"
@@ -12,7 +12,7 @@ events:
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
-          - name: "version-id"
+          - name: "version"
             description: "The version you wish to retrieve"
             schema:
               type: "string"

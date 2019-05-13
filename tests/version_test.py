@@ -82,7 +82,7 @@ class VersionTest(unittest.TestCase):
 
         update_event = {
             "body": json.dumps(common_test_helper.version_updated),
-            "pathParameters": {"dataset-id": dataset_id, "version-id": version_name},
+            "pathParameters": {"dataset-id": dataset_id, "version": version_name},
         }
 
         response = version_handler.update_version(update_event, None)
@@ -175,7 +175,7 @@ class VersionTest(unittest.TestCase):
         get_event = {
             "pathParameters": {
                 "dataset-id": common_test_helper.version[table.DATASET_ID],
-                "version-id": common_test_helper.version["version"],
+                "version": common_test_helper.version["version"],
             }
         }
 
@@ -200,7 +200,7 @@ class VersionTest(unittest.TestCase):
         get_event = {
             "pathParameters": {
                 "dataset-id": common_test_helper.version[table.DATASET_ID],
-                "version-id": version_id,
+                "version": version_id,
             }
         }
 
@@ -215,7 +215,7 @@ class VersionTest(unittest.TestCase):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
         common_test_helper.create_version_table(dynamodb)
 
-        get_event = {"pathParameters": {"dataset-id": "1234", "version-id": "1"}}
+        get_event = {"pathParameters": {"dataset-id": "1234", "version": "1"}}
 
         response = version_handler.get_version(get_event, None)
 

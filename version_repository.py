@@ -11,14 +11,14 @@ version_table = dynamodb.Table(common.table_name_prefix + "-version")
 metadata_table = dynamodb.Table("dataset-metadata")
 
 
-def version_exists(dataset_id, version_id):
-    version = get_version(dataset_id, version_id)
-    return version is not None
+def version_exists(dataset_id, version):
+    result = get_version(dataset_id, version)
+    return result is not None
 
 
-def get_version(dataset_id, version_id):
+def get_version(dataset_id, version):
     try:
-        id = f"{dataset_id}#{version_id}"
+        id = f"{dataset_id}#{version}"
         db_response = metadata_table.query(
             KeyConditionExpression=Key(common.ID_COLUMN).eq(id)
         )
@@ -30,7 +30,7 @@ def get_version(dataset_id, version_id):
         # Fall back to legacy version table
         try:
             db_response = version_table.query(
-                KeyConditionExpression=Key(common.VERSION_ID).eq(version_id)
+                KeyConditionExpression=Key(common.VERSION_ID).eq(version)
             )
             items = db_response["Items"]
         except Exception:
@@ -39,7 +39,7 @@ def get_version(dataset_id, version_id):
     if len(items) == 0:
         return None
     elif len(items) > 1:
-        raise Exception(f"Illegal state: Multiple versions with id {version_id}")
+        raise Exception(f"Illegal state: Multiple versions with id {version}")
     else:
         return items[0]
 
@@ -87,8 +87,8 @@ def create_version(dataset_id, content):
         return None
 
 
-def update_version(dataset_id, version_id, content):
-    old_version = get_version(dataset_id, version_id)
+def update_version(dataset_id, version, content):
+    old_version = get_version(dataset_id, version)
     if not old_version:
         return False
 
