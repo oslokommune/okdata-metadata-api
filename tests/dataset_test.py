@@ -39,10 +39,10 @@ class DatasetTest(unittest.TestCase):
     def test_update_dataset(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
-        dataset_table = common.create_dataset_table(dynamodb)
-        dataset_table.put_item(Item=common.dataset)
+        metadata_table = common.create_metadata_table(dynamodb)
+        metadata_table.put_item(Item=common.dataset_new_format)
 
-        dataset_id = common.dataset[table.DATASET_ID]
+        dataset_id = common.dataset_new_format[table.ID_COLUMN]
         event_for_update = {
             "body": json.dumps(common.dataset_updated),
             "pathParameters": {"dataset-id": dataset_id},
@@ -54,10 +54,12 @@ class DatasetTest(unittest.TestCase):
         assert body == dataset_id
         assert response["statusCode"] == 200
 
-        db_response = dataset_table.query(
-            KeyConditionExpression=Key(table.DATASET_ID).eq(dataset_id)
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(table.ID_COLUMN).eq(dataset_id)
         )
         item = db_response["Items"][0]
+        assert item[table.ID_COLUMN] == dataset_id
+        assert item[table.TYPE_COLUMN] == "Dataset"
         assert item["title"] == "UPDATED TITLE"
         assert item["privacyLevel"] == "red"
 

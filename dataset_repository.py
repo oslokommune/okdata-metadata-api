@@ -83,8 +83,9 @@ def update_dataset(dataset_id, content):
     if not dataset_exists(dataset_id):
         return False
 
-    content[common.DATASET_ID] = dataset_id
-    db_response = dataset_table.put_item(Item=content)
+    content[common.ID_COLUMN] = dataset_id
+    content[common.TYPE_COLUMN] = "Dataset"
+    db_response = metadata_table.put_item(Item=content)
 
     http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
 
