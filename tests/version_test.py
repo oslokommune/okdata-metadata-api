@@ -78,7 +78,6 @@ class VersionTest(unittest.TestCase):
 
         dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
         version_name = common_test_helper.version_new_format["version"]
-        version_id = f"{dataset_id}#{version_name}"
 
         update_event = {
             "body": json.dumps(common_test_helper.version_updated),
@@ -86,7 +85,10 @@ class VersionTest(unittest.TestCase):
         }
 
         response = version_handler.update_version(update_event, None)
+        version_id = json.loads(response["body"])
+
         assert response["statusCode"] == 200
+        assert version_id == f"{dataset_id}#{version_name}"
 
         db_response = metadata_table.query(
             KeyConditionExpression=Key(table.ID_COLUMN).eq(version_id)

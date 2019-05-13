@@ -28,7 +28,8 @@ def update_version(event, context):
     version = event["pathParameters"]["version"]
 
     if version_repository.update_version(dataset_id, version, content):
-        return common.response(200, version)
+        version_id = f"{dataset_id}#{version}"
+        return common.response(200, version_id)
     else:
         return common.response(
             404, "Selected version does not exist. Could not update version."
