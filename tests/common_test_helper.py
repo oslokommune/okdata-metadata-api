@@ -135,7 +135,6 @@ version = {
 version_new_format = remove_ids(version)
 version_new_format[table.ID_COLUMN] = f"{dataset[table.DATASET_ID]}#6"
 version_new_format[table.TYPE_COLUMN] = "Version"
-version_new_format.pop("version")
 
 new_version = remove_ids(version)
 
@@ -143,14 +142,14 @@ version_updated = {
     "datasetID": "antall-besokende-pa-gjenbruksstasjoner",
     "versionID": "6-UPDATED",
     "version": "6-TEST",
-    "schema": {},
+    "schema": "new schema",
     "transformation": {},
 }
 
 next_version_new_format = remove_ids(version_updated)
 next_version_new_format[table.ID_COLUMN] = f"{dataset[table.DATASET_ID]}#7"
 next_version_new_format[table.TYPE_COLUMN] = "Version"
-next_version_new_format.pop("version")
+next_version_new_format["version"] = "7"
 
 edition = {
     "datasetID": "antall-besokende-pa-gjenbruksstasjoner",

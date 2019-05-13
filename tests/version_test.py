@@ -73,25 +73,26 @@ class VersionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_update_version(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        version_table = common_test_helper.create_version_table(dynamodb)
-        version_table.put_item(Item=common_test_helper.version)
+        metadata_table = common_test_helper.create_metadata_table(dynamodb)
+        metadata_table.put_item(Item=common_test_helper.version_new_format)
 
-        dataset_id = common_test_helper.version[table.DATASET_ID]
-        version_id = common_test_helper.version[table.VERSION_ID]
+        dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
+        version_name = common_test_helper.version_new_format["version"]
+        version_id = f"{dataset_id}#{version_name}"
 
         update_event = {
             "body": json.dumps(common_test_helper.version_updated),
-            "pathParameters": {"dataset-id": dataset_id, "version-id": version_id},
+            "pathParameters": {"dataset-id": dataset_id, "version-id": version_name},
         }
 
         response = version_handler.update_version(update_event, None)
         assert response["statusCode"] == 200
 
-        db_response = version_table.query(
-            KeyConditionExpression=Key(table.VERSION_ID).eq(version_id)
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(table.ID_COLUMN).eq(version_id)
         )
         version_from_db = db_response["Items"][0]
-        assert version_from_db["version"] == "6-TEST"
+        assert version_from_db["schema"] == "new schema"
 
     @mock_dynamodb2
     def test_should_get_versions_from_new_table_if_present(self):
@@ -151,7 +152,7 @@ class VersionTest(unittest.TestCase):
 
         get_all_event = {
             "pathParameters": {
-                "dataset-id": common_test_helper.version[table.DATASET_ID]
+                "dataset-id": common_test_helper.dataset_new_format[table.ID_COLUMN]
             }
         }
 

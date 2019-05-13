@@ -92,10 +92,11 @@ def update_version(dataset_id, version_id, content):
     if not old_version:
         return False
 
-    content[common.DATASET_ID] = old_version[common.DATASET_ID]
-    content[common.VERSION_ID] = version_id
+    content[common.ID_COLUMN] = old_version[common.ID_COLUMN]
+    content[common.TYPE_COLUMN] = "Version"
+    content["version"] = old_version["version"]
 
-    db_response = version_table.put_item(Item=content)
+    db_response = metadata_table.put_item(Item=content)
 
     http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
 
