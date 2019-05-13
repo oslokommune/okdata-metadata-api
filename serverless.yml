@@ -39,7 +39,7 @@ custom:
       - ${file(serverless/models/Request.yaml)}
 
 functions:
-  post_dataset: ${file(serverless/functions/post_dataset.yaml)}
+  create_dataset: ${file(serverless/functions/create_dataset.yaml)}
   get_datasets: ${file(serverless/functions/get_datasets.yaml)}
   get_dataset:  ${file(serverless/functions/get_dataset.yaml)}
   put_dataset: ${file(serverless/functions/put_dataset.yaml)}

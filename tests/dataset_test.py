@@ -15,21 +15,23 @@ import common_test_helper as common
 
 class DatasetTest(unittest.TestCase):
     @mock_dynamodb2
-    def test_post_dataset(self):
+    def test_create_dataset(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        dataset_table = common.create_dataset_table(dynamodb)
+        metadata_table = common.create_metadata_table(dynamodb)
 
         create_event = {"body": json.dumps(common.new_dataset)}
-        response = dataset_handler.post_dataset(create_event, None)
+        response = dataset_handler.create_dataset(create_event, None)
         dataset_id = json.loads(response["body"])
 
         assert response["statusCode"] == 200
         assert dataset_id == "antall-besokende-pa-gjenbruksstasjoner"
 
-        db_response = dataset_table.query(
-            KeyConditionExpression=Key(table.DATASET_ID).eq(dataset_id)
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(table.ID_COLUMN).eq(dataset_id)
         )
         item = db_response["Items"][0]
+        assert item[table.ID_COLUMN] == dataset_id
+        assert item[table.TYPE_COLUMN] == "Dataset"
         assert item["title"] == "Antall besøkende på gjenbruksstasjoner"
         assert item["privacyLevel"] == "green"
 
