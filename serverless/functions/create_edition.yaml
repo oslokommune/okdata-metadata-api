@@ -1,7 +1,7 @@
-handler: edition_handler.post_edition
+handler: edition_handler.create_edition
 events:
   - http:
-      path: "datasets/{dataset-id}/versions/{version-id}/editions"
+      path: "datasets/{dataset-id}/versions/{version}/editions"
       method: "post"
       documentation:
         summary: "Post an edition"
@@ -16,7 +16,7 @@ events:
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
-          - name: "version-id"
+          - name: "version"
             description: "The version of the given dataset for which to create a new edition"
             schema:
               type: "string"

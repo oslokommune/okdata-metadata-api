@@ -12,7 +12,7 @@ import common_test_helper
 
 class EditionTest(unittest.TestCase):
     @mock_dynamodb2
-    def test_post_edition(self):
+    def test_create_edition(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
         dataset_table = common_test_helper.create_dataset_table(dynamodb)
         version_table = common_test_helper.create_version_table(dynamodb)
@@ -25,11 +25,11 @@ class EditionTest(unittest.TestCase):
             "body": json.dumps(common_test_helper.new_edition),
             "pathParameters": {
                 "dataset-id": common_test_helper.edition[table.DATASET_ID],
-                "version-id": common_test_helper.edition[table.VERSION_ID],
+                "version": common_test_helper.edition[table.VERSION_ID],
             },
         }
 
-        response = edition_handler.post_edition(create_event, None)
+        response = edition_handler.create_edition(create_event, None)
         assert response["statusCode"] == 200
 
     @mock_dynamodb2
@@ -46,8 +46,8 @@ class EditionTest(unittest.TestCase):
             "body": json.dumps(common_test_helper.edition_updated),
             "pathParameters": {
                 "dataset-id": edition[table.DATASET_ID],
-                "version-id": edition[table.VERSION_ID],
-                "edition-id": edition_id,
+                "version": edition[table.VERSION_ID],
+                "edition": edition_id,
             },
         }
 
@@ -71,7 +71,7 @@ class EditionTest(unittest.TestCase):
         get_all_event = {
             "pathParameters": {
                 "dataset-id": common_test_helper.dataset[table.DATASET_ID],
-                "version-id": common_test_helper.version["version"],
+                "version": common_test_helper.version["version"],
             }
         }
 
@@ -95,7 +95,7 @@ class EditionTest(unittest.TestCase):
         get_all_event = {
             "pathParameters": {
                 "dataset-id": edition[table.DATASET_ID],
-                "version-id": edition[table.VERSION_ID],
+                "version": edition[table.VERSION_ID],
             }
         }
 
@@ -118,8 +118,8 @@ class EditionTest(unittest.TestCase):
         get_event = {
             "pathParameters": {
                 "dataset-id": common_test_helper.edition[table.DATASET_ID],
-                "version-id": common_test_helper.version["version"],
-                "edition-id": common_test_helper.edition["edition"],
+                "version": common_test_helper.version["version"],
+                "edition": common_test_helper.edition["edition"],
             }
         }
 
@@ -142,8 +142,8 @@ class EditionTest(unittest.TestCase):
         get_event = {
             "pathParameters": {
                 "dataset-id": edition[table.DATASET_ID],
-                "version-id": edition[table.VERSION_ID],
-                "edition-id": edition_id,
+                "version": edition[table.VERSION_ID],
+                "edition": edition_id,
             }
         }
 
@@ -161,8 +161,8 @@ class EditionTest(unittest.TestCase):
         event_for_get = {
             "pathParameters": {
                 "dataset-id": "1234",
-                "version-id": "1",
-                "edition-id": "20190401T133700",
+                "version": "1",
+                "edition": "20190401T133700",
             }
         }
 

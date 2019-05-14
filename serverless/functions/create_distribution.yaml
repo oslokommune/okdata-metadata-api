@@ -1,7 +1,7 @@
-handler: distribution_handler.post_distribution
+handler: distribution_handler.create_distribution
 events:
   - http:
-      path: "datasets/{dataset-id}/versions/{version-id}/editions/{edition-id}/distributions"
+      path: "datasets/{dataset-id}/versions/{version}/editions/{edition}/distributions"
       method: "post"
       documentation:
         summary: "Post a dataset"
@@ -16,12 +16,12 @@ events:
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
-          - name: "version-id"
+          - name: "version"
             description: "The version of the given dataset for which to create a new distribution"
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
-          - name: "edition-id"
+          - name: "edition"
             description: "The edition of the given dataset for which to create a new distribution"
             schema:
               type: "string"

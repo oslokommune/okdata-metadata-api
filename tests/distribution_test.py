@@ -12,7 +12,7 @@ import common_test_helper
 
 class DistributionTest(unittest.TestCase):
     @mock_dynamodb2
-    def test_post_distribution(self):
+    def test_create_distribution(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
         dataset_table = common_test_helper.create_dataset_table(dynamodb)
         version_table = common_test_helper.create_version_table(dynamodb)
@@ -27,18 +27,18 @@ class DistributionTest(unittest.TestCase):
             "body": json.dumps(common_test_helper.new_distribution),
             "pathParameters": {
                 "dataset-id": common_test_helper.distribution[table.DATASET_ID],
-                "version-id": common_test_helper.distribution[table.VERSION_ID],
-                "edition-id": common_test_helper.distribution[table.EDITION_ID],
+                "version": common_test_helper.distribution[table.VERSION_ID],
+                "edition": common_test_helper.distribution[table.EDITION_ID],
             },
         }
 
-        response = distribution_handler.post_distribution(create_event, None)
+        response = distribution_handler.create_distribution(create_event, None)
         assert response["statusCode"] == 200
 
         bad_create_event = create_event
-        bad_create_event["pathParameters"]["edition-id"] = "LOLOLFEIL"
+        bad_create_event["pathParameters"]["edition"] = "LOLOLFEIL"
 
-        response = distribution_handler.post_distribution(bad_create_event, None)
+        response = distribution_handler.create_distribution(bad_create_event, None)
         assert response["statusCode"] == 400
 
     @mock_dynamodb2
@@ -54,9 +54,9 @@ class DistributionTest(unittest.TestCase):
             "body": json.dumps(common_test_helper.distribution_updated),
             "pathParameters": {
                 "dataset-id": distribution[table.DATASET_ID],
-                "version-id": distribution[table.VERSION_ID],
-                "edition-id": distribution[table.EDITION_ID],
-                "distribution-id": distribution_id,
+                "version": distribution[table.VERSION_ID],
+                "edition": distribution[table.EDITION_ID],
+                "distribution": distribution_id,
             },
         }
 
@@ -80,8 +80,8 @@ class DistributionTest(unittest.TestCase):
         get_all_event = {
             "pathParameters": {
                 "dataset-id": common_test_helper.dataset[table.DATASET_ID],
-                "version-id": common_test_helper.version["version"],
-                "edition-id": common_test_helper.edition["edition"],
+                "version": common_test_helper.version["version"],
+                "edition": common_test_helper.edition["edition"],
             }
         }
 
@@ -102,8 +102,8 @@ class DistributionTest(unittest.TestCase):
         get_all_event = {
             "pathParameters": {
                 "dataset-id": common_test_helper.distribution[table.DATASET_ID],
-                "version-id": common_test_helper.distribution[table.VERSION_ID],
-                "edition-id": common_test_helper.distribution[table.EDITION_ID],
+                "version": common_test_helper.distribution[table.VERSION_ID],
+                "edition": common_test_helper.distribution[table.EDITION_ID],
             }
         }
 
@@ -126,9 +126,9 @@ class DistributionTest(unittest.TestCase):
         get_event = {
             "pathParameters": {
                 "dataset-id": common_test_helper.dataset[table.DATASET_ID],
-                "version-id": common_test_helper.version["version"],
-                "edition-id": common_test_helper.edition["edition"],
-                "distribution-id": common_test_helper.distribution["filename"],
+                "version": common_test_helper.version["version"],
+                "edition": common_test_helper.edition["edition"],
+                "distribution": common_test_helper.distribution["filename"],
             }
         }
 
@@ -149,9 +149,9 @@ class DistributionTest(unittest.TestCase):
         get_event = {
             "pathParameters": {
                 "dataset-id": common_test_helper.distribution[table.DATASET_ID],
-                "version-id": common_test_helper.distribution[table.VERSION_ID],
-                "edition-id": common_test_helper.distribution[table.EDITION_ID],
-                "distribution-id": distribution_id,
+                "version": common_test_helper.distribution[table.VERSION_ID],
+                "edition": common_test_helper.distribution[table.EDITION_ID],
+                "distribution": distribution_id,
             }
         }
 
@@ -169,9 +169,9 @@ class DistributionTest(unittest.TestCase):
         event_for_get = {
             "pathParameters": {
                 "dataset-id": "1234",
-                "version-id": "1",
-                "edition-id": "20190401T133700",
-                "distribution-id": "file.txt",
+                "version": "1",
+                "edition": "20190401T133700",
+                "distribution": "file.txt",
             }
         }
 

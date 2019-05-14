@@ -47,11 +47,11 @@ functions:
   update_version: ${file(serverless/functions/update_version.yaml)}
   get_versions: ${file(serverless/functions/get_versions.yaml)}
   get_version: ${file(serverless/functions/get_version.yaml)}
-  post_edition: ${file(serverless/functions/post_edition.yaml)}
-  put_edition: ${file(serverless/functions/put_edition.yaml)}
+  create_edition: ${file(serverless/functions/create_edition.yaml)}
+  update_edition: ${file(serverless/functions/update_edition.yaml)}
   get_editions: ${file(serverless/functions/get_editions.yaml)}
   get_edition: ${file(serverless/functions/get_edition.yaml)}
-  post_distribution: ${file(serverless/functions/post_distribution.yaml)}
+  create_distribution: ${file(serverless/functions/create_distribution.yaml)}
   put_distribution: ${file(serverless/functions/put_distribution.yaml)}
   get_distributions: ${file(serverless/functions/get_distributions.yaml)}
   get_distribution: ${file(serverless/functions/get_distribution.yaml)}

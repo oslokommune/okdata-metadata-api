@@ -1,7 +1,7 @@
 handler: edition_handler.get_editions
 events:
   - http:
-      path: "datasets/{dataset-id}/versions/{version-id}/editions"
+      path: "datasets/{dataset-id}/versions/{version}/editions"
       method: "get"
       documentation:
         summary: "Get all editions"
@@ -12,7 +12,7 @@ events:
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
-          - name: "version-id"
+          - name: "version"
             description: "The version of the editions you want to retrieve"
             schema:
               type: "string"

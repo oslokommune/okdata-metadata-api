@@ -1,7 +1,7 @@
 handler: distribution_handler.get_distribution
 events:
   - http:
-      path: "datasets/{dataset-id}/versions/{version-id}/editions/{edition-id}/distributions/{distribution-id}"
+      path: "datasets/{dataset-id}/versions/{version}/editions/{edition}/distributions/{distribution}"
       method: "get"
       documentation:
         summary: "Get a distribution"
@@ -12,17 +12,17 @@ events:
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
-          - name: "version-id"
+          - name: "version"
             description: "The version containing the distribution you want to retrieve"
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
-          - name: "edition-id"
+          - name: "edition"
             description: "The edition containing the distribution you want to retrieve"
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
-          - name: "distribution-id"
+          - name: "distribution"
             description: "The distribution you want to retrieve"
             schema:
               type: "string"
