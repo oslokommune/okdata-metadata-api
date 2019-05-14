@@ -1,5 +1,6 @@
 import boto3
 from boto3.dynamodb.conditions import Key
+from botocore.exceptions import ClientError
 
 import common
 import dataset_repository
@@ -18,23 +19,23 @@ def version_exists(dataset_id, version):
 
 def get_version(dataset_id, version):
     try:
-        id = f"{dataset_id}#{version}"
-        db_response = metadata_table.query(
-            KeyConditionExpression=Key(common.ID_COLUMN).eq(id)
+        version_id = f"{dataset_id}#{version}"
+        key = {common.ID_COLUMN: version_id, common.TYPE_COLUMN: "Version"}
+        db_response = metadata_table.get_item(Key=key)
+        if "Item" in db_response:
+            return db_response["Item"]
+
+    except ClientError:
+        pass  # Do nothing for now
+
+    # Fall back to legacy version table
+    try:
+        db_response = version_table.query(
+            KeyConditionExpression=Key(common.VERSION_ID).eq(version)
         )
         items = db_response["Items"]
-    except Exception:
-        items = None
-
-    if not items:
-        # Fall back to legacy version table
-        try:
-            db_response = version_table.query(
-                KeyConditionExpression=Key(common.VERSION_ID).eq(version)
-            )
-            items = db_response["Items"]
-        except Exception:
-            pass
+    except ClientError:
+        return None
 
     if len(items) == 0:
         return None
