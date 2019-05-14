@@ -66,11 +66,10 @@ def get_datasets():
 def create_dataset(content):
     title = content["title"]
     dataset_id = generate_unique_id_based_on_title(title)
-
     content[common.ID_COLUMN] = dataset_id
     content[common.TYPE_COLUMN] = "Dataset"
-    db_response = metadata_table.put_item(Item=content)
 
+    db_response = metadata_table.put_item(Item=content)
     http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
 
     if http_status == 200:

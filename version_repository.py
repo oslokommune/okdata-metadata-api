@@ -1,6 +1,5 @@
 import boto3
 from boto3.dynamodb.conditions import Key
-import shortuuid
 
 import common
 import dataset_repository
@@ -12,14 +11,14 @@ version_table = dynamodb.Table(common.table_name_prefix + "-version")
 metadata_table = dynamodb.Table("dataset-metadata")
 
 
-def version_exists(dataset_id, version_id):
-    version = get_version(dataset_id, version_id)
-    return version is not None
+def version_exists(dataset_id, version):
+    result = get_version(dataset_id, version)
+    return result is not None
 
 
-def get_version(dataset_id, version_id):
+def get_version(dataset_id, version):
     try:
-        id = f"{dataset_id}#{version_id}"
+        id = f"{dataset_id}#{version}"
         db_response = metadata_table.query(
             KeyConditionExpression=Key(common.ID_COLUMN).eq(id)
         )
@@ -29,15 +28,18 @@ def get_version(dataset_id, version_id):
 
     if not items:
         # Fall back to legacy version table
-        db_response = version_table.query(
-            KeyConditionExpression=Key(common.VERSION_ID).eq(version_id)
-        )
-        items = db_response["Items"]
+        try:
+            db_response = version_table.query(
+                KeyConditionExpression=Key(common.VERSION_ID).eq(version)
+            )
+            items = db_response["Items"]
+        except Exception:
+            pass
 
     if len(items) == 0:
         return None
     elif len(items) > 1:
-        raise Exception(f"Illegal state: Multiple versions with id {version_id}")
+        raise Exception(f"Illegal state: Multiple versions with id {version}")
     else:
         return items[0]
 
@@ -69,12 +71,14 @@ def create_version(dataset_id, content):
         return None
 
     version = content["version"]
-    version_id = generate_unique_id(version)
+    if version_exists(dataset_id, version):
+        return None  # TODO return error message
 
-    content[common.DATASET_ID] = dataset_id
-    content[common.VERSION_ID] = version_id
-    db_response = version_table.put_item(Item=content)
+    version_id = f"{dataset_id}#{version}"
+    content[common.ID_COLUMN] = version_id
+    content[common.TYPE_COLUMN] = "Version"
 
+    db_response = metadata_table.put_item(Item=content)
     http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
 
     if http_status == 200:
@@ -83,20 +87,17 @@ def create_version(dataset_id, content):
         return None
 
 
-def update_version(dataset_id, version_id, content):
-    old_version = get_version(dataset_id, version_id)
+def update_version(dataset_id, version, content):
+    old_version = get_version(dataset_id, version)
     if not old_version:
         return False
 
-    content[common.DATASET_ID] = old_version[common.DATASET_ID]
-    content[common.VERSION_ID] = version_id
+    content[common.ID_COLUMN] = old_version[common.ID_COLUMN]
+    content[common.TYPE_COLUMN] = "Version"
+    content["version"] = old_version["version"]
 
-    db_response = version_table.put_item(Item=content)
+    db_response = metadata_table.put_item(Item=content)
 
     http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
 
     return http_status == 200
-
-
-def generate_unique_id(version):
-    return version + "-" + shortuuid.ShortUUID().random(length=8)

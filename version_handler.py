@@ -6,7 +6,7 @@ import common
 import version_repository
 
 
-def post_version(event, context):
+def create_version(event, context):
     """POST /datasets/:dataset-id/versions"""
 
     content = json.loads(event["body"])
@@ -21,13 +21,14 @@ def post_version(event, context):
 
 
 def update_version(event, context):
-    """PUT /datasets/:dataset-id/versions/:version-id"""
+    """PUT /datasets/:dataset-id/versions/:version"""
 
     content = json.loads(event["body"])
     dataset_id = event["pathParameters"]["dataset-id"]
-    version_id = event["pathParameters"]["version-id"]
+    version = event["pathParameters"]["version"]
 
-    if version_repository.update_version(dataset_id, version_id, content):
+    if version_repository.update_version(dataset_id, version, content):
+        version_id = f"{dataset_id}#{version}"
         return common.response(200, version_id)
     else:
         return common.response(
@@ -46,14 +47,14 @@ def get_versions(event, context):
 
 
 def get_version(event, context):
-    """GET /datasets/:dataset-id/versions/:version-id"""
+    """GET /datasets/:dataset-id/versions/:version"""
 
     dataset_id = event["pathParameters"]["dataset-id"]
-    version_id = event["pathParameters"]["version-id"]
+    version = event["pathParameters"]["version"]
 
-    version = version_repository.get_version(dataset_id, version_id)
+    content = version_repository.get_version(dataset_id, version)
 
-    if version:
-        return common.response(200, version)
+    if content:
+        return common.response(200, content)
     else:
         return common.response(404, "Selected version does not exist.")
