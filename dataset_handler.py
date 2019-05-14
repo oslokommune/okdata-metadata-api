@@ -4,7 +4,7 @@ import common
 import dataset_repository
 
 
-def post_dataset(event, context):
+def create_dataset(event, context):
     """POST /datasets"""
 
     content = json.loads(event["body"])

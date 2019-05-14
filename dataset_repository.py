@@ -30,10 +30,13 @@ def get_dataset(dataset_id):
 
     if not items:
         # Fall back to legacy dataset table
-        db_response = dataset_table.query(
-            KeyConditionExpression=Key(common.DATASET_ID).eq(dataset_id)
-        )
-        items = db_response["Items"]
+        try:
+            db_response = dataset_table.query(
+                KeyConditionExpression=Key(common.DATASET_ID).eq(dataset_id)
+            )
+            items = db_response["Items"]
+        except Exception:
+            pass
 
     if len(items) == 0:
         return None
@@ -64,8 +67,9 @@ def create_dataset(content):
     title = content["title"]
     dataset_id = generate_unique_id_based_on_title(title)
 
-    content[common.DATASET_ID] = dataset_id
-    db_response = dataset_table.put_item(Item=content)
+    content[common.ID_COLUMN] = dataset_id
+    content[common.TYPE_COLUMN] = "Dataset"
+    db_response = metadata_table.put_item(Item=content)
 
     http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
 
@@ -79,8 +83,9 @@ def update_dataset(dataset_id, content):
     if not dataset_exists(dataset_id):
         return False
 
-    content[common.DATASET_ID] = dataset_id
-    db_response = dataset_table.put_item(Item=content)
+    content[common.ID_COLUMN] = dataset_id
+    content[common.TYPE_COLUMN] = "Dataset"
+    db_response = metadata_table.put_item(Item=content)
 
     http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
 
