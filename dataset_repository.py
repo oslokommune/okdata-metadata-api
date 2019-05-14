@@ -1,5 +1,6 @@
 import boto3
 from boto3.dynamodb.conditions import Key
+from botocore.exceptions import ClientError
 import re
 import shortuuid
 
@@ -21,22 +22,22 @@ def dataset_exists(dataset_id):
 
 def get_dataset(dataset_id):
     try:
-        db_response = metadata_table.query(
-            KeyConditionExpression=Key(common.ID_COLUMN).eq(dataset_id)
+        key = {common.ID_COLUMN: dataset_id, common.TYPE_COLUMN: "Dataset"}
+        db_response = metadata_table.get_item(Key=key)
+        if "Item" in db_response:
+            return db_response["Item"]
+
+    except ClientError:
+        pass  # Do nothing for now
+
+    # Fall back to legacy dataset table
+    try:
+        db_response = dataset_table.query(
+            KeyConditionExpression=Key(common.DATASET_ID).eq(dataset_id)
         )
         items = db_response["Items"]
     except Exception:
-        items = None
-
-    if not items:
-        # Fall back to legacy dataset table
-        try:
-            db_response = dataset_table.query(
-                KeyConditionExpression=Key(common.DATASET_ID).eq(dataset_id)
-            )
-            items = db_response["Items"]
-        except Exception:
-            pass
+        return None
 
     if len(items) == 0:
         return None
