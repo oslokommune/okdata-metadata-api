@@ -14,50 +14,75 @@ class EditionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_create_edition(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        dataset_table = common_test_helper.create_dataset_table(dynamodb)
-        version_table = common_test_helper.create_version_table(dynamodb)
-        common_test_helper.create_edition_table(dynamodb)
+        metadata_table = common_test_helper.create_metadata_table(dynamodb)
+        metadata_table.put_item(Item=common_test_helper.version_new_format)
 
-        dataset_table.put_item(Item=common_test_helper.dataset)
-        version_table.put_item(Item=common_test_helper.version)
+        dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
 
         create_event = {
             "body": json.dumps(common_test_helper.new_edition),
             "pathParameters": {
-                "dataset-id": common_test_helper.edition[table.DATASET_ID],
-                "version": common_test_helper.edition[table.VERSION_ID],
+                "dataset-id": dataset_id,
+                "version": common_test_helper.version_new_format["version"],
+            },
+        }
+
+        response = edition_handler.create_edition(create_event, None)
+        edition_id = json.loads(response["body"])
+
+        assert response["statusCode"] == 200
+        assert edition_id == f"{dataset_id}#6#1557273600"
+
+    @mock_dynamodb2
+    def test_create_duplicate_edition_should_fail(self):
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        metadata_table = common_test_helper.create_metadata_table(dynamodb)
+
+        metadata_table.put_item(Item=common_test_helper.dataset_new_format)
+        metadata_table.put_item(Item=common_test_helper.version_new_format)
+
+        create_event = {
+            "body": json.dumps(common_test_helper.new_edition),
+            "pathParameters": {
+                "dataset-id": common_test_helper.dataset_new_format[table.ID_COLUMN],
+                "version": common_test_helper.version_new_format["version"],
             },
         }
 
         response = edition_handler.create_edition(create_event, None)
         assert response["statusCode"] == 200
 
+        response = edition_handler.create_edition(create_event, None)
+        assert response["statusCode"] == 400
+
     @mock_dynamodb2
     def test_update_edition(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        edition_table = common_test_helper.create_edition_table(dynamodb)
-
-        edition = common_test_helper.edition
-        edition_id = edition[table.EDITION_ID]
-
-        edition_table.put_item(Item=edition)
+        metadata_table = common_test_helper.create_metadata_table(dynamodb)
+        metadata_table.put_item(Item=common_test_helper.edition_new_format)
 
         update_event = {
             "body": json.dumps(common_test_helper.edition_updated),
             "pathParameters": {
-                "dataset-id": edition[table.DATASET_ID],
-                "version": edition[table.VERSION_ID],
-                "edition": edition_id,
+                "dataset-id": "antall-besokende-pa-gjenbruksstasjoner",
+                "version": "6",
+                "edition": "1557273600",
             },
         }
 
         response = edition_handler.update_edition(update_event, None)
-        assert response["statusCode"] == 200
+        edition_id = json.loads(response["body"])
 
-        db_response = edition_table.query(
-            KeyConditionExpression=Key(table.EDITION_ID).eq(edition_id)
+        assert response["statusCode"] == 200
+        assert edition_id == f"antall-besokende-pa-gjenbruksstasjoner#6#1557273600"
+
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(table.ID_COLUMN).eq(edition_id)
         )
-        assert db_response["Items"][0]["description"] == "CHANGED"
+        edition_from_db = db_response["Items"][0]
+
+        assert edition_from_db["edition"] == "1557273600"
+        assert edition_from_db["description"] == "CHANGED"
 
     @mock_dynamodb2
     def test_get_all_editions_from_new_table_if_present(self):

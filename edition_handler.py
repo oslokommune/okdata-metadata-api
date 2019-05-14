@@ -1,7 +1,9 @@
 import simplejson as json
 
 import common
-import edition_repository
+from edition_repository import EditionRepository
+
+edition_repository = EditionRepository()
 
 
 def create_edition(event, context):
@@ -30,7 +32,10 @@ def update_edition(event, context):
     edition = event["pathParameters"]["edition"]
 
     if edition_repository.update_edition(dataset_id, version, edition, content):
-        return common.response(200, edition)
+        # TODO move to repository response
+        edition_id = f"{dataset_id}#{version}#{edition}"
+
+        return common.response(200, edition_id)
     else:
         return common.response(
             404, "Selected edition does not exist. Could not update edition."

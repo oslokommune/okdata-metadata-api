@@ -19,6 +19,7 @@ setuptools.setup(
         "version_handler",
         "edition_handler",
         "distribution_handler",
+        "CommonRepository",
         "dataset_repository",
         "version_repository",
         "edition_repository",

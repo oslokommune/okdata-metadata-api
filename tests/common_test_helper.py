@@ -174,6 +174,7 @@ edition_updated = {
     "datasetID": "antall-besokende-pa-gjenbruksstasjoner",
     "versionID": "6-TEST",
     "editionID": "EDITION-id-updated",
+    "edition": "1557273600",
     "description": "CHANGED",
     "startTime": "2018-12-21T08:00:00+01:00",
     "endTime": "2018-12-21T09:00:00+01:00",

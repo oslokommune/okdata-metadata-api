@@ -1,7 +1,9 @@
 import simplejson as json
 
 import common
-import distribution_repository
+from distribution_repository import DistributionRepository
+
+distribution_repository = DistributionRepository()
 
 
 def create_distribution(event, context):
@@ -36,7 +38,10 @@ def update_distribution(event, context):
     if distribution_repository.update_distribution(
         dataset_id, version, edition, distribution, content
     ):
-        return common.response(200, distribution)
+        # TODO move to repository response
+        distribution_id = f"{dataset_id}#{version}#{edition}#{distribution}"
+
+        return common.response(200, distribution_id)
     else:
         return common.response(
             404, "Selected distribution does not exist. Could not update distribution."

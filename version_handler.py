@@ -3,7 +3,9 @@
 import simplejson as json
 
 import common
-import version_repository
+from version_repository import VersionRepository
+
+version_repository = VersionRepository()
 
 
 def create_version(event, context):

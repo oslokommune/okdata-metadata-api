@@ -1,103 +1,74 @@
 import boto3
 from boto3.dynamodb.conditions import Key
-from botocore.exceptions import ClientError
 import re
 import shortuuid
 
 from difflib import SequenceMatcher
 
 import common
+from CommonRepository import CommonRepository
 
 
-dynamodb = boto3.resource("dynamodb", "eu-west-1")
+class DatasetRepository(CommonRepository):
+    def __init__(self):
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
-dataset_table = dynamodb.Table(common.table_name_prefix + "-dataset")
-metadata_table = dynamodb.Table("dataset-metadata")
+        self.metadata_table = dynamodb.Table("dataset-metadata")
+        self.dataset_table = dynamodb.Table(common.table_name_prefix + "-dataset")
 
-
-def dataset_exists(dataset_id):
-    dataset = get_dataset(dataset_id)
-    return dataset is not None
-
-
-def get_dataset(dataset_id):
-    try:
-        key = {common.ID_COLUMN: dataset_id, common.TYPE_COLUMN: "Dataset"}
-        db_response = metadata_table.get_item(Key=key)
-        if "Item" in db_response:
-            return db_response["Item"]
-
-    except ClientError:
-        pass  # Do nothing for now
-
-    # Fall back to legacy dataset table
-    try:
-        db_response = dataset_table.query(
-            KeyConditionExpression=Key(common.DATASET_ID).eq(dataset_id)
+        super().__init__(
+            self.metadata_table, "Dataset", self.dataset_table, common.DATASET_ID
         )
-        items = db_response["Items"]
-    except Exception:
-        return None
 
-    if len(items) == 0:
-        return None
-    elif len(items) > 1:
-        raise Exception(f"Illegal state: Multiple datasets with id {dataset_id}")
-    else:
-        return items[0]
+    def dataset_exists(self, dataset_id):
+        dataset = self.get_dataset(dataset_id)
+        return dataset is not None
 
+    def get_dataset(self, dataset_id):
+        return self.get_item(dataset_id, dataset_id)
 
-def get_datasets():
-    try:
-        db_response = metadata_table.query(
-            IndexName="IdByTypeIndex",
-            KeyConditionExpression=Key(common.TYPE_COLUMN).eq("Dataset"),
-        )
-        items = db_response["Items"]
-    except Exception:
-        items = []
+    def get_datasets(self):
+        try:
+            db_response = self.metadata_table.query(
+                IndexName="IdByTypeIndex",
+                KeyConditionExpression=Key(common.TYPE_COLUMN).eq("Dataset"),
+            )
+            items = db_response["Items"]
+        except Exception:
+            items = []
 
-    # Include datasets from legacy dataset table
-    db_response = dataset_table.scan()
-    items = items + db_response["Items"]
+        # Include datasets from legacy dataset table
+        db_response = self.dataset_table.scan()
+        items = items + db_response["Items"]
 
-    return items
+        return items
 
+    def create_dataset(self, content):
+        title = content["title"]
+        dataset_id = self.generate_unique_id_based_on_title(title)
+        return self.create_item(dataset_id, content)
 
-def create_dataset(content):
-    title = content["title"]
-    dataset_id = generate_unique_id_based_on_title(title)
-    content[common.ID_COLUMN] = dataset_id
-    content[common.TYPE_COLUMN] = "Dataset"
+    def update_dataset(self, dataset_id, content):
+        return self.update_item(dataset_id, content)
 
-    db_response = metadata_table.put_item(Item=content)
-    http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
+    def generate_unique_id_based_on_title(self, title):
+        id = slugify(title)[:50]
+        if self.dataset_exists(id):
+            return id + "-" + shortuuid.ShortUUID().random(length=5)
+        else:
+            return id
 
-    if http_status == 200:
-        return dataset_id
-    else:
-        return None
-
-
-def update_dataset(dataset_id, content):
-    if not dataset_exists(dataset_id):
-        return False
-
-    content[common.ID_COLUMN] = dataset_id
-    content[common.TYPE_COLUMN] = "Dataset"
-    db_response = metadata_table.put_item(Item=content)
-
-    http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
-
-    return http_status == 200
-
-
-def generate_unique_id_based_on_title(title):
-    id = slugify(title)[:50]
-    if dataset_exists(id):
-        return id + "-" + shortuuid.ShortUUID().random(length=5)
-    else:
-        return id
+    def check_similarity_to_other_datasets(self, input_json):
+        already_existing_datasets = self.dataset_table.scan()["Items"]
+        print("--- Datasets ---")
+        for dataset in already_existing_datasets:
+            print("-----" + dataset["title"])
+            for item in input_json:
+                print(
+                    item
+                    + ": "
+                    + str(similar(str(dataset[item]), str(input_json[item])))
+                )
 
 
 def slugify(title):
@@ -110,15 +81,6 @@ def slugify(title):
     if t[-1] == "-":
         t = t[0:-1]
     return t
-
-
-def check_similarity_to_other_datasets(input_json):
-    already_existing_datasets = dataset_table.scan()["Items"]
-    print("--- Datasets ---")
-    for dataset in already_existing_datasets:
-        print("-----" + dataset["title"])
-        for item in input_json:
-            print(item + ": " + str(similar(str(dataset[item]), str(input_json[item]))))
 
 
 def similar(a, b):
