@@ -14,27 +14,31 @@ class DistributionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_create_distribution(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        dataset_table = common_test_helper.create_dataset_table(dynamodb)
-        version_table = common_test_helper.create_version_table(dynamodb)
-        edition_table = common_test_helper.create_edition_table(dynamodb)
-        common_test_helper.create_distribution_table(dynamodb)
+        metadata_table = common_test_helper.create_metadata_table(dynamodb)
+        metadata_table.put_item(Item=common_test_helper.edition_new_format)
 
-        dataset_table.put_item(Item=common_test_helper.dataset)
-        version_table.put_item(Item=common_test_helper.version)
-        edition_table.put_item(Item=common_test_helper.edition)
+        dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
 
         create_event = {
             "body": json.dumps(common_test_helper.new_distribution),
             "pathParameters": {
-                "dataset-id": common_test_helper.distribution[table.DATASET_ID],
-                "version": common_test_helper.distribution[table.VERSION_ID],
-                "edition": common_test_helper.distribution[table.EDITION_ID],
+                "dataset-id": dataset_id,
+                "version": common_test_helper.version["version"],
+                "edition": common_test_helper.edition["edition"],
             },
         }
 
         response = distribution_handler.create_distribution(create_event, None)
-        assert response["statusCode"] == 200
+        distribution_id = json.loads(response["body"])
 
+        assert response["statusCode"] == 200
+        assert distribution_id == f"{dataset_id}#6#1557273600#BOOOM.csv"
+
+        # Creating duplicate distribution should fail
+        response = distribution_handler.create_distribution(create_event, None)
+        assert response["statusCode"] == 400
+
+        # Creating distribution for non-existing edition should fail
         bad_create_event = create_event
         bad_create_event["pathParameters"]["edition"] = "LOLOLFEIL"
 
@@ -44,26 +48,27 @@ class DistributionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_update_distribution(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
-        distribution_table = common_test_helper.create_distribution_table(dynamodb)
+        metadata_table = common_test_helper.create_metadata_table(dynamodb)
+        metadata_table.put_item(Item=common_test_helper.distribution_new_format)
 
-        distribution = common_test_helper.distribution
-        distribution_id = distribution[table.DISTRIBUTION_ID]
-        distribution_table.put_item(Item=distribution)
+        dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
+        distribution_id = f"{dataset_id}#6#1557273600#BOOOM.csv"
 
         update_event = {
             "body": json.dumps(common_test_helper.distribution_updated),
             "pathParameters": {
-                "dataset-id": distribution[table.DATASET_ID],
-                "version": distribution[table.VERSION_ID],
-                "edition": distribution[table.EDITION_ID],
-                "distribution": distribution_id,
+                "dataset-id": dataset_id,
+                "version": common_test_helper.version["version"],
+                "edition": common_test_helper.edition["edition"],
+                "distribution": common_test_helper.distribution_new_format["filename"],
             },
         }
 
         response = distribution_handler.update_distribution(update_event, None)
+        assert response["statusCode"] == 200
         assert json.loads(response["body"]) == distribution_id
 
-        db_response = distribution_table.query(
+        db_response = metadata_table.query(
             KeyConditionExpression=Key(table.DISTRIBUTION_ID).eq(distribution_id)
         )
         assert db_response["Items"][0]["filename"] == "UPDATED.csv"
@@ -79,7 +84,7 @@ class DistributionTest(unittest.TestCase):
 
         get_all_event = {
             "pathParameters": {
-                "dataset-id": common_test_helper.dataset[table.DATASET_ID],
+                "dataset-id": common_test_helper.dataset_new_format[table.ID_COLUMN],
                 "version": common_test_helper.version["version"],
                 "edition": common_test_helper.edition["edition"],
             }
@@ -125,7 +130,7 @@ class DistributionTest(unittest.TestCase):
         distribution_id = common_test_helper.distribution_new_format[table.ID_COLUMN]
         get_event = {
             "pathParameters": {
-                "dataset-id": common_test_helper.dataset[table.DATASET_ID],
+                "dataset-id": common_test_helper.dataset_new_format[table.ID_COLUMN],
                 "version": common_test_helper.version["version"],
                 "edition": common_test_helper.edition["edition"],
                 "distribution": common_test_helper.distribution["filename"],

@@ -1,7 +1,10 @@
 import simplejson as json
 
 import common
-import dataset_repository
+from dataset_repository import DatasetRepository
+
+
+dataset_repository = DatasetRepository()
 
 
 def create_dataset(event, context):

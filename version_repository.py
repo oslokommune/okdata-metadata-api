@@ -1,104 +1,38 @@
 import boto3
 from boto3.dynamodb.conditions import Key
-from botocore.exceptions import ClientError
 
 import common
-import dataset_repository
+from CommonRepository import CommonRepository
 
 
-dynamodb = boto3.resource("dynamodb", "eu-west-1")
+class VersionRepository(CommonRepository):
+    def __init__(self):
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
-version_table = dynamodb.Table(common.table_name_prefix + "-version")
-metadata_table = dynamodb.Table("dataset-metadata")
+        self.metadata_table = dynamodb.Table("dataset-metadata")
+        self.version_table = dynamodb.Table(common.table_name_prefix + "-version")
 
+        super().__init__(
+            self.metadata_table, "Version", self.version_table, common.VERSION_ID
+        )
 
-def version_exists(dataset_id, version):
-    result = get_version(dataset_id, version)
-    return result is not None
+    def version_exists(self, dataset_id, version):
+        result = self.get_version(dataset_id, version)
+        return result is not None
 
-
-def get_version(dataset_id, version):
-    try:
+    def get_version(self, dataset_id, version):
         version_id = f"{dataset_id}#{version}"
-        key = {common.ID_COLUMN: version_id, common.TYPE_COLUMN: "Version"}
-        db_response = metadata_table.get_item(Key=key)
-        if "Item" in db_response:
-            return db_response["Item"]
+        return self.get_item(version_id, version)
 
-    except ClientError:
-        pass  # Do nothing for now
+    def get_versions(self, dataset_id):
+        legacy_filter = Key(common.DATASET_ID).eq(dataset_id)
+        return self.get_items(dataset_id, legacy_filter)
 
-    # Fall back to legacy version table
-    try:
-        db_response = version_table.query(
-            KeyConditionExpression=Key(common.VERSION_ID).eq(version)
-        )
-        items = db_response["Items"]
-    except ClientError:
-        return None
+    def create_version(self, dataset_id, content):
+        version = content["version"]
+        version_id = f"{dataset_id}#{version}"
+        return self.create_item(version_id, content, dataset_id, "Dataset")
 
-    if len(items) == 0:
-        return None
-    elif len(items) > 1:
-        raise Exception(f"Illegal state: Multiple versions with id {version}")
-    else:
-        return items[0]
-
-
-def get_versions(dataset_id):
-    try:
-        type_cond = Key(common.TYPE_COLUMN).eq("Version")
-        id_cond = Key(common.ID_COLUMN).begins_with(f"{dataset_id}#")
-
-        db_response = metadata_table.query(
-            IndexName="IdByTypeIndex", KeyConditionExpression=type_cond & id_cond
-        )
-        items = db_response["Items"]
-    except Exception:
-        items = []
-
-    if not items:
-        # Fall back to legacy version table
-        db_response = version_table.scan(
-            FilterExpression=Key(common.DATASET_ID).eq(dataset_id)
-        )
-        items = db_response["Items"]
-
-    return items
-
-
-def create_version(dataset_id, content):
-    if not dataset_repository.dataset_exists(dataset_id):
-        return None
-
-    version = content["version"]
-    if version_exists(dataset_id, version):
-        return None  # TODO return error message
-
-    version_id = f"{dataset_id}#{version}"
-    content[common.ID_COLUMN] = version_id
-    content[common.TYPE_COLUMN] = "Version"
-
-    db_response = metadata_table.put_item(Item=content)
-    http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
-
-    if http_status == 200:
-        return version_id
-    else:
-        return None
-
-
-def update_version(dataset_id, version, content):
-    old_version = get_version(dataset_id, version)
-    if not old_version:
-        return False
-
-    content[common.ID_COLUMN] = old_version[common.ID_COLUMN]
-    content[common.TYPE_COLUMN] = "Version"
-    content["version"] = old_version["version"]
-
-    db_response = metadata_table.put_item(Item=content)
-
-    http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
-
-    return http_status == 200
+    def update_version(self, dataset_id, version, content):
+        version_id = f"{dataset_id}#{version}"
+        return self.update_item(version_id, content)
