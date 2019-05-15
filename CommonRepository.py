@@ -62,13 +62,19 @@ class CommonRepository:
             if "Item" not in db_response:
                 return None
 
-        if self.get_item(id, None):
-            return None
-
         content[common.ID_COLUMN] = id
         content[common.TYPE_COLUMN] = self.type
 
-        db_response = self.table.put_item(Item=content)
+        cond = "attribute_not_exists(Id) AND attribute_not_exists(Type)"
+        try:
+            db_response = self.table.put_item(Item=content, ConditionExpression=cond)
+        except ClientError as e:
+            errorCode = e.response["Error"]["Code"]
+            if errorCode == "ConditionalCheckFailedException":
+                return None
+            else:
+                msg = e.response["Error"]["Message"]
+                raise Exception(f"Error creating item ({errorCode}): {msg}")
 
         http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
 
