@@ -1,7 +1,7 @@
 handler: edition_handler.update_edition
 events:
   - http:
-      path: "datasets/{dataset-id}/versions/{version-id}/editions/{edition-id}"
+      path: "datasets/{dataset-id}/versions/{version}/editions/{edition}"
       method: "put"
       documentation:
         summary: "Update an edition"
@@ -12,12 +12,12 @@ events:
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
-          - name: "version-id"
+          - name: "version"
             description: "The version which contains the edition you want to update"
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
-          - name: "edition-id"
+          - name: "edition"
             description: "The edition you want to update"
             schema:
               type: "string"

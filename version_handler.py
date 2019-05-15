@@ -28,7 +28,9 @@ def update_version(event, context):
     version = event["pathParameters"]["version"]
 
     if version_repository.update_version(dataset_id, version, content):
+        # TODO move to repository response
         version_id = f"{dataset_id}#{version}"
+
         return common.response(200, version_id)
     else:
         return common.response(
