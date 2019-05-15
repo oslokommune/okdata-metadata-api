@@ -31,7 +31,7 @@ class CommonRepository:
             return None
         elif len(items) > 1:
             msg = f"Illegal state: Multiple items with id {legacy_id}"
-            log.error(msg)
+            log.exception(msg)
             raise ValueError(msg)
         else:
             return items[0]
@@ -79,11 +79,12 @@ class CommonRepository:
                 raise ValueError(f"Error creating item ({error_code}): {msg}")
 
         http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
+
         if http_status == 200:
             return id
         else:
             msg = f"Error creating item ({http_status}): {db_response}"
-            log.error(msg)
+            log.exception(msg)
             raise ValueError(msg)
 
     def update_item(self, id, content):
@@ -97,9 +98,10 @@ class CommonRepository:
         db_response = self.table.put_item(Item=content)
 
         http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
-        if http_status != 200:
-            msg = f"Error updating item ({http_status}): {db_response}"
-            log.error(msg)
-            raise ValueError(msg)
 
-        return id
+        if http_status == 200:
+            return id
+        else:
+            msg = f"Error updating item ({http_status}): {db_response}"
+            log.exception(msg)
+            raise ValueError(msg)
