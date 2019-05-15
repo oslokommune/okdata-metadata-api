@@ -15,14 +15,13 @@ def create_distribution(event, context):
     version = event["pathParameters"]["version"]
     edition = event["pathParameters"]["edition"]
 
-    distribution_id = distribution_repository.create_distribution(
-        dataset_id, version, edition, content
-    )
-
-    if distribution_id:
+    try:
+        distribution_id = distribution_repository.create_distribution(
+            dataset_id, version, edition, content
+        )
         return common.response(200, distribution_id)
-    else:
-        return common.response(400, "Error creating distribution.")
+    except Exception as e:
+        return common.response(400, f"Error creating distribution: {e}")
 
 
 def update_distribution(event, context):
@@ -35,17 +34,16 @@ def update_distribution(event, context):
     edition = event["pathParameters"]["edition"]
     distribution = event["pathParameters"]["distribution"]
 
-    if distribution_repository.update_distribution(
-        dataset_id, version, edition, distribution, content
-    ):
-        # TODO move to repository response
-        distribution_id = f"{dataset_id}#{version}#{edition}#{distribution}"
+    try:
+        distribution_id = distribution_repository.update_distribution(
+            dataset_id, version, edition, distribution, content
+        )
 
         return common.response(200, distribution_id)
-    else:
-        return common.response(
-            404, "Selected distribution does not exist. Could not update distribution."
-        )
+    except KeyError:
+        return common.response(404, "Distribution not found.")
+    except ValueError as e:
+        return common.response(400, f"Error updating distribution: {e}")
 
 
 def get_distributions(event, context):
@@ -73,8 +71,7 @@ def get_distribution(event, context):
     content = distribution_repository.get_distribution(
         dataset_id, version, edition, distribution
     )
-
     if content:
         return common.response(200, content)
     else:
-        return common.response(404, "Selected distribution does not exist.")
+        return common.response(404, "Distribution not found.")

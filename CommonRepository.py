@@ -1,7 +1,10 @@
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
+import logging
 
 import common
+
+log = logging.getLogger()
 
 
 class CommonRepository:
@@ -19,21 +22,27 @@ class CommonRepository:
                 return db_response["Item"]
 
         except ClientError:
-            pass  # Do nothing for now
+            pass
 
-        # Fall back to legacy table
+        log.info(f"Item {id} not found. Attempting to fetch from legacy table.")
+
         try:
             db_response = self.legacy_table.query(
                 KeyConditionExpression=Key(self.legacy_key).eq(legacy_id)
             )
             items = db_response["Items"]
-        except Exception:
+        except ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            msg = e.response["Error"]["Message"]
+            log.info(f"Item {legacy_id} not found ({error_code}): {msg}")
             return None
 
         if len(items) == 0:
             return None
         elif len(items) > 1:
-            raise Exception(f"Illegal state: Multiple items with id {legacy_id}")
+            msg = f"Illegal state: Multiple items with id {legacy_id}"
+            log.error(msg)
+            raise ValueError(msg)
         else:
             return items[0]
 
@@ -45,11 +54,12 @@ class CommonRepository:
                 IndexName="IdByTypeIndex", KeyConditionExpression=type_cond & id_cond
             )
             items = db_response["Items"]
-        except Exception:
-            items = []
+        except ClientError:
+            items = None
 
         if not items:
-            # Fall back to legacy edition table
+            log.info(f"Items not found. Attempting to fetch from legacy table.")
+
             db_response = self.legacy_table.scan(FilterExpression=legacy_filter)
             items = db_response["Items"]
 
@@ -60,7 +70,9 @@ class CommonRepository:
             parent_key = {common.ID_COLUMN: parent_id, common.TYPE_COLUMN: parent_type}
             db_response = self.table.get_item(Key=parent_key)
             if "Item" not in db_response:
-                return None
+                msg = f"Parent item with id {parent_id} does not exist"
+                log.error(msg)
+                raise KeyError(msg)
 
         content[common.ID_COLUMN] = id
         content[common.TYPE_COLUMN] = self.type
@@ -69,24 +81,28 @@ class CommonRepository:
         try:
             db_response = self.table.put_item(Item=content, ConditionExpression=cond)
         except ClientError as e:
-            errorCode = e.response["Error"]["Code"]
-            if errorCode == "ConditionalCheckFailedException":
-                return None
+            error_code = e.response["Error"]["Code"]
+            if error_code == "ConditionalCheckFailedException":
+                msg = "Item with id {id} already exists"
+                log.error(msg)
+                raise KeyError(msg)
             else:
                 msg = e.response["Error"]["Message"]
-                raise Exception(f"Error creating item ({errorCode}): {msg}")
+                log.error(msg)
+                raise ValueError(f"Error creating item ({error_code}): {msg}")
 
         http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
-
         if http_status == 200:
             return id
         else:
-            return None
+            msg = f"Error creating item ({http_status}): {db_response}"
+            log.error(msg)
+            raise ValueError(msg)
 
     def update_item(self, id, content):
         old_item = self.get_item(id, None)
         if not old_item:
-            return False
+            raise KeyError(f"Item with id {id} does not exist")
 
         content[common.ID_COLUMN] = old_item[common.ID_COLUMN]
         content[common.TYPE_COLUMN] = self.type
@@ -94,5 +110,9 @@ class CommonRepository:
         db_response = self.table.put_item(Item=content)
 
         http_status = db_response["ResponseMetadata"]["HTTPStatusCode"]
+        if http_status != 200:
+            msg = f"Error updating item ({http_status}): {db_response}"
+            log.error(msg)
+            raise ValueError(msg)
 
-        return http_status == 200
+        return id

@@ -14,12 +14,11 @@ def create_version(event, context):
     content = json.loads(event["body"])
     dataset_id = event["pathParameters"]["dataset-id"]
 
-    version_id = version_repository.create_version(dataset_id, content)
-
-    if version_id:
+    try:
+        version_id = version_repository.create_version(dataset_id, content)
         return common.response(200, version_id)
-    else:
-        return common.response(400, "Error creating version.")
+    except Exception as e:
+        return common.response(400, f"Error creating version: {e}")
 
 
 def update_version(event, context):
@@ -29,15 +28,13 @@ def update_version(event, context):
     dataset_id = event["pathParameters"]["dataset-id"]
     version = event["pathParameters"]["version"]
 
-    if version_repository.update_version(dataset_id, version, content):
-        # TODO move to repository response
-        version_id = f"{dataset_id}#{version}"
-
+    try:
+        version_id = version_repository.update_version(dataset_id, version, content)
         return common.response(200, version_id)
-    else:
-        return common.response(
-            404, "Selected version does not exist. Could not update version."
-        )
+    except KeyError:
+        return common.response(404, "Version not found.")
+    except ValueError as e:
+        return common.response(400, f"Error updating version: {e}")
 
 
 def get_versions(event, context):
@@ -57,8 +54,7 @@ def get_version(event, context):
     version = event["pathParameters"]["version"]
 
     content = version_repository.get_version(dataset_id, version)
-
     if content:
         return common.response(200, content)
     else:
-        return common.response(404, "Selected version does not exist.")
+        return common.response(404, "Version not found.")
