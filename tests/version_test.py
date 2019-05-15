@@ -15,6 +15,7 @@ class VersionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_create_version(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common_test_helper.create_version_table(dynamodb)
         metadata_table = common_test_helper.create_metadata_table(dynamodb)
 
         dataset = common_test_helper.dataset_new_format
@@ -52,6 +53,7 @@ class VersionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_create_duplicate_version_should_fail(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common_test_helper.create_version_table(dynamodb)
         metadata_table = common_test_helper.create_metadata_table(dynamodb)
 
         dataset = common_test_helper.dataset_new_format
@@ -148,6 +150,7 @@ class VersionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_get_all_versions(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common_test_helper.create_version_table(dynamodb)
         metadata_table = common_test_helper.create_metadata_table(dynamodb)
         metadata_table.put_item(Item=common_test_helper.version_new_format)
         metadata_table.put_item(Item=common_test_helper.next_version_new_format)
@@ -195,6 +198,7 @@ class VersionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_get_version_from_legacy_table(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common_test_helper.create_metadata_table(dynamodb)
         version_table = common_test_helper.create_version_table(dynamodb)
         version_table.put_item(Item=common_test_helper.version)
 
@@ -215,6 +219,7 @@ class VersionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_version_not_found(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common_test_helper.create_metadata_table(dynamodb)
         common_test_helper.create_version_table(dynamodb)
 
         get_event = {"pathParameters": {"dataset-id": "1234", "version": "1"}}

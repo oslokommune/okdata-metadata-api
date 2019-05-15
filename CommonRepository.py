@@ -15,27 +15,17 @@ class CommonRepository:
         self.legacy_key = legacy_key
 
     def get_item(self, id, legacy_id):
-        try:
-            key = {common.ID_COLUMN: id, common.TYPE_COLUMN: self.type}
-            db_response = self.table.get_item(Key=key)
-            if "Item" in db_response:
-                return db_response["Item"]
-
-        except ClientError:
-            pass
+        key = {common.ID_COLUMN: id, common.TYPE_COLUMN: self.type}
+        db_response = self.table.get_item(Key=key)
+        if "Item" in db_response:
+            return db_response["Item"]
 
         log.info(f"Item {id} not found. Attempting to fetch from legacy table.")
 
-        try:
-            db_response = self.legacy_table.query(
-                KeyConditionExpression=Key(self.legacy_key).eq(legacy_id)
-            )
-            items = db_response["Items"]
-        except ClientError as e:
-            error_code = e.response["Error"]["Code"]
-            msg = e.response["Error"]["Message"]
-            log.info(f"Item {legacy_id} not found ({error_code}): {msg}")
-            return None
+        db_response = self.legacy_table.query(
+            KeyConditionExpression=Key(self.legacy_key).eq(legacy_id)
+        )
+        items = db_response["Items"]
 
         if len(items) == 0:
             return None
@@ -47,15 +37,12 @@ class CommonRepository:
             return items[0]
 
     def get_items(self, parent_id, legacy_filter):
-        try:
-            type_cond = Key(common.TYPE_COLUMN).eq(self.type)
-            id_cond = Key(common.ID_COLUMN).begins_with(f"{parent_id}#")
-            db_response = self.table.query(
-                IndexName="IdByTypeIndex", KeyConditionExpression=type_cond & id_cond
-            )
-            items = db_response["Items"]
-        except ClientError:
-            items = None
+        type_cond = Key(common.TYPE_COLUMN).eq(self.type)
+        id_cond = Key(common.ID_COLUMN).begins_with(f"{parent_id}#")
+        db_response = self.table.query(
+            IndexName="IdByTypeIndex", KeyConditionExpression=type_cond & id_cond
+        )
+        items = db_response["Items"]
 
         if not items:
             log.info(f"Items not found. Attempting to fetch from legacy table.")

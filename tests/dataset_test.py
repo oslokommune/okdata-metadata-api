@@ -17,6 +17,7 @@ class DatasetTest(unittest.TestCase):
     @mock_dynamodb2
     def test_create_dataset(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common.create_dataset_table(dynamodb)
         metadata_table = common.create_metadata_table(dynamodb)
 
         create_event = {"body": json.dumps(common.new_dataset)}
@@ -83,6 +84,7 @@ class DatasetTest(unittest.TestCase):
     @mock_dynamodb2
     def test_get_all_datasets_legacy(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common.create_metadata_table(dynamodb)
 
         dataset_table = common.create_dataset_table(dynamodb)
         dataset_table.put_item(Item=common.dataset)
@@ -116,6 +118,7 @@ class DatasetTest(unittest.TestCase):
     def test_get_dataset_from_legacy_table(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
+        common.create_metadata_table(dynamodb)
         dataset_table = common.create_dataset_table(dynamodb)
         dataset_table.put_item(Item=common.dataset)
 
@@ -130,6 +133,7 @@ class DatasetTest(unittest.TestCase):
     @mock_dynamodb2
     def test_dataset_not_found(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common.create_metadata_table(dynamodb)
         common.create_dataset_table(dynamodb)
 
         event_for_get = {"pathParameters": {"dataset-id": "1234"}}

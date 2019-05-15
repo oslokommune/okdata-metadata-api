@@ -14,6 +14,7 @@ class EditionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_create_edition(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common_test_helper.create_edition_table(dynamodb)
         metadata_table = common_test_helper.create_metadata_table(dynamodb)
         metadata_table.put_item(Item=common_test_helper.version_new_format)
 
@@ -36,6 +37,7 @@ class EditionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_create_duplicate_edition_should_fail(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common_test_helper.create_edition_table(dynamodb)
         metadata_table = common_test_helper.create_metadata_table(dynamodb)
 
         metadata_table.put_item(Item=common_test_helper.dataset_new_format)
@@ -111,6 +113,7 @@ class EditionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_get_all_editions_legacy(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common_test_helper.create_metadata_table(dynamodb)
         edition_table = common_test_helper.create_edition_table(dynamodb)
 
         edition = common_test_helper.edition
@@ -157,6 +160,7 @@ class EditionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_get_one_edition_legacy(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common_test_helper.create_metadata_table(dynamodb)
         edition_table = common_test_helper.create_edition_table(dynamodb)
 
         edition = common_test_helper.edition
@@ -181,6 +185,7 @@ class EditionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_edition_not_found(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common_test_helper.create_metadata_table(dynamodb)
         common_test_helper.create_edition_table(dynamodb)
 
         event_for_get = {
