@@ -14,6 +14,7 @@ class DistributionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_create_distribution(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common_test_helper.create_distribution_table(dynamodb)
         metadata_table = common_test_helper.create_metadata_table(dynamodb)
         metadata_table.put_item(Item=common_test_helper.edition_new_format)
 
@@ -100,6 +101,7 @@ class DistributionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_get_all_distributions_legacy(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common_test_helper.create_metadata_table(dynamodb)
         distribution_table = common_test_helper.create_distribution_table(dynamodb)
         distribution_table.put_item(Item=common_test_helper.distribution)
         distribution_table.put_item(Item=common_test_helper.distribution_updated)
@@ -146,6 +148,7 @@ class DistributionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_get_one_distribution_legacy(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common_test_helper.create_metadata_table(dynamodb)
         distribution_table = common_test_helper.create_distribution_table(dynamodb)
         distribution_table.put_item(Item=common_test_helper.distribution)
         distribution_table.put_item(Item=common_test_helper.distribution_updated)
@@ -169,6 +172,7 @@ class DistributionTest(unittest.TestCase):
     @mock_dynamodb2
     def test_distribution_not_found(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        common_test_helper.create_metadata_table(dynamodb)
         common_test_helper.create_distribution_table(dynamodb)
 
         event_for_get = {

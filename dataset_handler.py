@@ -12,12 +12,11 @@ def create_dataset(event, context):
 
     content = json.loads(event["body"])
 
-    dataset_id = dataset_repository.create_dataset(content)
-
-    if dataset_id:
+    try:
+        dataset_id = dataset_repository.create_dataset(content)
         return common.response(200, dataset_id)
-    else:
-        return common.response(400, "Error creating dataset.")
+    except Exception as e:
+        return common.response(400, f"Error creating dataset: {e}")
 
 
 def update_dataset(event, context):
@@ -26,12 +25,13 @@ def update_dataset(event, context):
     content = json.loads(event["body"])
     dataset_id = event["pathParameters"]["dataset-id"]
 
-    if dataset_repository.update_dataset(dataset_id, content):
+    try:
+        dataset_repository.update_dataset(dataset_id, content)
         return common.response(200, dataset_id)
-    else:
-        return common.response(
-            404, "Selected dataset does not exist. Could not update dataset."
-        )
+    except KeyError:
+        return common.response(404, "Dataset not found.")
+    except ValueError as e:
+        return common.response(400, f"Error updating dataset: {e}")
 
 
 def get_datasets(event, context):
@@ -51,4 +51,4 @@ def get_dataset(event, context):
     if dataset:
         return common.response(200, dataset)
     else:
-        return common.response(404, "Selected dataset does not exist.")
+        return common.response(404, "Dataset not found.")

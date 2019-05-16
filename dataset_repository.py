@@ -28,14 +28,11 @@ class DatasetRepository(CommonRepository):
         return self.get_item(dataset_id, dataset_id)
 
     def get_datasets(self):
-        try:
-            db_response = self.metadata_table.query(
-                IndexName="IdByTypeIndex",
-                KeyConditionExpression=Key(common.TYPE_COLUMN).eq("Dataset"),
-            )
-            items = db_response["Items"]
-        except Exception:
-            items = []
+        db_response = self.metadata_table.query(
+            IndexName="IdByTypeIndex",
+            KeyConditionExpression=Key(common.TYPE_COLUMN).eq("Dataset"),
+        )
+        items = db_response["Items"]
 
         # Include datasets from legacy dataset table
         db_response = self.dataset_table.scan()

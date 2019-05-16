@@ -14,12 +14,11 @@ def create_edition(event, context):
     dataset_id = event["pathParameters"]["dataset-id"]
     version = event["pathParameters"]["version"]
 
-    edition_id = edition_repository.create_edition(dataset_id, version, content)
-
-    if edition_id:
+    try:
+        edition_id = edition_repository.create_edition(dataset_id, version, content)
         return common.response(200, edition_id)
-    else:
-        return common.response(400, "Error creating edition.")
+    except Exception as e:
+        return common.response(400, f"Error creating edition: {e}")
 
 
 def update_edition(event, context):
@@ -31,15 +30,15 @@ def update_edition(event, context):
     version = event["pathParameters"]["version"]
     edition = event["pathParameters"]["edition"]
 
-    if edition_repository.update_edition(dataset_id, version, edition, content):
-        # TODO move to repository response
-        edition_id = f"{dataset_id}#{version}#{edition}"
-
-        return common.response(200, edition_id)
-    else:
-        return common.response(
-            404, "Selected edition does not exist. Could not update edition."
+    try:
+        edition_id = edition_repository.update_edition(
+            dataset_id, version, edition, content
         )
+        return common.response(200, edition_id)
+    except KeyError:
+        return common.response(404, "Edition not found.")
+    except ValueError as e:
+        return common.response(400, f"Error updating edition: {e}")
 
 
 def get_editions(event, context):
@@ -61,8 +60,7 @@ def get_edition(event, context):
     edition = event["pathParameters"]["edition"]
 
     content = edition_repository.get_edition(dataset_id, version, edition)
-
     if content:
         return common.response(200, content)
     else:
-        return common.response(404, "Selected edition does not exist.")
+        return common.response(404, "Edition not found.")
