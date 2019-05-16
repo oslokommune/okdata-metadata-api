@@ -32,7 +32,10 @@ class DistributionTest(unittest.TestCase):
         response = distribution_handler.create_distribution(create_event, None)
         distribution_id = json.loads(response["body"])
 
+        expected_location = f"/datasets/{dataset_id}/versions/6/editions/1557273600/distributions/BOOOM.csv"
+
         assert response["statusCode"] == 200
+        assert response["headers"]["Location"] == expected_location
         assert distribution_id == f"{dataset_id}#6#1557273600#BOOOM.csv"
 
         # Creating duplicate distribution should fail

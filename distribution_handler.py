@@ -19,7 +19,12 @@ def create_distribution(event, context):
         distribution_id = distribution_repository.create_distribution(
             dataset_id, version, edition, content
         )
-        return common.response(200, distribution_id)
+
+        distribution = distribution_id.split("#")[-1]
+        location = f"/datasets/{dataset_id}/versions/{version}/editions/{edition}/distributions/{distribution}"
+        headers = {"Location": location}
+
+        return common.response(200, distribution_id, headers)
     except Exception as e:
         return common.response(400, f"Error creating distribution: {e}")
 

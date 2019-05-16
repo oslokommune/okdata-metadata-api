@@ -16,7 +16,12 @@ def create_version(event, context):
 
     try:
         version_id = version_repository.create_version(dataset_id, content)
-        return common.response(200, version_id)
+
+        version = version_id.split("#")[-1]
+        location = f"/datasets/{dataset_id}/versions/{version}"
+        headers = {"Location": location}
+
+        return common.response(200, version_id, headers)
     except Exception as e:
         return common.response(400, f"Error creating version: {e}")
 

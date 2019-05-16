@@ -31,7 +31,10 @@ class VersionTest(unittest.TestCase):
         response = version_handler.create_version(create_event, None)
         version_id = json.loads(response["body"])
 
+        expected_location = f'/datasets/{dataset_id}/versions/{version["version"]}'
+
         assert response["statusCode"] == 200
+        assert response["headers"]["Location"] == expected_location
         assert version_id == f'{dataset_id}#{version["version"]}'
 
         db_response = metadata_table.query(
