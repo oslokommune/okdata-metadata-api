@@ -31,7 +31,10 @@ class EditionTest(unittest.TestCase):
         response = edition_handler.create_edition(create_event, None)
         edition_id = json.loads(response["body"])
 
+        expected_location = f"/datasets/{dataset_id}/versions/6/editions/1557273600"
+
         assert response["statusCode"] == 200
+        assert response["headers"]["Location"] == expected_location
         assert edition_id == f"{dataset_id}#6#1557273600"
 
     @mock_dynamodb2

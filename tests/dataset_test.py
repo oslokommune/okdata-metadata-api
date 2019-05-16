@@ -25,6 +25,7 @@ class DatasetTest(unittest.TestCase):
         dataset_id = json.loads(response["body"])
 
         assert response["statusCode"] == 200
+        assert response["headers"]["Location"] == f"/datasets/{dataset_id}"
         assert dataset_id == "antall-besokende-pa-gjenbruksstasjoner"
 
         db_response = metadata_table.query(

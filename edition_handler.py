@@ -16,7 +16,12 @@ def create_edition(event, context):
 
     try:
         edition_id = edition_repository.create_edition(dataset_id, version, content)
-        return common.response(200, edition_id)
+
+        edition = edition_id.split("#")[-1]
+        location = f"/datasets/{dataset_id}/versions/{version}/editions/{edition}"
+        headers = {"Location": location}
+
+        return common.response(200, edition_id, headers)
     except Exception as e:
         return common.response(400, f"Error creating edition: {e}")
 

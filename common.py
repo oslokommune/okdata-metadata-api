@@ -10,9 +10,6 @@ DISTRIBUTION_ID = "distributionID"
 table_name_prefix = "metadata-api"
 
 
-def response(statusCode, body):
-    return {
-        "statusCode": statusCode,
-        "headers": {"Access-Control-Allow-Origin": "*"},
-        "body": json.dumps(body),
-    }
+def response(statusCode, body, headers={}):
+    headers["Access-Control-Allow-Origin"] = "*"
+    return {"statusCode": statusCode, "headers": headers, "body": json.dumps(body)}
