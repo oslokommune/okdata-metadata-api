@@ -64,9 +64,13 @@ class CommonRepository:
         content[common.ID_COLUMN] = id
         content[common.TYPE_COLUMN] = self.type
 
-        cond = "attribute_not_exists(Id) AND attribute_not_exists(Type)"
+        cond = "attribute_not_exists(Id) AND attribute_not_exists(#Type)"
         try:
-            db_response = self.table.put_item(Item=content, ConditionExpression=cond)
+            db_response = self.table.put_item(
+                Item=content,
+                ExpressionAttributeNames={"#Type": common.TYPE_COLUMN},
+                ConditionExpression=cond,
+            )
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code == "ConditionalCheckFailedException":
