@@ -20,7 +20,7 @@ def create_distribution(event, context):
             dataset_id, version, edition, content
         )
 
-        distribution = distribution_id.split("#")[-1]
+        distribution = distribution_id.split("/")[-1]
         location = f"/datasets/{dataset_id}/versions/{version}/editions/{edition}/distributions/{distribution}"
         headers = {"Location": location}
 

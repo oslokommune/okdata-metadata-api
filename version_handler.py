@@ -17,7 +17,7 @@ def create_version(event, context):
     try:
         version_id = version_repository.create_version(dataset_id, content)
 
-        version = version_id.split("#")[-1]
+        version = version_id.split("/")[-1]
         location = f"/datasets/{dataset_id}/versions/{version}"
         headers = {"Location": location}
 

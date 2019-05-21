@@ -36,7 +36,7 @@ class DistributionTest(unittest.TestCase):
 
         assert response["statusCode"] == 200
         assert response["headers"]["Location"] == expected_location
-        assert distribution_id == f"{dataset_id}#6#1557273600#BOOOM.csv"
+        assert distribution_id == f"{dataset_id}/6/1557273600/BOOOM.csv"
 
         # Creating duplicate distribution should fail
         response = distribution_handler.create_distribution(create_event, None)
@@ -56,7 +56,7 @@ class DistributionTest(unittest.TestCase):
         metadata_table.put_item(Item=common_test_helper.distribution_new_format)
 
         dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
-        distribution_id = f"{dataset_id}#6#1557273600#BOOOM.csv"
+        distribution_id = f"{dataset_id}/6/1557273600/BOOOM.csv"
 
         update_event = {
             "body": json.dumps(common_test_helper.distribution_updated),

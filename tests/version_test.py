@@ -35,7 +35,7 @@ class VersionTest(unittest.TestCase):
 
         assert response["statusCode"] == 200
         assert response["headers"]["Location"] == expected_location
-        assert version_id == f'{dataset_id}#{version["version"]}'
+        assert version_id == f'{dataset_id}/{version["version"]}'
 
         db_response = metadata_table.query(
             KeyConditionExpression=Key(table.ID_COLUMN).eq(version_id)
@@ -93,7 +93,7 @@ class VersionTest(unittest.TestCase):
         version_id = json.loads(response["body"])
 
         assert response["statusCode"] == 200
-        assert version_id == f"{dataset_id}#{version_name}"
+        assert version_id == f"{dataset_id}/{version_name}"
 
         db_response = metadata_table.query(
             KeyConditionExpression=Key(table.ID_COLUMN).eq(version_id)
@@ -131,7 +131,7 @@ class VersionTest(unittest.TestCase):
         metadata_table = common_test_helper.create_metadata_table(dynamodb)
 
         version_new_table = deepcopy(common_test_helper.version_new_format)
-        version_new_table[table.ID_COLUMN] = "my-dataset#6"
+        version_new_table[table.ID_COLUMN] = "my-dataset/6"
 
         version_table.put_item(Item=common_test_helper.version)
         metadata_table.put_item(Item=version_new_table)

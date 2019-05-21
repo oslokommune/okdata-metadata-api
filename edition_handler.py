@@ -17,7 +17,7 @@ def create_edition(event, context):
     try:
         edition_id = edition_repository.create_edition(dataset_id, version, content)
 
-        edition = edition_id.split("#")[-1]
+        edition = edition_id.split("/")[-1]
         location = f"/datasets/{dataset_id}/versions/{version}/editions/{edition}"
         headers = {"Location": location}
 

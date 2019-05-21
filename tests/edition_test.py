@@ -35,7 +35,7 @@ class EditionTest(unittest.TestCase):
 
         assert response["statusCode"] == 200
         assert response["headers"]["Location"] == expected_location
-        assert edition_id == f"{dataset_id}#6#1557273600"
+        assert edition_id == f"{dataset_id}/6/1557273600"
 
     @mock_dynamodb2
     def test_create_duplicate_edition_should_fail(self):
@@ -79,7 +79,7 @@ class EditionTest(unittest.TestCase):
         edition_id = json.loads(response["body"])
 
         assert response["statusCode"] == 200
-        assert edition_id == f"antall-besokende-pa-gjenbruksstasjoner#6#1557273600"
+        assert edition_id == f"antall-besokende-pa-gjenbruksstasjoner/6/1557273600"
 
         db_response = metadata_table.query(
             KeyConditionExpression=Key(table.ID_COLUMN).eq(edition_id)
