@@ -133,7 +133,7 @@ version = {
 }
 
 version_new_format = remove_ids(version)
-version_new_format[table.ID_COLUMN] = f"{dataset[table.DATASET_ID]}#6"
+version_new_format[table.ID_COLUMN] = f"{dataset[table.DATASET_ID]}/6"
 version_new_format[table.TYPE_COLUMN] = "Version"
 
 new_version = remove_ids(version)
@@ -147,7 +147,7 @@ version_updated = {
 }
 
 next_version_new_format = remove_ids(version_updated)
-next_version_new_format[table.ID_COLUMN] = f"{dataset[table.DATASET_ID]}#7"
+next_version_new_format[table.ID_COLUMN] = f"{dataset[table.DATASET_ID]}/7"
 next_version_new_format[table.TYPE_COLUMN] = "Version"
 next_version_new_format["version"] = "7"
 
@@ -164,7 +164,7 @@ edition = {
 new_edition = remove_ids(edition)
 
 edition_id_new = (
-    f"{dataset[table.DATASET_ID]}#{version['version']}#{edition['edition']}"
+    f"{dataset[table.DATASET_ID]}/{version['version']}/{edition['edition']}"
 )
 edition_new_format = remove_ids(edition)
 edition_new_format[table.ID_COLUMN] = edition_id_new
@@ -190,7 +190,7 @@ distribution = {
     "checksum": "...",
 }
 
-distribution_id_new = f"{dataset[table.DATASET_ID]}#{version['version']}#{edition['edition']}#{distribution['filename']}"
+distribution_id_new = f"{dataset[table.DATASET_ID]}/{version['version']}/{edition['edition']}/{distribution['filename']}"
 distribution_new_format = remove_ids(distribution)
 distribution_new_format[table.ID_COLUMN] = distribution_id_new
 distribution_new_format[table.TYPE_COLUMN] = "Distribution"

@@ -21,11 +21,11 @@ class EditionRepository(CommonRepository):
         return result is not None
 
     def get_edition(self, dataset_id, version, edition):
-        edition_id = f"{dataset_id}#{version}#{edition}"
+        edition_id = f"{dataset_id}/{version}/{edition}"
         return self.get_item(edition_id, edition)
 
     def get_editions(self, dataset_id, version):
-        version_id = f"{dataset_id}#{version}"
+        version_id = f"{dataset_id}/{version}"
         legacy_filter = Key(common.DATASET_ID).eq(dataset_id) & Key(
             common.VERSION_ID
         ).eq(version)
@@ -33,11 +33,11 @@ class EditionRepository(CommonRepository):
 
     def create_edition(self, dataset_id, version, content):
         edition = content["edition"]
-        edition_id = f"{dataset_id}#{version}#{edition}"
-        version_id = f"{dataset_id}#{version}"
+        edition_id = f"{dataset_id}/{version}/{edition}"
+        version_id = f"{dataset_id}/{version}"
 
         return self.create_item(edition_id, content, version_id, "Version")
 
     def update_edition(self, dataset_id, version, edition, content):
-        edition_id = f"{dataset_id}#{version}#{edition}"
+        edition_id = f"{dataset_id}/{version}/{edition}"
         return self.update_item(edition_id, content)

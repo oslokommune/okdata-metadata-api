@@ -26,11 +26,11 @@ class DistributionRepository(CommonRepository):
         return result is not None
 
     def get_distribution(self, dataset_id, version, edition, distribution):
-        distribution_id = f"{dataset_id}#{version}#{edition}#{distribution}"
+        distribution_id = f"{dataset_id}/{version}/{edition}/{distribution}"
         return self.get_item(distribution_id, distribution)
 
     def get_distributions(self, dataset_id, version, edition):
-        edition_id = f"{dataset_id}#{version}#{edition}"
+        edition_id = f"{dataset_id}/{version}/{edition}"
         legacy_filter = (
             Key(common.DATASET_ID).eq(dataset_id)
             & Key(common.VERSION_ID).eq(version)
@@ -40,11 +40,11 @@ class DistributionRepository(CommonRepository):
 
     def create_distribution(self, dataset_id, version, edition, content):
         filename = content["filename"]
-        distribution_id = f"{dataset_id}#{version}#{edition}#{filename}"
-        edition_id = f"{dataset_id}#{version}#{edition}"
+        distribution_id = f"{dataset_id}/{version}/{edition}/{filename}"
+        edition_id = f"{dataset_id}/{version}/{edition}"
 
         return self.create_item(distribution_id, content, edition_id, "Edition")
 
     def update_distribution(self, dataset_id, version, edition, distribution, content):
-        distribution_id = f"{dataset_id}#{version}#{edition}#{distribution}"
+        distribution_id = f"{dataset_id}/{version}/{edition}/{distribution}"
         return self.update_item(distribution_id, content)

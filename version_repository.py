@@ -21,7 +21,7 @@ class VersionRepository(CommonRepository):
         return result is not None
 
     def get_version(self, dataset_id, version):
-        version_id = f"{dataset_id}#{version}"
+        version_id = f"{dataset_id}/{version}"
         return self.get_item(version_id, version)
 
     def get_versions(self, dataset_id):
@@ -30,9 +30,9 @@ class VersionRepository(CommonRepository):
 
     def create_version(self, dataset_id, content):
         version = content["version"]
-        version_id = f"{dataset_id}#{version}"
+        version_id = f"{dataset_id}/{version}"
         return self.create_item(version_id, content, dataset_id, "Dataset")
 
     def update_version(self, dataset_id, version, content):
-        version_id = f"{dataset_id}#{version}"
+        version_id = f"{dataset_id}/{version}"
         return self.update_item(version_id, content)

@@ -38,7 +38,7 @@ class CommonRepository:
 
     def get_items(self, parent_id, legacy_filter):
         type_cond = Key(common.TYPE_COLUMN).eq(self.type)
-        id_cond = Key(common.ID_COLUMN).begins_with(f"{parent_id}#")
+        id_cond = Key(common.ID_COLUMN).begins_with(f"{parent_id}/")
         db_response = self.table.query(
             IndexName="IdByTypeIndex", KeyConditionExpression=type_cond & id_cond
         )
