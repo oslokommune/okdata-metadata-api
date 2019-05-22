@@ -59,6 +59,7 @@ class EditionTest(unittest.TestCase):
 
         response = edition_handler.create_edition(create_event, None)
         assert response["statusCode"] == 409
+        assert str.startswith(json.loads(response["body"]), "Resource Conflict")
 
     @mock_dynamodb2
     def test_update_edition(self):

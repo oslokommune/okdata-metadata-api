@@ -40,6 +40,7 @@ class DistributionTest(unittest.TestCase):
         # Creating duplicate distribution should fail
         response = distribution_handler.create_distribution(create_event, None)
         assert response["statusCode"] == 409
+        assert str.startswith(json.loads(response["body"]), "Resource Conflict")
 
         # Creating distribution for non-existing edition should fail
         bad_create_event = create_event

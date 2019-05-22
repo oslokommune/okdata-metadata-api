@@ -24,7 +24,7 @@ def create_edition(event, context):
 
         return common.response(200, edition_id, headers)
     except ResourceConflict as d:
-        return common.response(409, f"'Resource Conflict': {d}")
+        return common.response(409, f"Resource Conflict: {d}")
     except Exception as e:
         return common.response(400, f"Error creating edition: {e}")
 
