@@ -1,6 +1,7 @@
 import simplejson as json
 
 import common
+from CommonRepository import ResourceConflict
 from edition_repository import EditionRepository
 
 edition_repository = EditionRepository()
@@ -22,6 +23,8 @@ def create_edition(event, context):
         headers = {"Location": location}
 
         return common.response(200, edition_id, headers)
+    except ResourceConflict as d:
+        return common.response(409, f"'Resource Conflict': {d}")
     except Exception as e:
         return common.response(400, f"Error creating edition: {e}")
 

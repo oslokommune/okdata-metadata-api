@@ -3,6 +3,7 @@
 import simplejson as json
 
 import common
+from CommonRepository import ResourceConflict
 from version_repository import VersionRepository
 
 version_repository = VersionRepository()
@@ -22,6 +23,8 @@ def create_version(event, context):
         headers = {"Location": location}
 
         return common.response(200, version_id, headers)
+    except ResourceConflict as d:
+        return common.response(409, f"'Resource Conflict': {d}")
     except Exception as e:
         return common.response(400, f"Error creating version: {e}")
 

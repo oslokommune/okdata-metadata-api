@@ -1,6 +1,7 @@
 import simplejson as json
 
 import common
+from CommonRepository import ResourceConflict
 from dataset_repository import DatasetRepository
 
 
@@ -18,6 +19,8 @@ def create_dataset(event, context):
         headers = {"Location": f"/datasets/{dataset_id}"}
 
         return common.response(200, dataset_id, headers)
+    except ResourceConflict as d:
+        return common.response(409, f"'Resource Conflict': {d}")
     except Exception as e:
         return common.response(400, f"Error creating dataset: {e}")
 

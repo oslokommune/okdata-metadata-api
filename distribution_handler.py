@@ -1,6 +1,7 @@
 import simplejson as json
 
 import common
+from CommonRepository import ResourceConflict
 from distribution_repository import DistributionRepository
 
 distribution_repository = DistributionRepository()
@@ -25,6 +26,8 @@ def create_distribution(event, context):
         headers = {"Location": location}
 
         return common.response(200, distribution_id, headers)
+    except ResourceConflict as d:
+        return common.response(409, f"'Resource Conflict': {d}")
     except Exception as e:
         return common.response(400, f"Error creating distribution: {e}")
 
