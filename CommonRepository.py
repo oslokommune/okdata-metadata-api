@@ -76,7 +76,7 @@ class CommonRepository:
             if error_code == "ConditionalCheckFailedException":
                 msg = "Item with id {id} already exists"
                 log.error(msg)
-                raise KeyError(msg)
+                raise ResourceConflict(msg, e)
             else:
                 msg = e.response["Error"]["Message"]
                 log.error(msg)
@@ -109,3 +109,9 @@ class CommonRepository:
             msg = f"Error updating item ({http_status}): {db_response}"
             log.exception(msg)
             raise ValueError(msg)
+
+
+class ResourceConflict(Exception):
+    def __init__(self, msg, errors):
+        super().__init__(msg)
+        self.errors = errors

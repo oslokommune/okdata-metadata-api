@@ -73,7 +73,8 @@ class VersionTest(unittest.TestCase):
         assert response["statusCode"] == 200
 
         response = version_handler.create_version(create_event, None)
-        assert response["statusCode"] == 400
+        assert response["statusCode"] == 409
+        assert str.startswith(json.loads(response["body"]), "Resource Conflict")
 
     @mock_dynamodb2
     def test_update_version(self):
