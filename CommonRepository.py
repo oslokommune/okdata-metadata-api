@@ -76,7 +76,7 @@ class CommonRepository:
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code == "ConditionalCheckFailedException":
-                msg = "Item with id {id} already exists"
+                msg = f"Item with id {id} already exists"
                 log.error(msg)
                 raise ResourceConflict(msg, e)
             else:
