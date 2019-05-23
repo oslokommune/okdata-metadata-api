@@ -36,15 +36,17 @@ class CommonRepository:
         else:
             return items[0]
 
-    def get_items(self, parent_id, legacy_filter):
-        type_cond = Key(common.TYPE_COLUMN).eq(self.type)
-        id_cond = Key(common.ID_COLUMN).begins_with(f"{parent_id}/")
+    def get_items(self, parent_id=None, legacy_filter=None):
+        cond = Key(common.TYPE_COLUMN).eq(self.type)
+        if parent_id:
+            cond = cond & Key(common.ID_COLUMN).begins_with(f"{parent_id}/")
+
         db_response = self.table.query(
-            IndexName="IdByTypeIndex", KeyConditionExpression=type_cond & id_cond
+            IndexName="IdByTypeIndex", KeyConditionExpression=cond
         )
         items = db_response["Items"]
 
-        if not items:
+        if not items and legacy_filter:
             log.info(f"Items not found. Attempting to fetch from legacy table.")
 
             db_response = self.legacy_table.scan(FilterExpression=legacy_filter)
