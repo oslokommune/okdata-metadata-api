@@ -32,13 +32,7 @@ class DatasetRepository(CommonRepository):
             IndexName="IdByTypeIndex",
             KeyConditionExpression=Key(common.TYPE_COLUMN).eq("Dataset"),
         )
-        items = db_response["Items"]
-
-        # Include datasets from legacy dataset table
-        db_response = self.dataset_table.scan()
-        items = items + db_response["Items"]
-
-        return items
+        return db_response["Items"]
 
     def create_dataset(self, content):
         title = content["title"]

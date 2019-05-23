@@ -66,7 +66,7 @@ class DatasetTest(unittest.TestCase):
         assert item["privacyLevel"] == "red"
 
     @mock_dynamodb2
-    def test_should_get_datasets_from_both_tables(self):
+    def test_should_just_get_datasets_from_new_table(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
         dataset_table = common.create_dataset_table(dynamodb)
@@ -78,12 +78,12 @@ class DatasetTest(unittest.TestCase):
         datasets = json.loads(response["body"])
 
         assert response["statusCode"] == 200
-        assert len(datasets) == 2
+        assert len(datasets) == 1
         assert common.dataset_new_format in datasets
-        assert common.dataset_updated in datasets
+        assert common.dataset_updated not in datasets
 
     @mock_dynamodb2
-    def test_get_all_datasets_legacy(self):
+    def test_should_not_get_datasets_legacy(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
         common.create_metadata_table(dynamodb)
 
@@ -95,7 +95,7 @@ class DatasetTest(unittest.TestCase):
         datasets = json.loads(response["body"])
 
         assert response["statusCode"] == 200
-        assert len(datasets) == 2
+        assert len(datasets) == 0
 
     @mock_dynamodb2
     def test_should_fetch_dataset_from_new_table_if_present(self):
