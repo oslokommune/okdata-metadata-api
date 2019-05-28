@@ -51,6 +51,8 @@ def get_versions(event, context):
     dataset_id = event["pathParameters"]["dataset-id"]
 
     versions = version_repository.get_versions(dataset_id)
+    for version in versions:
+        add_self_url(version)
 
     return common.response(200, versions)
 
@@ -63,6 +65,14 @@ def get_version(event, context):
 
     content = version_repository.get_version(dataset_id, version)
     if content:
+        add_self_url(content)
         return common.response(200, content)
     else:
         return common.response(404, "Version not found.")
+
+
+def add_self_url(version):
+    if "Id" in version:
+        (dataset_id, version_name) = version["Id"].split("/")
+        self_url = f"/datasets/{dataset_id}/versions/{version_name}"
+        version["_links"] = {"self": {"href": self_url}}
