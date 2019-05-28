@@ -44,6 +44,8 @@ def get_datasets(event, context):
     """GET /datasets"""
 
     datasets = dataset_repository.get_datasets()
+    for dataset in datasets:
+        add_self_url(dataset)
 
     return common.response(200, datasets)
 
@@ -55,6 +57,13 @@ def get_dataset(event, context):
     dataset = dataset_repository.get_dataset(dataset_id)
 
     if dataset:
+        add_self_url(dataset)
         return common.response(200, dataset)
     else:
         return common.response(404, "Dataset not found.")
+
+
+def add_self_url(dataset):
+    if "Id" in dataset:
+        self_url = f'/datasets/{dataset["Id"]}'
+        dataset["_links"] = {"self": {"href": self_url}}
