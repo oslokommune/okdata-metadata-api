@@ -85,10 +85,12 @@ class DistributionTest(unittest.TestCase):
         distribution_table.put_item(Item=common_test_helper.distribution)
         metadata_table.put_item(Item=common_test_helper.distribution_new_format)
 
+        dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
+        version = common_test_helper.version["version"]
         get_all_event = {
             "pathParameters": {
-                "dataset-id": common_test_helper.dataset_new_format[table.ID_COLUMN],
-                "version": common_test_helper.version["version"],
+                "dataset-id": dataset_id,
+                "version": version,
                 "edition": "20190528T133700",
             }
         }
@@ -98,7 +100,13 @@ class DistributionTest(unittest.TestCase):
 
         assert response["statusCode"] == 200
         assert len(distributions_from_db) == 1
+
+        self_url = distributions_from_db[0].pop("_links")["self"]["href"]
         assert distributions_from_db[0] == common_test_helper.distribution_new_format
+        assert (
+            self_url
+            == f"/datasets/{dataset_id}/versions/{version}/editions/20190528T133700/distributions/e80b5f2c-67f0-4a50-a6d9-b6a565ef2401"
+        )
 
     @mock_dynamodb2
     def test_get_all_distributions_legacy(self):
@@ -131,11 +139,13 @@ class DistributionTest(unittest.TestCase):
         distribution_table.put_item(Item=common_test_helper.distribution)
         metadata_table.put_item(Item=common_test_helper.distribution_new_format)
 
+        dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
+        version = common_test_helper.version["version"]
         distribution_id = common_test_helper.distribution_new_format[table.ID_COLUMN]
         get_event = {
             "pathParameters": {
-                "dataset-id": common_test_helper.dataset_new_format[table.ID_COLUMN],
-                "version": common_test_helper.version["version"],
+                "dataset-id": dataset_id,
+                "version": version,
                 "edition": "20190528T133700",
                 "distribution": "e80b5f2c-67f0-4a50-a6d9-b6a565ef2401",
             }
@@ -146,6 +156,12 @@ class DistributionTest(unittest.TestCase):
 
         assert response["statusCode"] == 200
         assert distribution_from_db[table.ID_COLUMN] == distribution_id
+
+        self_url = distribution_from_db.pop("_links")["self"]["href"]
+        assert (
+            self_url
+            == f"/datasets/{dataset_id}/versions/{version}/editions/20190528T133700/distributions/e80b5f2c-67f0-4a50-a6d9-b6a565ef2401"
+        )
 
     @mock_dynamodb2
     def test_get_one_distribution_legacy(self):

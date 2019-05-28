@@ -65,6 +65,9 @@ def get_distributions(event, context):
         dataset_id, version, edition
     )
 
+    for distribution in distributions:
+        add_self_url(distribution)
+
     return common.response(200, distributions)
 
 
@@ -80,6 +83,14 @@ def get_distribution(event, context):
         dataset_id, version, edition, distribution
     )
     if content:
+        add_self_url(content)
         return common.response(200, content)
     else:
         return common.response(404, "Distribution not found.")
+
+
+def add_self_url(distribution):
+    if "Id" in distribution:
+        (dataset_id, version, edition, distribution_id) = distribution["Id"].split("/")
+        self_url = f"/datasets/{dataset_id}/versions/{version}/editions/{edition}/distributions/{distribution_id}"
+        distribution["_links"] = {"self": {"href": self_url}}
