@@ -31,11 +31,13 @@ class EditionTest(unittest.TestCase):
         response = edition_handler.create_edition(create_event, None)
         edition_id = json.loads(response["body"])
 
-        expected_location = f"/datasets/{dataset_id}/versions/6/editions/1557273600"
+        expected_location = (
+            f"/datasets/{dataset_id}/versions/6/editions/20190528T133700"
+        )
 
         assert response["statusCode"] == 200
         assert response["headers"]["Location"] == expected_location
-        assert edition_id == f"{dataset_id}/6/1557273600"
+        assert edition_id == f"{dataset_id}/6/20190528T133700"
 
     @mock_dynamodb2
     def test_create_duplicate_edition_should_fail(self):
@@ -72,7 +74,7 @@ class EditionTest(unittest.TestCase):
             "pathParameters": {
                 "dataset-id": "antall-besokende-pa-gjenbruksstasjoner",
                 "version": "6",
-                "edition": "1557273600",
+                "edition": "20190528T133700",
             },
         }
 
@@ -80,14 +82,14 @@ class EditionTest(unittest.TestCase):
         edition_id = json.loads(response["body"])
 
         assert response["statusCode"] == 200
-        assert edition_id == f"antall-besokende-pa-gjenbruksstasjoner/6/1557273600"
+        assert edition_id == f"antall-besokende-pa-gjenbruksstasjoner/6/20190528T133700"
 
         db_response = metadata_table.query(
             KeyConditionExpression=Key(table.ID_COLUMN).eq(edition_id)
         )
         edition_from_db = db_response["Items"][0]
 
-        assert edition_from_db["edition"] == "1557273600"
+        assert edition_from_db["edition"] == "2019-05-28T15:37:00+02:00"
         assert edition_from_db["description"] == "CHANGED"
 
     @mock_dynamodb2
@@ -151,7 +153,7 @@ class EditionTest(unittest.TestCase):
             "pathParameters": {
                 "dataset-id": common_test_helper.edition[table.DATASET_ID],
                 "version": common_test_helper.version["version"],
-                "edition": common_test_helper.edition["edition"],
+                "edition": "20190528T133700",
             }
         }
 

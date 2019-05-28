@@ -155,7 +155,7 @@ edition = {
     "datasetID": "antall-besokende-pa-gjenbruksstasjoner",
     "versionID": "6-TEST",
     "editionID": "EDITION-id",
-    "edition": "1557273600",
+    "edition": "2019-05-28T15:37:00+02:00",
     "description": "Data for one hour",
     "startTime": "2018-12-21T08:00:00+01:00",
     "endTime": "2018-12-21T09:00:00+01:00",
@@ -163,9 +163,7 @@ edition = {
 
 new_edition = remove_ids(edition)
 
-edition_id_new = (
-    f"{dataset[table.DATASET_ID]}/{version['version']}/{edition['edition']}"
-)
+edition_id_new = f"{dataset[table.DATASET_ID]}/{version['version']}/20190528T133700"
 edition_new_format = remove_ids(edition)
 edition_new_format[table.ID_COLUMN] = edition_id_new
 edition_new_format[table.TYPE_COLUMN] = "Edition"
@@ -174,7 +172,7 @@ edition_updated = {
     "datasetID": "antall-besokende-pa-gjenbruksstasjoner",
     "versionID": "6-TEST",
     "editionID": "EDITION-id-updated",
-    "edition": "1557273600",
+    "edition": "2019-05-28T15:37:00+02:00",
     "description": "CHANGED",
     "startTime": "2018-12-21T08:00:00+01:00",
     "endTime": "2018-12-21T09:00:00+01:00",
@@ -190,7 +188,7 @@ distribution = {
     "checksum": "...",
 }
 
-distribution_id_new = f"{dataset[table.DATASET_ID]}/{version['version']}/{edition['edition']}/{distribution['filename']}"
+distribution_id_new = f"{dataset[table.DATASET_ID]}/{version['version']}/20190528T133700/{distribution['filename']}"
 distribution_new_format = remove_ids(distribution)
 distribution_new_format[table.ID_COLUMN] = distribution_id_new
 distribution_new_format[table.TYPE_COLUMN] = "Distribution"
