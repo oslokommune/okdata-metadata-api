@@ -25,17 +25,17 @@ class DistributionTest(unittest.TestCase):
             "pathParameters": {
                 "dataset-id": dataset_id,
                 "version": common_test_helper.version["version"],
-                "edition": common_test_helper.edition["edition"],
+                "edition": "20190528T133700",
             },
         }
         response = distribution_handler.create_distribution(create_event, None)
         distribution_id = json.loads(response["body"])
 
-        expected_location = f"/datasets/{dataset_id}/versions/6/editions/1557273600/distributions/BOOOM.csv"
+        expected_location = f"/datasets/{dataset_id}/versions/6/editions/20190528T133700/distributions/BOOOM.csv"
 
         assert response["statusCode"] == 200
         assert response["headers"]["Location"] == expected_location
-        assert distribution_id == f"{dataset_id}/6/1557273600/BOOOM.csv"
+        assert distribution_id == f"{dataset_id}/6/20190528T133700/BOOOM.csv"
 
         # Creating duplicate distribution should fail
         response = distribution_handler.create_distribution(create_event, None)
@@ -56,14 +56,14 @@ class DistributionTest(unittest.TestCase):
         metadata_table.put_item(Item=common_test_helper.distribution_new_format)
 
         dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
-        distribution_id = f"{dataset_id}/6/1557273600/BOOOM.csv"
+        distribution_id = f"{dataset_id}/6/20190528T133700/BOOOM.csv"
 
         update_event = {
             "body": json.dumps(common_test_helper.distribution_updated),
             "pathParameters": {
                 "dataset-id": dataset_id,
                 "version": common_test_helper.version["version"],
-                "edition": common_test_helper.edition["edition"],
+                "edition": "20190528T133700",
                 "distribution": common_test_helper.distribution_new_format["filename"],
             },
         }
@@ -90,7 +90,7 @@ class DistributionTest(unittest.TestCase):
             "pathParameters": {
                 "dataset-id": common_test_helper.dataset_new_format[table.ID_COLUMN],
                 "version": common_test_helper.version["version"],
-                "edition": common_test_helper.edition["edition"],
+                "edition": "20190528T133700",
             }
         }
 
@@ -137,7 +137,7 @@ class DistributionTest(unittest.TestCase):
             "pathParameters": {
                 "dataset-id": common_test_helper.dataset_new_format[table.ID_COLUMN],
                 "version": common_test_helper.version["version"],
-                "edition": common_test_helper.edition["edition"],
+                "edition": "20190528T133700",
                 "distribution": common_test_helper.distribution["filename"],
             }
         }

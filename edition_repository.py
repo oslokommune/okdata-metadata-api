@@ -1,8 +1,12 @@
 import boto3
 from boto3.dynamodb.conditions import Key
+from datetime import datetime, timezone
 
 import common
 from CommonRepository import CommonRepository
+
+
+edition_fmt = "%Y%m%dT%H%M%S"
 
 
 class EditionRepository(CommonRepository):
@@ -32,8 +36,8 @@ class EditionRepository(CommonRepository):
         return self.get_items(version_id, legacy_filter)
 
     def create_edition(self, dataset_id, version, content):
-        edition = content["edition"]
-        edition_id = f"{dataset_id}/{version}/{edition}"
+        edition_ts = datetime.fromisoformat(content["edition"]).astimezone(timezone.utc)
+        edition_id = f"{dataset_id}/{version}/{edition_ts.strftime(edition_fmt)}"
         version_id = f"{dataset_id}/{version}"
 
         return self.create_item(edition_id, content, version_id, "Version")
