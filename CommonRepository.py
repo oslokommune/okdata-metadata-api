@@ -17,8 +17,15 @@ class CommonRepository:
     def get_item(self, id, legacy_id):
         key = {common.ID_COLUMN: id, common.TYPE_COLUMN: self.type}
         db_response = self.table.get_item(Key=key)
+
         if "Item" in db_response:
-            return db_response["Item"]
+            item = db_response["Item"]
+
+            # Set correct ID for 'latest' version/edition
+            if "latest" in item:
+                item["Id"] = item.pop("latest")
+
+            return item
 
         log.info(f"Item {id} not found. Attempting to fetch from legacy table.")
 
