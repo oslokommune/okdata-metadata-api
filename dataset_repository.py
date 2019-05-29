@@ -66,7 +66,7 @@ def slugify(title):
     a = "àáäâãåăçèéëêæǵḧìíïîḿńǹñòóöôœøṕŕßśșțùúüûǘẃẍÿź_"
     b = "aaaaaaaceeeeeghiiiimnnnooooooprssstuuuuuwxyz "
     tr = str.maketrans(a, b)
-    t = re.sub("\\W+", "-", title.lower().translate(tr))
+    t = re.sub("[^a-z0-9]+", "-", title.lower().translate(tr))
     if t[0] == "-":
         t = t[1:]
     if t[-1] == "-":
