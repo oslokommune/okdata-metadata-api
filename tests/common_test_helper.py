@@ -188,7 +188,7 @@ distribution = {
     "checksum": "...",
 }
 
-distribution_id_new = f"{dataset[table.DATASET_ID]}/{version['version']}/20190528T133700/{distribution['filename']}"
+distribution_id_new = f"{dataset[table.DATASET_ID]}/{version['version']}/20190528T133700/e80b5f2c-67f0-4a50-a6d9-b6a565ef2401"
 distribution_new_format = remove_ids(distribution)
 distribution_new_format[table.ID_COLUMN] = distribution_id_new
 distribution_new_format[table.TYPE_COLUMN] = "Distribution"

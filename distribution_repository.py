@@ -1,5 +1,6 @@
 import boto3
 from boto3.dynamodb.conditions import Key
+import uuid
 
 import common
 from CommonRepository import CommonRepository
@@ -39,8 +40,7 @@ class DistributionRepository(CommonRepository):
         return self.get_items(edition_id, legacy_filter)
 
     def create_distribution(self, dataset_id, version, edition, content):
-        filename = content["filename"]
-        distribution_id = f"{dataset_id}/{version}/{edition}/{filename}"
+        distribution_id = f"{dataset_id}/{version}/{edition}/{uuid.uuid4()}"
         edition_id = f"{dataset_id}/{version}/{edition}"
 
         return self.create_item(distribution_id, content, edition_id, "Edition")

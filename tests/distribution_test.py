@@ -1,4 +1,5 @@
 import json
+import re
 import unittest
 
 import boto3
@@ -31,16 +32,12 @@ class DistributionTest(unittest.TestCase):
         response = distribution_handler.create_distribution(create_event, None)
         distribution_id = json.loads(response["body"])
 
-        expected_location = f"/datasets/{dataset_id}/versions/6/editions/20190528T133700/distributions/BOOOM.csv"
+        id_regex = f"{dataset_id}/6/20190528T133700/[0-9a-f-]+"
+        location_regex = f"/datasets/{dataset_id}/versions/6/editions/20190528T133700/distributions/[0-9a-f-]+"
 
         assert response["statusCode"] == 200
-        assert response["headers"]["Location"] == expected_location
-        assert distribution_id == f"{dataset_id}/6/20190528T133700/BOOOM.csv"
-
-        # Creating duplicate distribution should fail
-        response = distribution_handler.create_distribution(create_event, None)
-        assert response["statusCode"] == 409
-        assert str.startswith(json.loads(response["body"]), "Resource Conflict")
+        assert re.fullmatch(id_regex, distribution_id)
+        assert re.fullmatch(location_regex, response["headers"]["Location"])
 
         # Creating distribution for non-existing edition should fail
         bad_create_event = create_event
@@ -56,7 +53,9 @@ class DistributionTest(unittest.TestCase):
         metadata_table.put_item(Item=common_test_helper.distribution_new_format)
 
         dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
-        distribution_id = f"{dataset_id}/6/20190528T133700/BOOOM.csv"
+        distribution_id = (
+            f"{dataset_id}/6/20190528T133700/e80b5f2c-67f0-4a50-a6d9-b6a565ef2401"
+        )
 
         update_event = {
             "body": json.dumps(common_test_helper.distribution_updated),
@@ -64,7 +63,7 @@ class DistributionTest(unittest.TestCase):
                 "dataset-id": dataset_id,
                 "version": common_test_helper.version["version"],
                 "edition": "20190528T133700",
-                "distribution": common_test_helper.distribution_new_format["filename"],
+                "distribution": "e80b5f2c-67f0-4a50-a6d9-b6a565ef2401",
             },
         }
 
@@ -138,7 +137,7 @@ class DistributionTest(unittest.TestCase):
                 "dataset-id": common_test_helper.dataset_new_format[table.ID_COLUMN],
                 "version": common_test_helper.version["version"],
                 "edition": "20190528T133700",
-                "distribution": common_test_helper.distribution["filename"],
+                "distribution": "e80b5f2c-67f0-4a50-a6d9-b6a565ef2401",
             }
         }
 
@@ -183,7 +182,7 @@ class DistributionTest(unittest.TestCase):
                 "dataset-id": "1234",
                 "version": "1",
                 "edition": "20190401T133700",
-                "distribution": "file.txt",
+                "distribution": "6f563c62-8fe4-4591-a999-5fbf0798e268",
             }
         }
 
