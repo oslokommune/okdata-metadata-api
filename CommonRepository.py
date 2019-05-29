@@ -54,7 +54,9 @@ class CommonRepository:
 
         return items
 
-    def create_item(self, id, content, parent_id=None, parent_type=None):
+    def create_item(
+        self, id, content, parent_id=None, parent_type=None, update_on_exists=False
+    ):
         if parent_id:
             parent_key = {common.ID_COLUMN: parent_id, common.TYPE_COLUMN: parent_type}
             db_response = self.table.get_item(Key=parent_key)
@@ -66,13 +68,16 @@ class CommonRepository:
         content[common.ID_COLUMN] = id
         content[common.TYPE_COLUMN] = self.type
 
-        cond = "attribute_not_exists(Id) AND attribute_not_exists(#Type)"
         try:
-            db_response = self.table.put_item(
-                Item=content,
-                ExpressionAttributeNames={"#Type": common.TYPE_COLUMN},
-                ConditionExpression=cond,
-            )
+            if update_on_exists:
+                db_response = self.table.put_item(Item=content)
+            else:
+                cond = "attribute_not_exists(Id) AND attribute_not_exists(#Type)"
+                db_response = self.table.put_item(
+                    Item=content,
+                    ExpressionAttributeNames={"#Type": common.TYPE_COLUMN},
+                    ConditionExpression=cond,
+                )
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code == "ConditionalCheckFailedException":
