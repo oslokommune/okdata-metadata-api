@@ -111,11 +111,8 @@ class VersionTest(unittest.TestCase):
         version_table.put_item(Item=common_test_helper.version_updated)
         metadata_table.put_item(Item=common_test_helper.version_new_format)
 
-        get_all_event = {
-            "pathParameters": {
-                "dataset-id": common_test_helper.version[table.DATASET_ID]
-            }
-        }
+        dataset_id = common_test_helper.version[table.DATASET_ID]
+        get_all_event = {"pathParameters": {"dataset-id": dataset_id}}
 
         response = version_handler.get_versions(get_all_event, None)
 
@@ -123,6 +120,9 @@ class VersionTest(unittest.TestCase):
 
         assert response["statusCode"] == 200
         assert len(versions) == 1
+
+        self_url = versions[0].pop("_links")["self"]["href"]
+        assert self_url == f"/datasets/{dataset_id}/versions/6"
         assert versions[0] == common_test_helper.version_new_format
 
     @mock_dynamodb2
@@ -181,11 +181,10 @@ class VersionTest(unittest.TestCase):
         version_table.put_item(Item=common_test_helper.version)
         metadata_table.put_item(Item=common_test_helper.version_new_format)
 
+        dataset_id = common_test_helper.version[table.DATASET_ID]
+        version_name = common_test_helper.version["version"]
         get_event = {
-            "pathParameters": {
-                "dataset-id": common_test_helper.version[table.DATASET_ID],
-                "version": common_test_helper.version["version"],
-            }
+            "pathParameters": {"dataset-id": dataset_id, "version": version_name}
         }
 
         response = version_handler.get_version(get_event, None)
@@ -198,6 +197,9 @@ class VersionTest(unittest.TestCase):
             == common_test_helper.version_new_format[table.ID_COLUMN]
         )
         assert version_from_db[table.TYPE_COLUMN] == "Version"
+
+        self_url = version_from_db["_links"]["self"]["href"]
+        assert self_url == f"/datasets/{dataset_id}/versions/{version_name}"
 
     @mock_dynamodb2
     def test_get_version_from_legacy_table(self):

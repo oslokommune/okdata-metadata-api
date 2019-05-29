@@ -56,6 +56,8 @@ def get_editions(event, context):
     version = event["pathParameters"]["version"]
 
     editions = edition_repository.get_editions(dataset_id, version)
+    for edition in editions:
+        add_self_url(edition)
 
     return common.response(200, editions)
 
@@ -69,6 +71,14 @@ def get_edition(event, context):
 
     content = edition_repository.get_edition(dataset_id, version, edition)
     if content:
+        add_self_url(content)
         return common.response(200, content)
     else:
         return common.response(404, "Edition not found.")
+
+
+def add_self_url(edition):
+    if "Id" in edition:
+        (dataset_id, version, edition_name) = edition["Id"].split("/")
+        self_url = f"/datasets/{dataset_id}/versions/{version}/editions/{edition_name}"
+        edition["_links"] = {"self": {"href": self_url}}

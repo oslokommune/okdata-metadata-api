@@ -101,20 +101,24 @@ class EditionTest(unittest.TestCase):
         edition_table.put_item(Item=common_test_helper.edition)
         metadata_table.put_item(Item=common_test_helper.edition_new_format)
 
+        dataset_id = common_test_helper.dataset[table.DATASET_ID]
+        version = common_test_helper.version["version"]
         get_all_event = {
-            "pathParameters": {
-                "dataset-id": common_test_helper.dataset[table.DATASET_ID],
-                "version": common_test_helper.version["version"],
-            }
+            "pathParameters": {"dataset-id": dataset_id, "version": version}
         }
 
         response = edition_handler.get_editions(get_all_event, None)
 
         editions_from_db = json.loads(response["body"])
+        self_url = editions_from_db[0].pop("_links")["self"]["href"]
 
         assert response["statusCode"] == 200
         assert len(editions_from_db) == 1
         assert editions_from_db[0] == common_test_helper.edition_new_format
+        assert (
+            self_url
+            == f"/datasets/{dataset_id}/versions/{version}/editions/20190528T133700"
+        )
 
     @mock_dynamodb2
     def test_get_all_editions_legacy(self):
@@ -149,19 +153,26 @@ class EditionTest(unittest.TestCase):
         edition_table.put_item(Item=common_test_helper.edition)
         metadata_table.put_item(Item=common_test_helper.edition_new_format)
 
+        dataset_id = common_test_helper.dataset[table.DATASET_ID]
+        version = common_test_helper.version["version"]
         get_event = {
             "pathParameters": {
-                "dataset-id": common_test_helper.edition[table.DATASET_ID],
-                "version": common_test_helper.version["version"],
+                "dataset-id": dataset_id,
+                "version": version,
                 "edition": "20190528T133700",
             }
         }
 
         response = edition_handler.get_edition(get_event, None)
         edition_from_db = json.loads(response["body"])
+        self_url = edition_from_db.pop("_links")["self"]["href"]
 
         assert response["statusCode"] == 200
         assert edition_from_db == common_test_helper.edition_new_format
+        assert (
+            self_url
+            == f"/datasets/{dataset_id}/versions/{version}/editions/20190528T133700"
+        )
 
     @mock_dynamodb2
     def test_get_one_edition_legacy(self):

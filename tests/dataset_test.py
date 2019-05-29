@@ -79,8 +79,6 @@ class DatasetTest(unittest.TestCase):
 
         assert response["statusCode"] == 200
         assert len(datasets) == 1
-        assert common.dataset_new_format in datasets
-        assert common.dataset_updated not in datasets
 
     @mock_dynamodb2
     def test_should_not_get_datasets_legacy(self):
@@ -113,6 +111,8 @@ class DatasetTest(unittest.TestCase):
         response = dataset_handler.get_dataset(get_event, None)
         dataset_from_db = json.loads(response["body"])
 
+        self_url = dataset_from_db.pop("_links")["self"]["href"]
+        assert self_url == f"/datasets/{dataset_id}"
         assert dataset_from_db == common.dataset_new_format
 
     @mock_dynamodb2
