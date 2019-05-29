@@ -59,6 +59,9 @@ class CommonRepository:
             db_response = self.legacy_table.scan(FilterExpression=legacy_filter)
             items = db_response["Items"]
 
+        # Remove 'latest' version/edition
+        items = list(filter(lambda i: "latest" not in i, items))
+
         return items
 
     def create_item(
