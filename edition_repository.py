@@ -40,7 +40,14 @@ class EditionRepository(CommonRepository):
         edition_id = f"{dataset_id}/{version}/{edition_ts.strftime(edition_fmt)}"
         version_id = f"{dataset_id}/{version}"
 
-        return self.create_item(edition_id, content, version_id, "Version")
+        result = self.create_item(edition_id, content, version_id, "Version")
+
+        latest = content.copy()
+        latest["latest"] = edition_id
+        latest_id = f"{dataset_id}/{version}/latest"
+        self.create_item(latest_id, latest, update_on_exists=True)
+
+        return result
 
     def update_edition(self, dataset_id, version, edition, content):
         edition_id = f"{dataset_id}/{version}/{edition}"

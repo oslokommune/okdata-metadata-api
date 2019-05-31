@@ -31,7 +31,15 @@ class VersionRepository(CommonRepository):
     def create_version(self, dataset_id, content):
         version = content["version"]
         version_id = f"{dataset_id}/{version}"
-        return self.create_item(version_id, content, dataset_id, "Dataset")
+
+        result = self.create_item(version_id, content, dataset_id, "Dataset")
+
+        latest = content.copy()
+        latest["latest"] = version_id
+        latest_id = f"{dataset_id}/latest"
+        self.create_item(latest_id, latest, update_on_exists=True)
+
+        return result
 
     def update_version(self, dataset_id, version, content):
         version_id = f"{dataset_id}/{version}"
