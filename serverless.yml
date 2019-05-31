@@ -1,4 +1,4 @@
-service: metadata-api-serverless-testing
+service: metadata-api
 
 provider:
   name: aws
