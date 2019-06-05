@@ -19,7 +19,7 @@ provider:
 plugins:
   - serverless-aws-documentation
   - serverless-python-requirements
-
+  - serverless-scriptable-plugin
 package:
   exclude:
     - './**'
@@ -27,6 +27,8 @@ package:
     - './*.py'
 
 custom:
+  scriptHooks:
+    after:deploy:finalize: make put-parameter
   pythonRequirements:
     dockerizePip: non-linux
   documentation:
