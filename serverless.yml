@@ -28,7 +28,7 @@ package:
 
 custom:
   scriptHooks:
-    after:deploy:finalize: make put-parameter
+    after:deploy:finalize: make update-ssm STAGE=${self:provider.stage}
   pythonRequirements:
     dockerizePip: non-linux
   documentation:
