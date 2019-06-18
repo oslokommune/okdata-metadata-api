@@ -9,12 +9,18 @@ provider:
     name: ok-origo-dataplatform-config-${self:provider.stage}
     serverSideEncryption: AES256
   deploymentPrefix: deploy
+  tracing:
+    lambda: true
   iamManagedPolicies:
     - Fn::Join:
       - ':'
       - - 'arn:aws:iam:'
         - Ref: AWS::AccountId
         - 'policy/metadata-api-policy'
+    - Fn::Join:
+        - ':'
+        - - 'arn:aws:iam::aws'
+          - 'policy/AWSXRayDaemonWriteAccess'
 
 plugins:
   - serverless-aws-documentation

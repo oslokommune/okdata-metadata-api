@@ -4,7 +4,9 @@ from datetime import datetime, timezone
 
 import common
 from CommonRepository import CommonRepository
+from aws_xray_sdk.core import patch
 
+patch(['boto3'])
 
 edition_fmt = "%Y%m%dT%H%M%S"
 
