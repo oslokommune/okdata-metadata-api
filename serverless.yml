@@ -11,6 +11,7 @@ provider:
   deploymentPrefix: deploy
   tracing:
     lambda: true
+    apiGateway: true
   iamManagedPolicies:
     - Fn::Join:
       - ':'
