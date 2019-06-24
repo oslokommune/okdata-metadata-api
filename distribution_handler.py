@@ -8,7 +8,7 @@ from distribution_repository import DistributionRepository
 distribution_repository = DistributionRepository()
 
 
-@xray_recorder.capture('create_distribution')
+@xray_recorder.capture("create_distribution")
 def create_distribution(event, context):
     """POST /datasets/:dataset-id/versions/:version/editions/:edition/distributions"""
 
@@ -33,7 +33,8 @@ def create_distribution(event, context):
     except Exception as e:
         return common.response(400, f"Error creating distribution: {e}")
 
-@xray_recorder.capture('update_distribution')
+
+@xray_recorder.capture("update_distribution")
 def update_distribution(event, context):
     """PUT /datasets/:dataset-id/versions/:version/editions/:edition/distributions/:distribution"""
 
@@ -55,7 +56,8 @@ def update_distribution(event, context):
     except ValueError as e:
         return common.response(400, f"Error updating distribution: {e}")
 
-@xray_recorder.capture('get_distributions')
+
+@xray_recorder.capture("get_distributions")
 def get_distributions(event, context):
     """GET /datasets/:dataset-id/versions/:version/editions/:edition/distributions"""
 
@@ -72,7 +74,8 @@ def get_distributions(event, context):
 
     return common.response(200, distributions)
 
-@xray_recorder.capture('get_distribution')
+
+@xray_recorder.capture("get_distribution")
 def get_distribution(event, context):
     """GET /datasets/:dataset-id/versions/:version/editions/:edition/distributions/:distribution"""
 

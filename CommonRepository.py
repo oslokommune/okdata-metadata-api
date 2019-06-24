@@ -4,7 +4,7 @@ import logging
 import common
 from aws_xray_sdk.core import patch
 
-patch(['boto3'])
+patch(["boto3"])
 
 log = logging.getLogger()
 
