@@ -25,5 +25,5 @@ setuptools.setup(
         "edition_repository",
         "distribution_repository",
     ],
-    install_requires=["simplejson==3.16.0", "shortuuid==0.5.0"],
+    install_requires=["simplejson==3.16.0", "shortuuid==0.5.0", "aws_xray_sdk>=2.4.2"],
 )

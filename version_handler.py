@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import simplejson as json
+from aws_xray_sdk.core import xray_recorder
 
 import common
 from CommonRepository import ResourceConflict
@@ -9,6 +10,7 @@ from version_repository import VersionRepository
 version_repository = VersionRepository()
 
 
+@xray_recorder.capture("create_version")
 def create_version(event, context):
     """POST /datasets/:dataset-id/versions"""
 
@@ -29,6 +31,7 @@ def create_version(event, context):
         return common.response(400, f"Error creating version: {e}")
 
 
+@xray_recorder.capture("update_version")
 def update_version(event, context):
     """PUT /datasets/:dataset-id/versions/:version"""
 
@@ -45,6 +48,7 @@ def update_version(event, context):
         return common.response(400, f"Error updating version: {e}")
 
 
+@xray_recorder.capture("get_versions")
 def get_versions(event, context):
     """GET /datasets/:dataset-id/versions"""
 
@@ -57,6 +61,7 @@ def get_versions(event, context):
     return common.response(200, versions)
 
 
+@xray_recorder.capture("get_version")
 def get_version(event, context):
     """GET /datasets/:dataset-id/versions/:version"""
 

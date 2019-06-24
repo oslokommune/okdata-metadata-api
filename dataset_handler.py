@@ -3,11 +3,13 @@ import simplejson as json
 import common
 from CommonRepository import ResourceConflict
 from dataset_repository import DatasetRepository
+from aws_xray_sdk.core import xray_recorder
 
 
 dataset_repository = DatasetRepository()
 
 
+@xray_recorder.capture("create_dataset")
 def create_dataset(event, context):
     """POST /datasets"""
 
@@ -25,6 +27,7 @@ def create_dataset(event, context):
         return common.response(400, f"Error creating dataset: {e}")
 
 
+@xray_recorder.capture("update_dataset")
 def update_dataset(event, context):
     """PUT /datasets/:dataset-id"""
 
@@ -40,6 +43,7 @@ def update_dataset(event, context):
         return common.response(400, f"Error updating dataset: {e}")
 
 
+@xray_recorder.capture("get_datasets")
 def get_datasets(event, context):
     """GET /datasets"""
 
@@ -50,6 +54,7 @@ def get_datasets(event, context):
     return common.response(200, datasets)
 
 
+@xray_recorder.capture("get_dataset")
 def get_dataset(event, context):
     """GET /datasets/:dataset-id"""
 

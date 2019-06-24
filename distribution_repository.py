@@ -4,6 +4,9 @@ import uuid
 
 import common
 from CommonRepository import CommonRepository
+from aws_xray_sdk.core import patch
+
+patch(["boto3"])
 
 
 class DistributionRepository(CommonRepository):
