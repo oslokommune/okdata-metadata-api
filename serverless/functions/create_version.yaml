@@ -3,6 +3,7 @@ events:
   - http:
       path: "datasets/{dataset-id}/versions"
       method: "post"
+      cors: true
       documentation:
         summary: "Create new version"
         description: "Creates a version"
