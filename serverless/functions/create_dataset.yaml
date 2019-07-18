@@ -3,6 +3,7 @@ events:
   - http:
       path: "datasets"
       method: "post"
+      cors: true
       documentation:
         summary: "Post a dataset"
         description: "Posts a new dataset"

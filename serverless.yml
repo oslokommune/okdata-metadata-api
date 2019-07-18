@@ -38,6 +38,7 @@ custom:
     after:deploy:finalize: make update-ssm STAGE=${self:provider.stage}
   pythonRequirements:
     dockerizePip: non-linux
+    usePoetry: false
   documentation:
     version: '0.5.0'
     title: 'Metadata-api'
