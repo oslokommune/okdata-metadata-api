@@ -6,9 +6,9 @@ import boto3
 from boto3.dynamodb.conditions import Key
 from moto import mock_dynamodb2
 
-import common as table
-import distribution_handler
-import common_test_helper
+import metadata.common as table
+import metadata.distribution.handler as distribution_handler
+from tests import common_test_helper
 
 
 class DistributionTest(unittest.TestCase):

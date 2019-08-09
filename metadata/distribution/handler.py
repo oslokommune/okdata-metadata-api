@@ -1,9 +1,9 @@
 import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 
-import common
-from CommonRepository import ResourceConflict
-from distribution_repository import DistributionRepository
+from metadata import common
+from metadata.CommonRepository import ResourceConflict
+from metadata.distribution.repository import DistributionRepository
 
 distribution_repository = DistributionRepository()
 

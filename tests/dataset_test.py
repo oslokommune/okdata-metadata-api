@@ -7,10 +7,10 @@ import boto3
 from boto3.dynamodb.conditions import Key
 from moto import mock_dynamodb2
 
-import common as table
-import dataset_handler
-import dataset_repository
-import common_test_helper as common
+import metadata.common as table
+import metadata.dataset.handler as dataset_handler
+import metadata.dataset.repository as dataset_repository
+import tests.common_test_helper as common
 
 
 class DatasetTest(unittest.TestCase):

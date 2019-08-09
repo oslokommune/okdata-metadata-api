@@ -1,4 +1,4 @@
-handler: distribution_handler.get_distributions
+handler: metadata.distribution.handler.get_distributions
 events:
   - http:
       path: "datasets/{dataset-id}/versions/{version}/editions/{edition}/distributions"
