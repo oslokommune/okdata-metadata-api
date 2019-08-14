@@ -1,8 +1,8 @@
 import simplejson as json
 
-import common
-from CommonRepository import ResourceConflict
-from dataset_repository import DatasetRepository
+from metadata import common
+from metadata.CommonRepository import ResourceConflict
+from metadata.dataset.repository import DatasetRepository
 from aws_xray_sdk.core import xray_recorder
 
 

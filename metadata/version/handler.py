@@ -3,9 +3,9 @@
 import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 
-import common
-from CommonRepository import ResourceConflict
-from version_repository import VersionRepository
+from metadata import common
+from metadata.CommonRepository import ResourceConflict
+from metadata.version.repository import VersionRepository
 
 version_repository = VersionRepository()
 

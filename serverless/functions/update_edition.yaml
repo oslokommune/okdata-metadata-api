@@ -1,4 +1,4 @@
-handler: edition_handler.update_edition
+handler: metadata.edition.handler.update_edition
 events:
   - http:
       path: "datasets/{dataset-id}/versions/{version}/editions/{edition}"

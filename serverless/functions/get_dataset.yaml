@@ -1,4 +1,4 @@
-handler: dataset_handler.get_dataset
+handler: metadata.dataset.handler.get_dataset
 events:
   - http:
       path: "/datasets/{dataset-id}"

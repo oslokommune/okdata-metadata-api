@@ -1,8 +1,8 @@
 import simplejson as json
 
-import common
-from CommonRepository import ResourceConflict
-from edition_repository import EditionRepository
+from metadata import common
+from metadata.CommonRepository import ResourceConflict
+from metadata.edition.repository import EditionRepository
 from aws_xray_sdk.core import xray_recorder
 
 edition_repository = EditionRepository()

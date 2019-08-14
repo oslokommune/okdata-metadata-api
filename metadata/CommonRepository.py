@@ -1,7 +1,7 @@
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 import logging
-import common
+from metadata import common
 from aws_xray_sdk.core import patch
 
 patch(["boto3"])

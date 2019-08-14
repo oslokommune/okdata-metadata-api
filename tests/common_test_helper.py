@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-import common as table
+import metadata.common as table
 
 dataset_table_name = "metadata-api-dataset"
 version_table_name = "metadata-api-version"

@@ -1,4 +1,4 @@
-handler: dataset_handler.create_dataset
+handler: metadata.dataset.handler.create_dataset
 events:
   - http:
       path: "datasets"

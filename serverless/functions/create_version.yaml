@@ -1,4 +1,4 @@
-handler: version_handler.create_version
+handler: metadata.version.handler.create_version
 events:
   - http:
       path: "datasets/{dataset-id}/versions"
