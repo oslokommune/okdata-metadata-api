@@ -1,5 +1,6 @@
 import boto3
 from boto3.dynamodb.conditions import Key
+from botocore.exceptions import ClientError
 from datetime import datetime, timezone
 
 from metadata import common
@@ -51,6 +52,27 @@ class EditionRepository(CommonRepository):
 
         return result
 
+    def update_latest_edition(self, dataset_id, edition_id, version, content):
+        latest = content.copy()
+        latest["latest"] = edition_id
+        latest_id = f"{dataset_id}/{version}/latest"
+        result = False
+        try:
+            result = self.update_item(latest_id, content)
+        except ClientError:
+            # TODO: should we create a /latest edition if it doesn't exist?
+            result = True
+        return result
+
     def update_edition(self, dataset_id, version, edition, content):
         edition_id = f"{dataset_id}/{version}/{edition}"
-        return self.update_item(edition_id, content)
+        update_result = self.update_item(edition_id, content)
+
+        # Check if edition_id is the latest first!
+        update_latest_result = self.update_latest_edition(
+            dataset_id, edition_id, version, content
+        )
+        if update_result and update_latest_result:
+            return edition_id
+
+        return False

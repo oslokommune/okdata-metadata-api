@@ -103,6 +103,37 @@ class VersionTest(unittest.TestCase):
         assert version_from_db["schema"] == "new schema"
 
     @mock_dynamodb2
+    def test_update_edition_latest_is_updated(self):
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        metadata_table = common_test_helper.create_metadata_table(dynamodb)
+
+        dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
+        version_name = common_test_helper.version_new_format["version"]
+        create_event = {
+            "body": json.dumps(common_test_helper.version_new_format),
+            "pathParameters": {"dataset-id": dataset_id, "version": version_name},
+        }
+
+        # Insert parent first:
+        metadata_table.put_item(Item=common_test_helper.dataset_new_format)
+        version_handler.create_version(create_event, None)
+
+        update_event = {
+            "body": json.dumps(common_test_helper.version_updated),
+            "pathParameters": {"dataset-id": dataset_id, "version": version_name},
+        }
+        version_handler.update_version(update_event, None)
+
+        version_id = f"antall-besokende-pa-gjenbruksstasjoner/latest"
+
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(table.ID_COLUMN).eq(version_id)
+        )
+        version_from_db = db_response["Items"][0]
+        assert version_from_db["Id"] == "antall-besokende-pa-gjenbruksstasjoner/latest"
+        assert version_from_db["latest"] == "antall-besokende-pa-gjenbruksstasjoner/6"
+
+    @mock_dynamodb2
     def test_should_get_versions_from_new_table_if_present(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
         version_table = common_test_helper.create_version_table(dynamodb)

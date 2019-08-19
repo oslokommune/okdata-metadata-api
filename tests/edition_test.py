@@ -93,6 +93,45 @@ class EditionTest(unittest.TestCase):
         assert edition_from_db["description"] == "CHANGED"
 
     @mock_dynamodb2
+    def test_update_edition_latest_is_updated(self):
+        dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        metadata_table = common_test_helper.create_metadata_table(dynamodb)
+        dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
+        create_event = {
+            "body": json.dumps(common_test_helper.new_edition),
+            "pathParameters": {
+                "dataset-id": dataset_id,
+                "version": common_test_helper.version_new_format["version"],
+            },
+        }
+
+        # Insert parent first:
+        metadata_table.put_item(Item=common_test_helper.version_new_format)
+        edition_handler.create_edition(create_event, None)
+
+        update_event = {
+            "body": json.dumps(common_test_helper.edition_updated),
+            "pathParameters": {
+                "dataset-id": "antall-besokende-pa-gjenbruksstasjoner",
+                "version": "6",
+                "edition": "20190528T133700",
+            },
+        }
+
+        edition_handler.update_edition(update_event, None)
+
+        edition_id = f"antall-besokende-pa-gjenbruksstasjoner/6/latest"
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(table.ID_COLUMN).eq(edition_id)
+        )
+        edition_from_db = db_response["Items"][0]
+
+        assert (
+            edition_from_db["latest"]
+            == "antall-besokende-pa-gjenbruksstasjoner/6/20190528T133700"
+        )
+
+    @mock_dynamodb2
     def test_get_all_editions_from_new_table_if_present(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
         edition_table = common_test_helper.create_edition_table(dynamodb)
