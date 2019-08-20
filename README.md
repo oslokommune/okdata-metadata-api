@@ -1,20 +1,15 @@
 # Metadata-api
 
-API for posting, updating and retrieving metadata. 
+API for posting, updating and retrieving metadata.
 
 Feel free to add any fields you'd like/need. We do not currently validate input data, so what you put in,
- you'll get out. 
- 
+ you'll get out.
+
 ## Setup
 
 1. [Install Serverless Framework](https://serverless.com/framework/docs/getting-started/)
-2. Install plugins: 
+2. Install plugins:
 ```
-sls plugin install -n serverless-python-requirements
-sls plugin install -n serverless-aws-documentation
-
-*or* 
-
 npm install
 
 ```
