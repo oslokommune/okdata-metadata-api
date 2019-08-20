@@ -37,7 +37,11 @@ package:
   exclude:
     - './**'
   include:
-    - './*.py'
+    - './metadata/*.py'
+    - './metadata/dataset/*.py'
+    - './metadata/version/*.py'
+    - './metadata/edition/*.py'
+    - './metadata/distribution/*.py'
 
 resources:
   Description: >
