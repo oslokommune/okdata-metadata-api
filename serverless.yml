@@ -1,3 +1,4 @@
+frameworkVersion: ">=1.50.0 <2.0.0"
 service: metadata-api
 
 provider:
@@ -22,12 +23,16 @@ provider:
         - ':'
         - - 'arn:aws:iam::aws'
           - 'policy/AWSXRayDaemonWriteAccess'
+  tags:
+    GIT_REV: ${git:branch}:${git:sha1}
+  environment:
+    GIT_REV: ${git:branch}:${git:sha1}
 
 plugins:
   - serverless-aws-documentation
   - serverless-python-requirements
   - serverless-scriptable-plugin
-
+  - serverless-plugin-git-variables
 package:
   exclude:
     - './**'
@@ -37,6 +42,13 @@ package:
     - './metadata/version/*.py'
     - './metadata/edition/*.py'
     - './metadata/distribution/*.py'
+
+resources:
+  Description: >
+    ${self:service} ${git:branch}:${git:sha1}
+
+    ${git:message}
+
 
 custom:
   scriptHooks:
@@ -52,6 +64,7 @@ custom:
       - ${file(serverless/models/ErrorResponse.yaml)}
       - ${file(serverless/models/Response.yaml)}
       - ${file(serverless/models/Request.yaml)}
+  exportGitVariables: false
 
 functions:
   create_dataset: ${file(serverless/functions/create_dataset.yaml)}
@@ -70,4 +83,3 @@ functions:
   put_distribution: ${file(serverless/functions/put_distribution.yaml)}
   get_distributions: ${file(serverless/functions/get_distributions.yaml)}
   get_distribution: ${file(serverless/functions/get_distribution.yaml)}
-
