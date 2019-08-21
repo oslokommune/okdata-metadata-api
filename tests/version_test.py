@@ -80,11 +80,18 @@ class VersionTest(unittest.TestCase):
     def test_update_version(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
         metadata_table = common_test_helper.create_metadata_table(dynamodb)
-        metadata_table.put_item(Item=common_test_helper.version_new_format)
 
         dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
         version_name = common_test_helper.version_new_format["version"]
 
+        create_event = {
+            "body": json.dumps(common_test_helper.version_new_format),
+            "pathParameters": {"dataset-id": dataset_id, "version": version_name},
+        }
+
+        # Insert parent first:
+        metadata_table.put_item(Item=common_test_helper.dataset_new_format)
+        version_handler.create_version(create_event, None)
         update_event = {
             "body": json.dumps(common_test_helper.version_updated),
             "pathParameters": {"dataset-id": dataset_id, "version": version_name},

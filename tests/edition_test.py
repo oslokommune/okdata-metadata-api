@@ -67,7 +67,19 @@ class EditionTest(unittest.TestCase):
     def test_update_edition(self):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
         metadata_table = common_test_helper.create_metadata_table(dynamodb)
-        metadata_table.put_item(Item=common_test_helper.edition_new_format)
+
+        create_event = {
+            "body": json.dumps(common_test_helper.new_edition),
+            "pathParameters": {
+                "dataset-id": "antall-besokende-pa-gjenbruksstasjoner",
+                "version": "6",
+                "edition": "20190528T133700",
+            },
+        }
+
+        # Insert parent first:
+        metadata_table.put_item(Item=common_test_helper.version_new_format)
+        edition_handler.create_edition(create_event, None)
 
         update_event = {
             "body": json.dumps(common_test_helper.edition_updated),

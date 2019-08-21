@@ -45,25 +45,26 @@ class VersionRepository(CommonRepository):
 
         return result
 
-    def update_latest_version(self, dataset_id, version_id, content):
-        latest = content.copy()
-        latest["latest"] = version_id
-        latest_id = f"{dataset_id}/latest"
-        result = False
+    def update_latest_version(self, dataset_id, version, content):
         try:
-            result = self.update_item(latest_id, content)
+            current_version_id = f"{dataset_id}/{version}"
+            latest_version = self.get_version(dataset_id, "latest")
+            if (
+                latest_version is not None
+                and "Id" in latest_version
+                and latest_version["Id"] == current_version_id
+            ):
+                latest = content.copy()
+                latest["latest"] = current_version_id
+                latest_id = f"{dataset_id}/latest"
+                return self.update_item(latest_id, content)
         except ClientError:
-            # TODO: should we create a /latest version if it doesn't exist?
-            result = True
+            return False
 
-        return result
+        return False
 
     def update_version(self, dataset_id, version, content):
         version_id = f"{dataset_id}/{version}"
-        update_result = self.update_item(version_id, content)
-
-        update_latest_result = self.update_latest_version(dataset_id, version, content)
-        if update_result and update_latest_result:
-            return version_id
-
-        return False
+        self.update_item(version_id, content)
+        self.update_latest_version(dataset_id, version, content)
+        return version_id

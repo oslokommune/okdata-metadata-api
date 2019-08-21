@@ -52,27 +52,26 @@ class EditionRepository(CommonRepository):
 
         return result
 
-    def update_latest_edition(self, dataset_id, edition_id, version, content):
-        latest = content.copy()
-        latest["latest"] = edition_id
-        latest_id = f"{dataset_id}/{version}/latest"
-        result = False
+    def update_latest_edition(self, dataset_id, version, edition, content):
         try:
-            result = self.update_item(latest_id, content)
+            current_edition_id = f"{dataset_id}/{version}/{edition}"
+            latest_edition = self.get_edition(dataset_id, version, "latest")
+            if (
+                latest_edition is not None
+                and "Id" in latest_edition
+                and latest_edition["Id"] == current_edition_id
+            ):
+                latest = content.copy()
+                latest["latest"] = current_edition_id
+                latest_id = f"{dataset_id}/{version}/latest"
+                return self.update_item(latest_id, content)
         except ClientError:
-            # TODO: should we create a /latest edition if it doesn't exist?
-            result = True
-        return result
+            return False
+
+        return False
 
     def update_edition(self, dataset_id, version, edition, content):
         edition_id = f"{dataset_id}/{version}/{edition}"
-        update_result = self.update_item(edition_id, content)
-
-        # Check if edition_id is the latest first!
-        update_latest_result = self.update_latest_edition(
-            dataset_id, edition_id, version, content
-        )
-        if update_result and update_latest_result:
-            return edition_id
-
-        return False
+        self.update_item(edition_id, content)
+        self.update_latest_edition(dataset_id, version, edition, content)
+        return edition_id
