@@ -48,23 +48,32 @@ class VersionRepository(CommonRepository):
     def update_latest_version(self, dataset_id, version, content):
         try:
             current_version_id = f"{dataset_id}/{version}"
+            latest = content.copy()
+            latest["latest"] = current_version_id
+            latest_id = f"{dataset_id}/latest"
+            return self.update_item(latest_id, content)
+        except ClientError:
+            return False
+
+        return False
+
+    def is_latest_version(self, dataset_id, version):
+        try:
+            current_version_id = f"{dataset_id}/{version}"
             latest_version = self.get_version(dataset_id, "latest")
             if (
                 latest_version is not None
                 and "Id" in latest_version
                 and latest_version["Id"] == current_version_id
             ):
-                latest = content.copy()
-                latest["latest"] = current_version_id
-                latest_id = f"{dataset_id}/latest"
-                return self.update_item(latest_id, content)
+                return True
         except ClientError:
             return False
-
         return False
 
     def update_version(self, dataset_id, version, content):
         version_id = f"{dataset_id}/{version}"
         result = self.update_item(version_id, content)
-        self.update_latest_version(dataset_id, version, content)
+        if self.is_latest_version(dataset_id, version):
+            self.update_latest_version(dataset_id, version, content)
         return result
