@@ -72,6 +72,6 @@ class EditionRepository(CommonRepository):
 
     def update_edition(self, dataset_id, version, edition, content):
         edition_id = f"{dataset_id}/{version}/{edition}"
-        self.update_item(edition_id, content)
+        result = self.update_item(edition_id, content)
         self.update_latest_edition(dataset_id, version, edition, content)
-        return edition_id
+        return result

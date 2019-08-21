@@ -65,6 +65,6 @@ class VersionRepository(CommonRepository):
 
     def update_version(self, dataset_id, version, content):
         version_id = f"{dataset_id}/{version}"
-        self.update_item(version_id, content)
+        result = self.update_item(version_id, content)
         self.update_latest_version(dataset_id, version, content)
-        return version_id
+        return result
