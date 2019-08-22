@@ -10,7 +10,7 @@ Feel free to add any fields you'd like/need. We do not currently validate input 
 1. [Install Serverless Framework](https://serverless.com/framework/docs/getting-started/)
 2. Install plugins:
 ```
-npm install
+make init
 
 ```
 
@@ -19,8 +19,12 @@ npm install
 Tests are run using [tox](https://pypi.org/project/tox/).
 
 ```
-$ tox
+$ make test
 ```
+
+## Deploy
+
+`make deploy` or `make deploy-prod`
 
 ### Register dataset
 
