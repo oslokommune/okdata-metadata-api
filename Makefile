@@ -16,7 +16,7 @@ init:
 	npm install
 
 .PHONY: format
-format: init
+format:
 	python3 -m black .
 
 .PHONY: deploy
