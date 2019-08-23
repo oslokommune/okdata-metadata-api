@@ -15,19 +15,11 @@ Feel free to add any fields you'd like/need. We do not currently validate input 
 
 ## Formatting code
 
-Code is formatted using [black](https://pypi.org/project/black/).
-
-```
-make format
-```
+Code is formatted using [black](https://pypi.org/project/black/): `make format`
 
 ## Running tests
 
-Tests are run using [tox](https://pypi.org/project/tox/).
-
-```
-make test
-```
+Tests are run using [tox](https://pypi.org/project/tox/): `make test`
 
 ## Deploy
 
