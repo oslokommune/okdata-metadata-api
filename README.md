@@ -33,6 +33,8 @@ make test
 
 `make deploy` or `make deploy-prod`
 
+## API usage
+
 ### Register dataset
 
 ```
@@ -55,7 +57,7 @@ POST /datasets
 }
 ```
 
-###Update dataset
+### Update dataset
 
 
 ```
@@ -98,7 +100,7 @@ POST /datasets/:dataset-id/versions/:version-id/editions/:edition-id/distributio
 }
 ```
 
-### TODO's
+## TODOs
 
 - Validering av json som kommer inn
 - Cleanup-jobber
