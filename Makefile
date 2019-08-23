@@ -11,26 +11,24 @@
 
 .PHONY: init
 init:
-	python3 -m pip install tox black pip-tools
-	pip-compile
 	npm install
 
 .PHONY: format
 format:
 	python3 -m black .
 
-.PHONY: deploy
-deploy: format test login-dev
-	sls deploy --stage dev --aws-profile $(.DEV_PROFILE)
-
-.PHONY: deploy-prod
-deploy-prod: format is-git-clean test login-prod
-	sls deploy --stage prod --aws-profile $(.PROD_PROFILE) && \
-	sls --stage prod downloadDocumentation --outputFileName swagger.yaml
-
 .PHONY: test
 test:
 	python3 -m tox -p auto
+
+.PHONY: deploy
+deploy: init format test login-dev
+	sls deploy --stage dev --aws-profile $(.DEV_PROFILE)
+
+.PHONY: deploy-prod
+deploy-prod: init format is-git-clean test login-prod
+	sls deploy --stage prod --aws-profile $(.PROD_PROFILE) && \
+	sls --stage prod downloadDocumentation --outputFileName swagger.yaml
 
 .PHONY: login-dev
 login-dev:
