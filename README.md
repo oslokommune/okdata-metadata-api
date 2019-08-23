@@ -21,6 +21,8 @@ Code is formatted using [black](https://pypi.org/project/black/): `make format`
 
 Tests are run using [tox](https://pypi.org/project/tox/): `make test`
 
+For tests and linting we use [pytest](https://pypi.org/project/pytest/), [flake8](https://pypi.org/project/flake8/) and [black](https://pypi.org/project/black/).
+
 ## Deploy
 
 `make deploy` or `make deploy-prod`
