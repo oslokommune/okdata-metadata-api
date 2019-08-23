@@ -1,4 +1,5 @@
-# Metadata-api
+Metadata-api
+============
 
 API for posting, updating and retrieving metadata.
 
@@ -7,11 +8,17 @@ Feel free to add any fields you'd like/need. We do not currently validate input 
 
 ## Setup
 
-1. [Install Serverless Framework](https://serverless.com/framework/docs/getting-started/)
-2. Install plugins:
-```
-make init
+1. Install [Serverless Framework](https://serverless.com/framework/docs/getting-started/)
+2. Install Serverless plugins: `make init`
+3. Install Python toolchain: `python3 -m pip install (--user) tox black pip-tools`
+   - If running with `--user` flag, add `$HOME/.local/bin` to `$PATH`
 
+## Formatting code
+
+Code is formatted using [black](https://pypi.org/project/black/).
+
+```
+make format
 ```
 
 ## Running tests
@@ -19,7 +26,7 @@ make init
 Tests are run using [tox](https://pypi.org/project/tox/).
 
 ```
-$ make test
+make test
 ```
 
 ## Deploy
