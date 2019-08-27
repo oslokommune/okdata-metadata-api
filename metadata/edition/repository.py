@@ -53,16 +53,11 @@ class EditionRepository(CommonRepository):
         return result
 
     def update_latest_edition(self, dataset_id, version, edition, content):
-        try:
-            current_edition_id = f"{dataset_id}/{version}/{edition}"
-            latest = content.copy()
-            latest["latest"] = current_edition_id
-            latest_id = f"{dataset_id}/{version}/latest"
-            return self.update_item(latest_id, content)
-        except ClientError:
-            return False
-
-        return False
+        current_edition_id = f"{dataset_id}/{version}/{edition}"
+        latest = content.copy()
+        latest["latest"] = current_edition_id
+        latest_id = f"{dataset_id}/{version}/latest"
+        self.update_item(latest_id, content)
 
     def is_latest_edition(self, dataset_id, version, edition):
         try:
