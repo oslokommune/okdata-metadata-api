@@ -52,7 +52,7 @@ resources:
 
 custom:
   scriptHooks:
-    after:deploy:finalize: make update-ssm STAGE=${self:provider.stage}
+    after:deploy:finalize: make update-ssm-${self:provider.stage}
   pythonRequirements:
     dockerizePip: non-linux
     usePoetry: false
