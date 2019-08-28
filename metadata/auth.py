@@ -10,6 +10,7 @@ log = logging.getLogger()
 log.setLevel(logging.INFO)
 
 AUTHORIZER_API = os.environ["AUTHORIZER_API"]
+ENABLE_AUTH = os.environ.get("ENABLE_AUTH", "false") == "true"
 
 
 class SimpleAuth:
@@ -17,6 +18,10 @@ class SimpleAuth:
         self.event = event
 
     def is_owner(self, dataset_id):
+        if not ENABLE_AUTH:
+            log.info("Auth disabled")
+            return True
+
         header = None
 
         try:
@@ -29,6 +34,10 @@ class SimpleAuth:
 
 
 def is_owner(authorization_header, dataset_id):
+    if not ENABLE_AUTH:
+        log.info("Auth disabled")
+        return True
+
     r = requests.get(
         f"{AUTHORIZER_API}/{dataset_id}",
         headers={"Authorization": authorization_header},
