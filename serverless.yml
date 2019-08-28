@@ -27,6 +27,8 @@ provider:
     GIT_REV: ${git:branch}:${git:sha1}
   environment:
     GIT_REV: ${git:branch}:${git:sha1}
+    AUTHORIZER_API: ${ssm:/dataplatform/simple-dataset-authorizer/url}
+    ENABLE_AUTH: false
 
 plugins:
   - serverless-aws-documentation
