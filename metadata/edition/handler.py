@@ -3,6 +3,7 @@ import simplejson as json
 from metadata import common
 from metadata.CommonRepository import ResourceConflict
 from metadata.edition.repository import EditionRepository
+from metadata.auth import SimpleAuth
 from aws_xray_sdk.core import xray_recorder
 
 edition_repository = EditionRepository()
@@ -16,6 +17,9 @@ def create_edition(event, context):
 
     dataset_id = event["pathParameters"]["dataset-id"]
     version = event["pathParameters"]["version"]
+
+    if not SimpleAuth(event).is_owner(dataset_id):
+        return common.response(403, "Forbidden")
 
     try:
         edition_id = edition_repository.create_edition(dataset_id, version, content)
@@ -40,6 +44,9 @@ def update_edition(event, context):
     dataset_id = event["pathParameters"]["dataset-id"]
     version = event["pathParameters"]["version"]
     edition = event["pathParameters"]["edition"]
+
+    if not SimpleAuth(event).is_owner(dataset_id):
+        return common.response(403, "Forbidden")
 
     try:
         edition_id = edition_repository.update_edition(
