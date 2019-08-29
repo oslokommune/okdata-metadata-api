@@ -94,6 +94,35 @@ class TestUpdateEdition:
         assert edition_from_db["edition"] == "2019-05-28T15:37:00+02:00"
         assert edition_from_db["description"] == "CHANGED"
 
+    def test_update_edition_latest_is_updated(self, metadata_table, auth_event):
+        dataset_id = "antall-besokende-pa-gjenbruksstasjoner"
+        version_name = "6"
+        edition = "20190528T133700"
+
+        create_event = auth_event(
+            common_test_helper.new_edition, dataset_id, version_name
+        )
+        # Insert parent first:
+        metadata_table.put_item(Item=common_test_helper.version_new_format)
+        edition_handler.create_edition(create_event, None)
+
+        update_event = auth_event(
+            common_test_helper.edition_updated, dataset_id, version_name, edition
+        )
+
+        edition_handler.update_edition(update_event, None)
+
+        edition_id = f"antall-besokende-pa-gjenbruksstasjoner/6/latest"
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(table.ID_COLUMN).eq(edition_id)
+        )
+        edition_from_db = db_response["Items"][0]
+
+        assert (
+            edition_from_db["latest"]
+            == "antall-besokende-pa-gjenbruksstasjoner/6/20190528T133700"
+        )
+
     def test_forbidden(self, metadata_table, event):
         metadata_table.put_item(Item=common_test_helper.edition_new_format)
         update_event = event(

@@ -103,6 +103,30 @@ class TestUpdateVersion:
         version_from_db = db_response["Items"][0]
         assert version_from_db["schema"] == "new schema"
 
+    def test_update_edition_latest_is_updated(self, metadata_table, auth_event):
+        dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
+        version_name = common_test_helper.version_new_format["version"]
+        create_event = auth_event(
+            common_test_helper.version_new_format, dataset_id, version_name
+        )
+        print(f"create_event: {create_event}")
+        # Insert parent first:
+        metadata_table.put_item(Item=common_test_helper.dataset_new_format)
+        version_handler.create_version(create_event, None)
+        update_event = auth_event(
+            common_test_helper.version_updated, dataset_id, version_name
+        )
+        version_handler.update_version(update_event, None)
+
+        version_id = f"antall-besokende-pa-gjenbruksstasjoner/latest"
+
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(table.ID_COLUMN).eq(version_id)
+        )
+        version_from_db = db_response["Items"][0]
+        assert version_from_db["Id"] == "antall-besokende-pa-gjenbruksstasjoner/latest"
+        assert version_from_db["latest"] == "antall-besokende-pa-gjenbruksstasjoner/6"
+
     def test_forbidden(self, event, metadata_table):
         metadata_table.put_item(Item=common_test_helper.version_new_format)
 
