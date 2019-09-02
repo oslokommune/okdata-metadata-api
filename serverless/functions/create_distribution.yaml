@@ -4,6 +4,7 @@ events:
       path: "datasets/{dataset-id}/versions/{version}/editions/{edition}/distributions"
       method: "post"
       cors: true
+      authorizer: ${file(serverless/kc-authorizer.yaml)}
       documentation:
         summary: "Post a dataset"
         description: "Posts a new dataset"

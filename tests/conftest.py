@@ -4,6 +4,7 @@ import json
 import pytest
 import boto3
 from moto import mock_dynamodb2
+from layer.auth import SimpleAuth
 
 AUTHORIZER_API = os.environ["AUTHORIZER_API"]
 good_token = "Bjørnepollett"
@@ -16,7 +17,7 @@ def dynamodb():
 
 
 @pytest.fixture(autouse=True)
-def auth_mock(requests_mock):
+def auth_mock(requests_mock, mocker):
     matcher = re.compile(f"{AUTHORIZER_API}/.*")
 
     requests_mock.register_uri("GET", matcher, json={"access": False})
@@ -26,6 +27,14 @@ def auth_mock(requests_mock):
         request_headers={"Authorization": good_token},
         json={"access": True},
     )
+    mocker.patch.object(SimpleAuth, "requests")
+    mocker.patch.object(SimpleAuth, "is_owner", return_value=True)
+
+
+@pytest.fixture()
+def auth_denied(mocker):
+    mocker.patch.object(SimpleAuth, "requests")
+    mocker.patch.object(SimpleAuth, "is_owner", return_value=False)
 
 
 def lambda_event_factory(token=None):
@@ -50,6 +59,7 @@ def lambda_event_factory(token=None):
         if path:
             event["pathParameters"] = path
 
+        event["requestContext"] = {"authorizer": {"principalId": "mock-user"}}
         return event
 
     return _lambda_event

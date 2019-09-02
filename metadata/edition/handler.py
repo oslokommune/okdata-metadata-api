@@ -3,8 +3,8 @@ import simplejson as json
 from metadata import common
 from metadata.CommonRepository import ResourceConflict
 from metadata.edition.repository import EditionRepository
-from metadata.auth import SimpleAuth
 from aws_xray_sdk.core import xray_recorder
+from layer.auth import SimpleAuth
 
 edition_repository = EditionRepository()
 

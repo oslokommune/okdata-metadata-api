@@ -56,7 +56,7 @@ class TestCreateEdition:
         assert response["statusCode"] == 409
         assert str.startswith(json.loads(response["body"]), "Resource Conflict")
 
-    def test_forbidden(self, metadata_table, event):
+    def test_forbidden(self, metadata_table, event, auth_denied):
         metadata_table.put_item(Item=common_test_helper.version_new_format)
 
         dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
@@ -123,7 +123,7 @@ class TestUpdateEdition:
             == "antall-besokende-pa-gjenbruksstasjoner/6/20190528T133700"
         )
 
-    def test_forbidden(self, metadata_table, event):
+    def test_forbidden(self, metadata_table, event, auth_denied):
         metadata_table.put_item(Item=common_test_helper.edition_new_format)
         update_event = event(
             common_test_helper.edition_updated,

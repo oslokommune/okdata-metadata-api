@@ -3,6 +3,7 @@ events:
   - http:
       path: "datasets/{dataset-id}/versions/{version}"
       method: "put"
+      authorizer: ${file(serverless/kc-authorizer.yaml)}
       documentation:
         summary: "Update a version"
         description: "Updates an existing version"

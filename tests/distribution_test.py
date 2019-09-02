@@ -48,7 +48,7 @@ class TestCreateDistribution:
         response = distribution_handler.create_distribution(bad_create_event, None)
         assert response["statusCode"] == 400
 
-    def test_forbidden(self, metadata_table, event):
+    def test_forbidden(self, metadata_table, event, auth_denied):
         metadata_table.put_item(Item=common_test_helper.edition_new_format)
 
         dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
@@ -88,7 +88,7 @@ class TestUpdateDistribution:
         )
         assert db_response["Items"][0]["filename"] == "UPDATED.csv"
 
-    def test_forbidden(self, metadata_table, event):
+    def test_forbidden(self, metadata_table, event, auth_denied):
         metadata_table.put_item(Item=common_test_helper.distribution_new_format)
 
         dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]

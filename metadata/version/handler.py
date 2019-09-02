@@ -4,7 +4,7 @@ from aws_xray_sdk.core import xray_recorder
 from metadata import common
 from metadata.CommonRepository import ResourceConflict
 from metadata.version.repository import VersionRepository
-from metadata.auth import SimpleAuth
+from layer.auth import SimpleAuth
 
 version_repository = VersionRepository()
 
