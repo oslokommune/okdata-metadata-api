@@ -30,7 +30,7 @@ provider:
   environment:
     GIT_REV: ${git:branch}:${git:sha1}
     AUTHORIZER_API: ${ssm:/dataplatform/simple-dataset-authorizer/url}
-    ENABLE_AUTH: true
+    ENABLE_AUTH: false
     KEYCLOAK_SERVER: ${ssm:/dataplatform/apis/metadata-api/auth/server}
     KEYCLOAK_REALM: api-catalog
     CLIENT_ID: metadata-api
