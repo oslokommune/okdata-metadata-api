@@ -4,6 +4,7 @@
 #
 #    pip-compile
 #
+<<<<<<< HEAD
 aws-xray-sdk==2.4.2
 botocore==1.12.222        # via aws-xray-sdk
 certifi==2019.6.16        # via requests
@@ -20,3 +21,7 @@ simplejson==3.16.0
 six==1.12.0               # via python-dateutil
 urllib3==1.25.3           # via botocore, requests
 wrapt==1.11.2             # via aws-xray-sdk
+=======
+shortuuid==0.5.0
+simplejson==3.16.0
+>>>>>>> dp-103 removed boto & co
