@@ -24,8 +24,6 @@ def create_dataset(event, context):
 
         requests = SimpleAuth(event).requests()
         requests.post(f"{AUTHORIZER_API}/{dataset_id}", json={"principalId": user_id})
-        if not SimpleAuth(event).is_owner(dataset_id):
-            return common.response(403, "Forbidden")
 
         headers = {"Location": f"/datasets/{dataset_id}"}
 
