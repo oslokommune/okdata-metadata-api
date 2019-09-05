@@ -4,7 +4,7 @@ from aws_xray_sdk.core import xray_recorder
 from metadata import common
 from metadata.CommonRepository import ResourceConflict
 from metadata.distribution.repository import DistributionRepository
-from layer.auth import SimpleAuth
+from auth import SimpleAuth
 
 distribution_repository = DistributionRepository()
 

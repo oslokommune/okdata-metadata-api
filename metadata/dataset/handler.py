@@ -6,7 +6,7 @@ from metadata import common
 from metadata.CommonRepository import ResourceConflict
 from metadata.dataset.repository import DatasetRepository
 from aws_xray_sdk.core import xray_recorder
-from layer.auth import SimpleAuth
+from auth import SimpleAuth
 
 dataset_repository = DatasetRepository()
 AUTHORIZER_API = os.environ["AUTHORIZER_API"]

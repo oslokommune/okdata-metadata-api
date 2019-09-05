@@ -4,7 +4,7 @@ import json
 import pytest
 import boto3
 from moto import mock_dynamodb2
-from layer.auth import SimpleAuth
+from auth import SimpleAuth
 
 AUTHORIZER_API = os.environ["AUTHORIZER_API"]
 good_token = "Bjørnepollett"
