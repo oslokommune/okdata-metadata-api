@@ -22,7 +22,7 @@ def create_dataset(event, context):
         dataset_id = dataset_repository.create_dataset(content)
         user_id = event["requestContext"]["authorizer"]["principalId"]
 
-        requests = SimpleAuth().requests()
+        requests = SimpleAuth().request_from_client()
         requests.post(f"{AUTHORIZER_API}/{dataset_id}", json={"principalId": user_id})
 
         headers = {"Location": f"/datasets/{dataset_id}"}

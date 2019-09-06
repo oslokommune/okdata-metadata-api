@@ -27,13 +27,15 @@ def auth_mock(requests_mock, mocker):
         request_headers={"Authorization": good_token},
         json={"access": True},
     )
-    mocker.patch.object(SimpleAuth, "requests")
+    mocker.patch.object(SimpleAuth, "request_from_client")
+    mocker.patch.object(SimpleAuth, "request_with_token_exchange")
     mocker.patch.object(SimpleAuth, "is_owner", return_value=True)
 
 
 @pytest.fixture()
 def auth_denied(mocker):
-    mocker.patch.object(SimpleAuth, "requests")
+    mocker.patch.object(SimpleAuth, "request_from_client")
+    mocker.patch.object(SimpleAuth, "request_with_token_exchange")
     mocker.patch.object(SimpleAuth, "is_owner", return_value=False)
 
 
