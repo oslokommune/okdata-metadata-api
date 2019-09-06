@@ -19,7 +19,7 @@ def create_distribution(event, context):
     version = event["pathParameters"]["version"]
     edition = event["pathParameters"]["edition"]
 
-    if not SimpleAuth(event).is_owner(dataset_id):
+    if not SimpleAuth().is_owner(event, dataset_id):
         return common.response(403, "Forbidden")
 
     try:
@@ -49,7 +49,7 @@ def update_distribution(event, context):
     edition = event["pathParameters"]["edition"]
     distribution = event["pathParameters"]["distribution"]
 
-    if not SimpleAuth(event).is_owner(dataset_id):
+    if not SimpleAuth().is_owner(event, dataset_id):
         return common.response(403, "Forbidden")
 
     try:
