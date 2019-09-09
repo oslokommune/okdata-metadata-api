@@ -17,6 +17,11 @@ init:
 format:
 	python3 -m black .
 
+.PHONY: get-layer-deps
+get-layer-deps:
+	python3 -m pip install --extra-index-url https://artifacts.oslo.kommune.no/repository/itas-pypip/simple dataplatform-base-layer --upgrade
+
+
 .PHONY: test
 test:
 	python3 -m tox -p auto

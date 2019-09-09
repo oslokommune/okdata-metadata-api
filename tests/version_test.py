@@ -68,7 +68,7 @@ class TestCreateVersion:
         assert response["statusCode"] == 409
         assert str.startswith(json.loads(response["body"]), "Resource Conflict")
 
-    def test_forbidden(self, event, metadata_table):
+    def test_forbidden(self, event, metadata_table, auth_denied):
         dataset = common_test_helper.dataset_new_format
         dataset_id = dataset[table.ID_COLUMN]
         metadata_table.put_item(Item=dataset)
@@ -127,7 +127,7 @@ class TestUpdateVersion:
         assert version_from_db["Id"] == "antall-besokende-pa-gjenbruksstasjoner/latest"
         assert version_from_db["latest"] == "antall-besokende-pa-gjenbruksstasjoner/6"
 
-    def test_forbidden(self, event, metadata_table):
+    def test_forbidden(self, event, metadata_table, auth_denied):
         metadata_table.put_item(Item=common_test_helper.version_new_format)
 
         dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]

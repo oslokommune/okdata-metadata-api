@@ -1,0 +1,5 @@
+arn: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:keycloak-authorizer-${self:provider.stage}-authenticate
+resultTtlInSeconds: 300
+identitySource: method.request.header.Authorization
+identityValidationExpression: "^(B|b)earer [-0-9a-zA-Z\\._]*$"
+type: token

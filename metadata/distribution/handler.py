@@ -4,7 +4,7 @@ from aws_xray_sdk.core import xray_recorder
 from metadata import common
 from metadata.CommonRepository import ResourceConflict
 from metadata.distribution.repository import DistributionRepository
-from metadata.auth import SimpleAuth
+from auth import SimpleAuth
 
 distribution_repository = DistributionRepository()
 
@@ -19,7 +19,7 @@ def create_distribution(event, context):
     version = event["pathParameters"]["version"]
     edition = event["pathParameters"]["edition"]
 
-    if not SimpleAuth(event).is_owner(dataset_id):
+    if not SimpleAuth().is_owner(event, dataset_id):
         return common.response(403, "Forbidden")
 
     try:
@@ -49,7 +49,7 @@ def update_distribution(event, context):
     edition = event["pathParameters"]["edition"]
     distribution = event["pathParameters"]["distribution"]
 
-    if not SimpleAuth(event).is_owner(dataset_id):
+    if not SimpleAuth().is_owner(event, dataset_id):
         return common.response(403, "Forbidden")
 
     try:

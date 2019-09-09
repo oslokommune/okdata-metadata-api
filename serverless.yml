@@ -13,6 +13,8 @@ provider:
   tracing:
     lambda: true
     apiGateway: true
+  layers:
+    - ${ssm:/dataplatform/python-base-lambda-layer/arn}
   iamManagedPolicies:
     - Fn::Join:
       - ':'
@@ -28,13 +30,20 @@ provider:
   environment:
     GIT_REV: ${git:branch}:${git:sha1}
     AUTHORIZER_API: ${ssm:/dataplatform/simple-dataset-authorizer/url}
-    ENABLE_AUTH: false
+    ENABLE_AUTH: true
+    KEYCLOAK_SERVER: ${ssm:/dataplatform/apis/metadata-api/auth/server}
+    KEYCLOAK_REALM: api-catalog
+    CLIENT_ID: metadata-api
+    CLIENT_SECRET: ${ssm:/dataplatform/apis/metadata-api/auth/clientsecret~true}
+
 
 plugins:
   - serverless-aws-documentation
   - serverless-python-requirements
   - serverless-scriptable-plugin
   - serverless-plugin-git-variables
+  - serverless-plugin-common-layers
+  - serverless-pseudo-parameters
 package:
   exclude:
     - './**'

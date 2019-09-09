@@ -4,7 +4,7 @@ from aws_xray_sdk.core import xray_recorder
 from metadata import common
 from metadata.CommonRepository import ResourceConflict
 from metadata.version.repository import VersionRepository
-from metadata.auth import SimpleAuth
+from auth import SimpleAuth
 
 version_repository = VersionRepository()
 
@@ -16,7 +16,7 @@ def create_version(event, context):
     content = json.loads(event["body"])
     dataset_id = event["pathParameters"]["dataset-id"]
 
-    if not SimpleAuth(event).is_owner(dataset_id):
+    if not SimpleAuth().is_owner(event, dataset_id):
         return common.response(403, "Forbidden")
 
     try:
@@ -41,7 +41,7 @@ def update_version(event, context):
     dataset_id = event["pathParameters"]["dataset-id"]
     version = event["pathParameters"]["version"]
 
-    if not SimpleAuth(event).is_owner(dataset_id):
+    if not SimpleAuth().is_owner(event, dataset_id):
         return common.response(403, "Forbidden")
 
     try:

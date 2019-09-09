@@ -1,13 +1,15 @@
+import os
+
 import simplejson as json
 
 from metadata import common
-from metadata.auth import SimpleAuth
 from metadata.CommonRepository import ResourceConflict
 from metadata.dataset.repository import DatasetRepository
 from aws_xray_sdk.core import xray_recorder
-
+from auth import SimpleAuth
 
 dataset_repository = DatasetRepository()
+AUTHORIZER_API = os.environ["AUTHORIZER_API"]
 
 
 @xray_recorder.capture("create_dataset")
@@ -18,9 +20,10 @@ def create_dataset(event, context):
 
     try:
         dataset_id = dataset_repository.create_dataset(content)
+        user_id = event["requestContext"]["authorizer"]["principalId"]
 
-        if not SimpleAuth(event).is_owner(dataset_id):
-            return common.response(403, "Forbidden")
+        requests = SimpleAuth().request_from_client()
+        requests.post(f"{AUTHORIZER_API}/{dataset_id}", json={"principalId": user_id})
 
         headers = {"Location": f"/datasets/{dataset_id}"}
 
@@ -38,7 +41,7 @@ def update_dataset(event, context):
     content = json.loads(event["body"])
     dataset_id = event["pathParameters"]["dataset-id"]
 
-    if not SimpleAuth(event).is_owner(dataset_id):
+    if not SimpleAuth().is_owner(event, dataset_id):
         return common.response(403, "Forbidden")
 
     try:

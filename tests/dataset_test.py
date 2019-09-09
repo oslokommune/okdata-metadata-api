@@ -38,11 +38,6 @@ class TestCreateDataset:
         assert item["title"] == "Antall besøkende på gjenbruksstasjoner"
         assert item["privacyLevel"] == "green"
 
-    def test_invalid_token(self, event):
-        create_event = event(common.new_dataset)
-        response = dataset_handler.create_dataset(create_event, None)
-        assert response["statusCode"] == 403
-
 
 class TestUpdateDataset:
     def test_update_dataset(self, auth_event, metadata_table):
@@ -66,7 +61,7 @@ class TestUpdateDataset:
         assert item["title"] == "UPDATED TITLE"
         assert item["privacyLevel"] == "red"
 
-    def test_invalid_tokeN(self, event, metadata_table):
+    def test_invalid_tokeN(self, event, metadata_table, auth_denied):
         metadata_table.put_item(Item=common.dataset_new_format)
 
         dataset_id = common.dataset_new_format[table.ID_COLUMN]

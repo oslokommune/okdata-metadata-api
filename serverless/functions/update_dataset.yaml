@@ -3,6 +3,7 @@ events:
   - http:
       path: "/datasets/{dataset-id}"
       method: "put"
+      authorizer: ${file(serverless/kc-authorizer.yaml)}
       documentation:
         summary: "Update a dataset"
         description: "Updates an existing dataset"
