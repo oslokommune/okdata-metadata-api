@@ -1,0 +1,4 @@
+name: Edition
+description: Create a edition
+contentType: "application/json"
+schema: ${file(schema/edition.json)}

@@ -10,7 +10,7 @@ events:
         requestBody:
           description: "The new object"
         requestModels:
-          application/json: Request
+          application/json: Dataset
         pathParams:
           - name: "dataset-id"
             description: "The dataset you want to update"

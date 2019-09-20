@@ -11,7 +11,7 @@ events:
         requestBody:
           description: "A dataset object"
         requestModels:
-          application/json: "Request"
+          application/json: Edition
         pathParams:
           - name: "dataset-id"
             description: "The dataset for which to create a new edition"
