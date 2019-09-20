@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://metadata.api.oslo.kommune.no/version.json",
   "title": "Version",
   "description": "Metadata about a version",
   "type": "object",
