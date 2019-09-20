@@ -24,7 +24,6 @@ class TestCreateDataset:
         create_event = auth_event(common.new_dataset)
         response = dataset_handler.create_dataset(create_event, None)
         dataset_id = json.loads(response["body"])
-
         assert response["statusCode"] == 200
         assert response["headers"]["Location"] == f"/datasets/{dataset_id}"
         assert dataset_id == "antall-besokende-pa-gjenbruksstasjoner"
@@ -36,7 +35,16 @@ class TestCreateDataset:
         assert item[table.ID_COLUMN] == dataset_id
         assert item[table.TYPE_COLUMN] == "Dataset"
         assert item["title"] == "Antall besøkende på gjenbruksstasjoner"
-        assert item["privacyLevel"] == "green"
+        assert item["confidentiality"] == "green"
+
+    def test_create_invalid(self, auth_event, metadata_table):
+        invalid_dataset = common.new_dataset.copy()
+        invalid_dataset["confidentiality"] = "blue"
+        create_event = auth_event(invalid_dataset)
+        response = dataset_handler.create_dataset(create_event, None)
+        error_message = json.loads(response["body"])
+        assert response["statusCode"] == 400
+        assert "blue" in error_message
 
 
 class TestUpdateDataset:
@@ -59,7 +67,7 @@ class TestUpdateDataset:
         assert item[table.ID_COLUMN] == dataset_id
         assert item[table.TYPE_COLUMN] == "Dataset"
         assert item["title"] == "UPDATED TITLE"
-        assert item["privacyLevel"] == "red"
+        assert item["confidentiality"] == "red"
 
     def test_invalid_tokeN(self, event, metadata_table, auth_denied):
         metadata_table.put_item(Item=common.dataset_new_format)
@@ -69,6 +77,18 @@ class TestUpdateDataset:
 
         response = dataset_handler.update_dataset(event_for_update, None)
         assert response["statusCode"] == 403
+
+    def test_update_invalid(self, auth_event, metadata_table):
+        metadata_table.put_item(Item=common.dataset_new_format)
+
+        invalid_dataset = common.dataset_new_format.copy()
+        invalid_dataset["confidentiality"] = "blue"
+        update_event = auth_event(invalid_dataset)
+
+        response = dataset_handler.update_dataset(update_event, None)
+        error_message = json.loads(response["body"])
+        assert response["statusCode"] == 400
+        assert "blue" in error_message
 
 
 class TestDataset:

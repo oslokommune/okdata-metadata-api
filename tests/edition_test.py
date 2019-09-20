@@ -40,6 +40,25 @@ class TestCreateEdition:
         assert response["headers"]["Location"] == expected_location
         assert edition_id == f"{dataset_id}/6/20190528T133700"
 
+    def test_create_invalid_edition(self, metadata_table, auth_event):
+        metadata_table.put_item(Item=common_test_helper.version_new_format)
+
+        dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
+
+        invalid_edition = common_test_helper.new_edition.copy()
+        invalid_edition["edition"] = "2019-05-28T15:37:00"
+        create_event = auth_event(
+            invalid_edition,
+            dataset_id,
+            common_test_helper.version_new_format["version"],
+        )
+
+        response = edition_handler.create_edition(create_event, None)
+        message = json.loads(response["body"])
+
+        assert response["statusCode"] == 400
+        assert "is not a 'date-time'" in message
+
     def test_create_duplicate_edition_should_fail(self, metadata_table, auth_event):
         metadata_table.put_item(Item=common_test_helper.dataset_new_format)
         metadata_table.put_item(Item=common_test_helper.version_new_format)
