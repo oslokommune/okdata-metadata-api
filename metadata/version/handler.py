@@ -3,10 +3,12 @@ from aws_xray_sdk.core import xray_recorder
 
 from metadata import common
 from metadata.CommonRepository import ResourceConflict
+from metadata.validator import Validator
 from metadata.version.repository import VersionRepository
 from auth import SimpleAuth
 
 version_repository = VersionRepository()
+validator = Validator("version")
 
 
 @xray_recorder.capture("create_version")
