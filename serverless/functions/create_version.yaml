@@ -15,6 +15,7 @@ events:
         pathParams:
           - name: "dataset-id"
             description: "The dataset for which to create a new version"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"

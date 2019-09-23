@@ -10,11 +10,13 @@ events:
         pathParams:
           - name: "dataset-id"
             description: "The dataset which contains the version you want to update"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
           - name: "version"
             description: "The version you wish to update"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"

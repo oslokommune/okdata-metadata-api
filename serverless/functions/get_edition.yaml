@@ -9,16 +9,19 @@ events:
         pathParams:
           - name: "dataset-id"
             description: "The dataset containing the edition you want to retrieve"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
           - name: "version"
             description: "The version containing the edition you want to retrieve"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
           - name: "edition"
             description: "The edition you want to retrieve."
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"

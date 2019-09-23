@@ -9,16 +9,19 @@ events:
         pathParams:
           - name: "dataset-id"
             description: "The dataset which contains the distributions you want to retrieve"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
           - name: "version"
             description: "The version of the distributions you want to retrieve"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
           - name: "edition"
             description: "The edition which contains the distributions you want to retrieve"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"

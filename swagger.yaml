@@ -1,7 +1,7 @@
 ---
 swagger: "2.0"
 info:
-  version: "2019-09-23T10:35:49Z"
+  version: "2019-09-23T11:33:16Z"
   title: "dev-metadata-api"
 host: "463aw752ag.execute-api.eu-west-1.amazonaws.com"
 basePath: "/dev"
@@ -75,7 +75,7 @@ paths:
       - name: "dataset-id"
         in: "path"
         description: "The dataset you want to retrieve"
-        required: false
+        required: true
         type: "string"
       responses:
         200:
@@ -97,7 +97,7 @@ paths:
       - name: "dataset-id"
         in: "path"
         description: "The dataset you want to update"
-        required: false
+        required: true
         type: "string"
       - in: "body"
         name: "Dataset"
@@ -126,7 +126,7 @@ paths:
       - name: "dataset-id"
         in: "path"
         description: "The dataset which contains the versions you want to retrieve"
-        required: false
+        required: true
         type: "string"
       responses:
         200:
@@ -148,7 +148,7 @@ paths:
       - name: "dataset-id"
         in: "path"
         description: "The dataset for which to create a new version"
-        required: false
+        required: true
         type: "string"
       - in: "body"
         name: "Version"
@@ -194,12 +194,12 @@ paths:
       - name: "version"
         in: "path"
         description: "The version you wish to retrieve"
-        required: false
+        required: true
         type: "string"
       - name: "dataset-id"
         in: "path"
         description: "The dataset containing the version you want to retrieve"
-        required: false
+        required: true
         type: "string"
       responses:
         200:
@@ -221,12 +221,12 @@ paths:
       - name: "version"
         in: "path"
         description: "The version you wish to update"
-        required: false
+        required: true
         type: "string"
       - name: "dataset-id"
         in: "path"
         description: "The dataset which contains the version you want to update"
-        required: false
+        required: true
         type: "string"
       - in: "body"
         name: "Version"
@@ -255,12 +255,12 @@ paths:
       - name: "version"
         in: "path"
         description: "The version of the editions you want to retrieve"
-        required: false
+        required: true
         type: "string"
       - name: "dataset-id"
         in: "path"
         description: "The dataset which contains the editions you want to retrieve"
-        required: false
+        required: true
         type: "string"
       responses:
         200:
@@ -282,12 +282,12 @@ paths:
       - name: "version"
         in: "path"
         description: "The version of the given dataset for which to create a new edition"
-        required: false
+        required: true
         type: "string"
       - name: "dataset-id"
         in: "path"
         description: "The dataset for which to create a new edition"
-        required: false
+        required: true
         type: "string"
       - in: "body"
         name: "Edition"
@@ -333,17 +333,17 @@ paths:
       - name: "version"
         in: "path"
         description: "The version containing the edition you want to retrieve"
-        required: false
+        required: true
         type: "string"
       - name: "dataset-id"
         in: "path"
         description: "The dataset containing the edition you want to retrieve"
-        required: false
+        required: true
         type: "string"
       - name: "edition"
         in: "path"
         description: "The edition you want to retrieve."
-        required: false
+        required: true
         type: "string"
       responses:
         200:
@@ -365,17 +365,17 @@ paths:
       - name: "version"
         in: "path"
         description: "The version which contains the edition you want to update"
-        required: false
+        required: true
         type: "string"
       - name: "dataset-id"
         in: "path"
         description: "The dataset which contains the edition you want to update"
-        required: false
+        required: true
         type: "string"
       - name: "edition"
         in: "path"
         description: "The edition you want to update"
-        required: false
+        required: true
         type: "string"
       - in: "body"
         name: "Edition"
@@ -404,17 +404,17 @@ paths:
       - name: "version"
         in: "path"
         description: "The version of the distributions you want to retrieve"
-        required: false
+        required: true
         type: "string"
       - name: "dataset-id"
         in: "path"
         description: "The dataset which contains the distributions you want to retrieve"
-        required: false
+        required: true
         type: "string"
       - name: "edition"
         in: "path"
         description: "The edition which contains the distributions you want to retrieve"
-        required: false
+        required: true
         type: "string"
       responses:
         200:
@@ -436,17 +436,17 @@ paths:
       - name: "version"
         in: "path"
         description: "The version of the given dataset for which to create a new distribution"
-        required: false
+        required: true
         type: "string"
       - name: "dataset-id"
         in: "path"
         description: "The dataset for which to create a new distribution"
-        required: false
+        required: true
         type: "string"
       - name: "edition"
         in: "path"
         description: "The edition of the given dataset for which to create a new distribution"
-        required: false
+        required: true
         type: "string"
       - in: "body"
         name: "Distribution"
@@ -492,22 +492,22 @@ paths:
       - name: "version"
         in: "path"
         description: "The version containing the distribution you want to retrieve"
-        required: false
+        required: true
         type: "string"
       - name: "dataset-id"
         in: "path"
         description: "The dataset containing the distribution you want to retrieve"
-        required: false
+        required: true
         type: "string"
       - name: "edition"
         in: "path"
         description: "The edition containing the distribution you want to retrieve"
-        required: false
+        required: true
         type: "string"
       - name: "distribution"
         in: "path"
         description: "The distribution you want to retrieve"
-        required: false
+        required: true
         type: "string"
       responses:
         200:
@@ -529,22 +529,22 @@ paths:
       - name: "version"
         in: "path"
         description: "The version which contains the distribution you want to update"
-        required: false
+        required: true
         type: "string"
       - name: "dataset-id"
         in: "path"
         description: "The dataset which contains the distribution you want to update"
-        required: false
+        required: true
         type: "string"
       - name: "edition"
         in: "path"
         description: "The edition which contains the distribution you want to update"
-        required: false
+        required: true
         type: "string"
       - name: "distribution"
         in: "path"
         description: "The distribution you want to update"
-        required: false
+        required: true
         type: "string"
       - in: "body"
         name: "Distribution"

@@ -15,11 +15,13 @@ events:
         pathParams:
           - name: "dataset-id"
             description: "The dataset for which to create a new edition"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
           - name: "version"
             description: "The version of the given dataset for which to create a new edition"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
