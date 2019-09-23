@@ -1,4 +1,4 @@
 name: Distribution
-description: Create a distribution
+description: This is a distribution
 contentType: "application/json"
 schema: ${file(schema/distribution.json)}

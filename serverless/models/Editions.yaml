@@ -1,0 +1,11 @@
+name: Editions
+description: This is multiple editions
+contentType: "application/json"
+schema:
+  type: array
+  items:
+    title: ${file(schema/edition.json):title}
+    description: ${file(schema/edition.json):description}
+    type: ${file(schema/edition.json):type}
+    properties: ${file(schema/edition.json):properties}
+    required: ${file(schema/edition.json):required}
