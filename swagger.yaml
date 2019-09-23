@@ -2,6 +2,11 @@ swagger: '2.0'
 info:
   version: '2019-09-23T11:33:16Z'
   title: dev-metadata-api
+  description: "Api for å registrere og redigere metadata for datasett i dataplattformen.\
+    \ \n    Create og Update endepunktene krever autorisasjon, mens resten er åpent. "
+  contact:
+    name: Origo dataplattform
+    email: dataplattform@oslo.kommune.no
 host: 463aw752ag.execute-api.eu-west-1.amazonaws.com
 basePath: /dev
 schemes:
