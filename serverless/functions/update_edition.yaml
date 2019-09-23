@@ -31,6 +31,8 @@ events:
           - statusCode: "200"
             responseBody:
               description: "Edition updated successfully"
+            responseModels:
+              application/json: "CreateResponse"
           - statusCode: "500"
             responseBody:
               description: "Was not able to update the edition. Internal server error."

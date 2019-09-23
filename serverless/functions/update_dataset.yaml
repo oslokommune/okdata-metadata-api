@@ -21,6 +21,8 @@ events:
           - statusCode: "200"
             responseBody:
               description: "Dataset updated successfully"
+            responseModels:
+              application/json: "CreateResponse"
           - statusCode: "500"
             responseBody:
               description: "Was not able to update the dataset. Internal server error."

@@ -10,6 +10,8 @@ events:
           - statusCode: "200"
             responseBody:
               description: "Datasets retrieved successfully"
+            responseModels:
+              application/json: "Datasets"
           - statusCode: "500"
             responseBody:
               description: "Was not able to retrieve the datasets. Internal server error."

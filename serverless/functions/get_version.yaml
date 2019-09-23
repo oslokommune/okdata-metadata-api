@@ -21,6 +21,8 @@ events:
           - statusCode: "200"
             responseBody:
               description: "Dataset retrieved successfully"
+            responseModels:
+              application/json: "Version"
           - statusCode: "500"
             responseBody:
               description: "Was not able to retrieve the dataset. Internal server error."

@@ -26,6 +26,8 @@ events:
           - statusCode: "200"
             responseBody:
               description: "Distributions retrieved successfully"
+            responseModels:
+              application/json: "Distributions"
           - statusCode: "500"
             responseBody:
               description: "Was not able to retrieve the distributions. Internal server error."

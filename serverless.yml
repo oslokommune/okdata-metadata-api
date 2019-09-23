@@ -48,6 +48,8 @@ package:
   exclude:
     - './**'
   include:
+    - '!./**'
+    - './schema/**'
     - './metadata/*.py'
     - './metadata/dataset/*.py'
     - './metadata/version/*.py'
@@ -62,22 +64,27 @@ resources:
 
 
 custom:
-  scriptHooks:
-    after:deploy:finalize: make update-ssm-${self:provider.stage}
   pythonRequirements:
     dockerizePip: non-linux
     usePoetry: false
   documentation:
-    version: '0.5.0'
-    title: 'Metadata-api'
-    description: 'Metadata-api for dataplattform'
+    info:
+      version: ${git:sha1}
+      title: 'Metadata-api'
+      description: 'Metadata-api for dataplattform'
     models:
       - ${file(serverless/models/ErrorResponse.yaml)}
-      - ${file(serverless/models/Response.yaml)}
+      - ${file(serverless/models/CreateResponse.yaml)}
       - ${file(serverless/models/Dataset.yaml)}
       - ${file(serverless/models/Edition.yaml)}
       - ${file(serverless/models/Version.yaml)}
       - ${file(serverless/models/Distribution.yaml)}
+      - ${file(serverless/models/Datasets.yaml)}
+      - ${file(serverless/models/Editions.yaml)}
+      - ${file(serverless/models/Versions.yaml)}
+      - ${file(serverless/models/Distributions.yaml)}
+    authorizers:
+      - ${file(serverless/kc-authorizer.yaml)}
   exportGitVariables: false
 
 functions:

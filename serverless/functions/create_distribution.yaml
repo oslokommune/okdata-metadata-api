@@ -29,6 +29,9 @@ events:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
         methodResponses:
+          - statusCode: "200"
+            responseModels:
+              application/json: "CreateResponse"
           - statusCode: "500"
             responseBody:
               description: "Was not able to post the distribution. Internal server error."

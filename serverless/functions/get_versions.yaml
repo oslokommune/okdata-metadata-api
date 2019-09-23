@@ -16,6 +16,8 @@ events:
           - statusCode: "200"
             responseBody:
               description: "Versions retrieved successfully"
+            responseModels:
+              application/json: "Versions"
           - statusCode: "500"
             responseBody:
               description: "Was not able to retrieve the versions. Internal server error."
