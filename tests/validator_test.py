@@ -39,3 +39,8 @@ def test_valid_dataset():
 def test_invalid_dataset():
     with pytest.raises(ValidationError):
         dataset.validate(invalid_dataset)
+
+
+def test_missing_schema():
+    with pytest.raises(Exception, match="Missing schema for object d4t4s3t"):
+        Validator("d4t4s3t")

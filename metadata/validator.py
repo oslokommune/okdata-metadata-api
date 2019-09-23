@@ -10,8 +10,9 @@ class Validator:
         try:
             with open(f"{self.path.parent}/schema/{object_type}.json", "r") as f:
                 self.schema = json.loads(f.read())
-        except Exception as e:
+        except IOError as e:
             print(e)
+            raise Exception(f"Missing schema for object {object_type}!")
 
     def validate(self, validation_object):
         return validate_object(
