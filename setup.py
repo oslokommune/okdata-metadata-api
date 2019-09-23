@@ -25,5 +25,11 @@ setuptools.setup(
         "metadata.edition.repository",
         "metadata.distribution.repository",
     ],
-    install_requires=["simplejson", "shortuuid", "requests"],
+    install_requires=[
+        "simplejson",
+        "shortuuid",
+        "requests",
+        "jsonschema[format]",
+        "strict-rfc3339",
+    ],
 )

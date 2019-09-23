@@ -1,0 +1,150 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Dataset",
+  "description": "Metadata about a dataset",
+  "type": "object",
+  "properties": {
+    "accessRights": {
+      "description": "The level of access of this dataset. Should be used to indicate if the dataset should have restricted public access.",
+      "type": "string",
+      "enum": [
+        "non-public",
+        "public",
+        "restricted"
+      ]
+    },
+    "theme": {
+      "description": "Reference to a main theme for this dataset.",
+      "type": "string",
+      "enum": [
+        "economy and finance",
+        "education, culture and sport",
+        "energy",
+        "environment",
+        "government and public sector",
+        "health",
+        "international issues",
+        "justice, legal system and public safety",
+        "regions and cities",
+        "population and society",
+        "science and technology",
+        "transport"
+      ]
+    },
+    "processing_stage": {
+      "description": "In what stage is the dataset stored.",
+      "type": "string",
+      "enum": [
+        "incoming",
+        "raw",
+        "processed"
+      ]
+    },
+    "accruralPeriodicity": {
+      "description": "Indicates how often a dataset is updated",
+      "type": "string",
+      "enum": [
+        "annual",
+        "semiannual",
+        "three times a year",
+        "bidecennial",
+        "biennial",
+        "bihourly",
+        "bimonthly",
+        "biweekly",
+        "continuous",
+        "daily",
+        "twice a day",
+        "decennial",
+        "hourly",
+        "irregular",
+        "monthly",
+        "semimonthly",
+        "three times a month",
+        "never",
+        "other",
+        "quadrennial",
+        "quarterly",
+        "quinquennial",
+        "tridecennial",
+        "triennial",
+        "trihourly",
+        "unknown",
+        "continuously updated",
+        "weekly",
+        "semiweekly",
+        "three times a week"
+      ]
+    },
+    "contactPoint": {
+      "description": "Contact info",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "email": {
+          "type": "string",
+          "format": "idn-email",
+          "maxLength": 255
+        }
+      },
+      "required": [
+        "email"
+      ]
+    },
+    "publisher": {
+      "description": "Refrence to a unit responsible for making the dataset available.",
+      "type": "string",
+      "maxLength": 255
+    },
+    "confidentiality": {
+      "description": "Classifier for how sensitive the dataset is.",
+      "type": "string",
+      "enum": [
+        "green",
+        "yellow",
+        "red",
+        "purple"
+      ]
+    },
+    "keywords": {
+      "description": "Extra keywords describing the dataset",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "maxLength": 255
+      }
+    },
+    "objective": {
+      "description": "A description on why this dataset was created.",
+      "type": "string",
+      "maxLength": 2048
+    },
+    "description": {
+      "description": "A description of what this dataset contains.",
+      "type": "string",
+      "maxLength": 2048
+    },
+    "title": {
+      "description": "The dataset title",
+      "type": "string",
+      "maxLength": 128
+    },
+    "parent_id": {
+      "description": "Id of the parent dataset",
+      "type": "string",
+      "maxLength": 128
+    }
+  },
+  "required": [
+    "title",
+    "accessRights",
+    "processing_stage",
+    "contactPoint",
+    "publisher",
+    "confidentiality"
+  ]
+}

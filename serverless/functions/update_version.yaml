@@ -21,7 +21,7 @@ events:
         requestBody:
           description: "The new object"
         requestModels:
-          application/json: Request
+          application/json: Version
         methodResponses:
           - statusCode: "200"
             responseBody:

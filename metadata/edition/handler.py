@@ -2,13 +2,18 @@ import simplejson as json
 
 from metadata import common
 from metadata.CommonRepository import ResourceConflict
+from metadata.common import validate_input
 from metadata.edition.repository import EditionRepository
 from aws_xray_sdk.core import xray_recorder
 from auth import SimpleAuth
 
+from metadata.validator import Validator
+
 edition_repository = EditionRepository()
+validator = Validator("edition")
 
 
+@validate_input(validator)
 @xray_recorder.capture("create_edition")
 def create_edition(event, context):
     """POST /datasets/:dataset-id/versions/:version/editions"""
@@ -35,6 +40,7 @@ def create_edition(event, context):
         return common.response(400, f"Error creating edition: {e}")
 
 
+@validate_input(validator)
 @xray_recorder.capture("update_edition")
 def update_edition(event, context):
     """PUT /datasets/:dataset-id/versions/:version/editions/:edition"""

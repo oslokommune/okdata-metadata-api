@@ -3,12 +3,17 @@ from aws_xray_sdk.core import xray_recorder
 
 from metadata import common
 from metadata.CommonRepository import ResourceConflict
+from metadata.common import validate_input
 from metadata.distribution.repository import DistributionRepository
 from auth import SimpleAuth
 
+from metadata.validator import Validator
+
 distribution_repository = DistributionRepository()
+validator = Validator("distribution")
 
 
+@validate_input(validator)
 @xray_recorder.capture("create_distribution")
 def create_distribution(event, context):
     """POST /datasets/:dataset-id/versions/:version/editions/:edition/distributions"""
@@ -38,6 +43,7 @@ def create_distribution(event, context):
         return common.response(400, f"Error creating distribution: {e}")
 
 
+@validate_input(validator)
 @xray_recorder.capture("update_distribution")
 def update_distribution(event, context):
     """PUT /datasets/:dataset-id/versions/:version/editions/:edition/distributions/:distribution"""

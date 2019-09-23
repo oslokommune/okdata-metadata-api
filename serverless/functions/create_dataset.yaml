@@ -11,7 +11,7 @@ events:
         requestBody:
           description: "A dataset object"
         requestModels:
-          application/json: "Request"
+          application/json: "Dataset"
         methodResponses:
         - statusCode: "200"
           responseBody:

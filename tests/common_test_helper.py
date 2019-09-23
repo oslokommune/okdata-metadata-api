@@ -90,8 +90,9 @@ dataset = {
     "description": "Sensordata fra tellere på gjenbruksstasjonene",
     "keywords": ["avfall", "besøkende", "gjenbruksstasjon"],
     "frequency": "hourly",
-    "accessRights": ":non-public",
-    "privacyLevel": "green",
+    "accessRights": "non-public",
+    "confidentiality": "green",
+    "processing_stage": "raw",
     "objective": "Formålsbeskrivelse",
     "contactPoint": {
         "name": "Tim",
@@ -113,8 +114,9 @@ dataset_updated = {
     "description": "Sensordata fra tellere på gamle gjenbruksstasjoner",
     "keywords": ["avfall", "besøkende", "gjenbruksstasjon"],
     "frequency": "hourly",
-    "accessRights": ":restricted",
-    "privacyLevel": "red",
+    "accessRights": "restricted",
+    "confidentiality": "red",
+    "processing_stage": "raw",
     "objective": "Formålsbeskrivelse",
     "contactPoint": {
         "name": "Tim",

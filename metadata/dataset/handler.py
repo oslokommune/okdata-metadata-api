@@ -4,14 +4,19 @@ import simplejson as json
 
 from metadata import common
 from metadata.CommonRepository import ResourceConflict
+from metadata.common import validate_input
 from metadata.dataset.repository import DatasetRepository
 from aws_xray_sdk.core import xray_recorder
 from auth import SimpleAuth
 
+from metadata.validator import Validator
+
 dataset_repository = DatasetRepository()
 AUTHORIZER_API = os.environ["AUTHORIZER_API"]
+validator = Validator("dataset")
 
 
+@validate_input(validator)
 @xray_recorder.capture("create_dataset")
 def create_dataset(event, context):
     """POST /datasets"""
@@ -34,6 +39,7 @@ def create_dataset(event, context):
         return common.response(400, f"Error creating dataset: {e}")
 
 
+@validate_input(validator)
 @xray_recorder.capture("update_dataset")
 def update_dataset(event, context):
     """PUT /datasets/:dataset-id"""

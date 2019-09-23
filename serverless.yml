@@ -74,7 +74,10 @@ custom:
     models:
       - ${file(serverless/models/ErrorResponse.yaml)}
       - ${file(serverless/models/Response.yaml)}
-      - ${file(serverless/models/Request.yaml)}
+      - ${file(serverless/models/Dataset.yaml)}
+      - ${file(serverless/models/Edition.yaml)}
+      - ${file(serverless/models/Version.yaml)}
+      - ${file(serverless/models/Distribution.yaml)}
   exportGitVariables: false
 
 functions:

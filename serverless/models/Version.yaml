@@ -1,0 +1,4 @@
+name: Version
+description: Create a version
+contentType: "application/json"
+schema: ${file(schema/version.json)}
