@@ -131,6 +131,7 @@
     "title": {
       "description": "The dataset title",
       "type": "string",
+      "pattern": "^[- a-zA-Z0-9åÅæÆøØ]+$",
       "maxLength": 128
     },
     "parent_id": {
