@@ -10,16 +10,19 @@ events:
         pathParams:
           - name: "dataset-id"
             description: "The dataset which contains the edition you want to update"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
           - name: "version"
             description: "The version which contains the edition you want to update"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
           - name: "edition"
             description: "The edition you want to update"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
@@ -31,6 +34,8 @@ events:
           - statusCode: "200"
             responseBody:
               description: "Edition updated successfully"
+            responseModels:
+              application/json: "CreateResponse"
           - statusCode: "500"
             responseBody:
               description: "Was not able to update the edition. Internal server error."

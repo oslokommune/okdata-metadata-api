@@ -1,0 +1,11 @@
+name: Distributions
+description: This is multiple datasets
+contentType: "application/json"
+schema:
+  type: array
+  items:
+    title: ${file(schema/distribution.json):title}
+    description: ${file(schema/distribution.json):description}
+    type: ${file(schema/distribution.json):type}
+    properties: ${file(schema/distribution.json):properties}
+    required: ${file(schema/distribution.json):required}

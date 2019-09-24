@@ -9,21 +9,25 @@ events:
         pathParams:
           - name: "dataset-id"
             description: "The dataset containing the distribution you want to retrieve"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
           - name: "version"
             description: "The version containing the distribution you want to retrieve"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
           - name: "edition"
             description: "The edition containing the distribution you want to retrieve"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
           - name: "distribution"
             description: "The distribution you want to retrieve"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
@@ -31,6 +35,8 @@ events:
           - statusCode: "200"
             responseBody:
               description: "Distribution retrieved successfully"
+            responseModels:
+              application/json: "Distribution"
           - statusCode: "500"
             responseBody:
               description: "Was not able to retrieve the distribution. Internal server error."

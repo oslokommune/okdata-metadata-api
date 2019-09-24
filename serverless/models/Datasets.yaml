@@ -1,0 +1,11 @@
+name: Datasets
+description: This is multiple datasets
+contentType: "application/json"
+schema:
+  type: array
+  items:
+    title: ${file(schema/dataset.json):title}
+    description: ${file(schema/dataset.json):description}
+    type: ${file(schema/dataset.json):type}
+    properties: ${file(schema/dataset.json):properties}
+    required: ${file(schema/dataset.json):required}

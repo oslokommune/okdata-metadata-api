@@ -16,6 +16,8 @@ events:
         - statusCode: "200"
           responseBody:
             description: "Dataset posted successfully"
+          responseModels:
+            application/json: "CreateResponse"
         - statusCode: "500"
           responseBody:
             description: "Was not able to post the dataset. Internal server error."

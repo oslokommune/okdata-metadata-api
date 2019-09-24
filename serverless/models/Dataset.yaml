@@ -1,4 +1,4 @@
 name: Dataset
-description: Create a dataset
+description: This is a dataset
 contentType: "application/json"
 schema: ${file(schema/dataset.json)}

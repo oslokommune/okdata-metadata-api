@@ -1,0 +1,844 @@
+swagger: '2.0'
+info:
+  version: '2019-09-23T11:33:16Z'
+  title: dev-metadata-api
+  description: "Api for å registrere og redigere metadata for datasett i dataplattformen.\
+    \ \n    Create og Update endepunktene krever autorisasjon, mens resten er åpent. "
+  contact:
+    name: Origo dataplattform
+    email: dataplattform@oslo.kommune.no
+host: 463aw752ag.execute-api.eu-west-1.amazonaws.com
+basePath: /dev
+schemes:
+- https
+paths:
+  /datasets:
+    get:
+      summary: Get all datasets
+      description: Retrieves all datasets
+      produces:
+      - application/json
+      responses:
+        200:
+          description: 200 response
+          schema:
+            $ref: '#/definitions/Datasets'
+        500:
+          description: 500 response
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    post:
+      summary: Post a dataset
+      description: Posts a new dataset
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: Dataset
+        description: A dataset object
+        required: true
+        schema:
+          $ref: '#/definitions/Dataset'
+      responses:
+        200:
+          description: 200 response
+          schema:
+            $ref: '#/definitions/CreateResponse'
+        500:
+          description: 500 response
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - authenticate: []
+  /datasets/{dataset-id}:
+    get:
+      summary: Get a dataset
+      description: Retrieves a dataset
+      produces:
+      - application/json
+      parameters:
+      - name: dataset-id
+        in: path
+        description: The dataset you want to retrieve
+        required: true
+        type: string
+      responses:
+        200:
+          description: 200 response
+          schema:
+            $ref: '#/definitions/Dataset'
+        500:
+          description: 500 response
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    put:
+      summary: Update a dataset
+      description: Updates an existing dataset
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: dataset-id
+        in: path
+        description: The dataset you want to update
+        required: true
+        type: string
+      - in: body
+        name: Dataset
+        description: The new object
+        required: true
+        schema:
+          $ref: '#/definitions/Dataset'
+      responses:
+        200:
+          description: 200 response
+          schema:
+            $ref: '#/definitions/CreateResponse'
+        500:
+          description: 500 response
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - authenticate: []
+  /datasets/{dataset-id}/versions:
+    get:
+      summary: Get all versions
+      description: Retrieves all versions
+      produces:
+      - application/json
+      parameters:
+      - name: dataset-id
+        in: path
+        description: The dataset which contains the versions you want to retrieve
+        required: true
+        type: string
+      responses:
+        200:
+          description: 200 response
+          schema:
+            $ref: '#/definitions/Versions'
+        500:
+          description: 500 response
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    post:
+      summary: Create new version
+      description: Creates a version
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: dataset-id
+        in: path
+        description: The dataset for which to create a new version
+        required: true
+        type: string
+      - in: body
+        name: Version
+        description: A user information object
+        required: true
+        schema:
+          $ref: '#/definitions/Version'
+      responses:
+        200:
+          description: 200 response
+          schema:
+            $ref: '#/definitions/CreateResponse'
+        500:
+          description: 500 response
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - authenticate: []
+  /datasets/{dataset-id}/versions/{version}:
+    get:
+      summary: Get a version
+      description: Retrieves a specific version
+      produces:
+      - application/json
+      parameters:
+      - name: version
+        in: path
+        description: The version you wish to retrieve
+        required: true
+        type: string
+      - name: dataset-id
+        in: path
+        description: The dataset containing the version you want to retrieve
+        required: true
+        type: string
+      responses:
+        200:
+          description: 200 response
+          schema:
+            $ref: '#/definitions/Version'
+        500:
+          description: 500 response
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    put:
+      summary: Update a version
+      description: Updates an existing version
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: version
+        in: path
+        description: The version you wish to update
+        required: true
+        type: string
+      - name: dataset-id
+        in: path
+        description: The dataset which contains the version you want to update
+        required: true
+        type: string
+      - in: body
+        name: Version
+        description: The new object
+        required: true
+        schema:
+          $ref: '#/definitions/Version'
+      responses:
+        200:
+          description: 200 response
+          schema:
+            $ref: '#/definitions/CreateResponse'
+        500:
+          description: 500 response
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - authenticate: []
+  /datasets/{dataset-id}/versions/{version}/editions:
+    get:
+      summary: Get all editions
+      description: Retrieves all editions
+      produces:
+      - application/json
+      parameters:
+      - name: version
+        in: path
+        description: The version of the editions you want to retrieve
+        required: true
+        type: string
+      - name: dataset-id
+        in: path
+        description: The dataset which contains the editions you want to retrieve
+        required: true
+        type: string
+      responses:
+        200:
+          description: 200 response
+          schema:
+            $ref: '#/definitions/Editions'
+        500:
+          description: 500 response
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    post:
+      summary: Post an edition
+      description: Posts a new edition
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: version
+        in: path
+        description: The version of the given dataset for which to create a new edition
+        required: true
+        type: string
+      - name: dataset-id
+        in: path
+        description: The dataset for which to create a new edition
+        required: true
+        type: string
+      - in: body
+        name: Edition
+        description: A dataset object
+        required: true
+        schema:
+          $ref: '#/definitions/Edition'
+      responses:
+        200:
+          description: 200 response
+          schema:
+            $ref: '#/definitions/CreateResponse'
+        500:
+          description: 500 response
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - authenticate: []
+  /datasets/{dataset-id}/versions/{version}/editions/{edition}:
+    get:
+      summary: Get an edition
+      description: Retrieves a specific edition
+      produces:
+      - application/json
+      parameters:
+      - name: version
+        in: path
+        description: The version containing the edition you want to retrieve
+        required: true
+        type: string
+      - name: dataset-id
+        in: path
+        description: The dataset containing the edition you want to retrieve
+        required: true
+        type: string
+      - name: edition
+        in: path
+        description: The edition you want to retrieve.
+        required: true
+        type: string
+      responses:
+        200:
+          description: 200 response
+          schema:
+            $ref: '#/definitions/Edition'
+        500:
+          description: 500 response
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    put:
+      summary: Update an edition
+      description: Updates an existing edition
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: version
+        in: path
+        description: The version which contains the edition you want to update
+        required: true
+        type: string
+      - name: dataset-id
+        in: path
+        description: The dataset which contains the edition you want to update
+        required: true
+        type: string
+      - name: edition
+        in: path
+        description: The edition you want to update
+        required: true
+        type: string
+      - in: body
+        name: Edition
+        description: The new object
+        required: true
+        schema:
+          $ref: '#/definitions/Edition'
+      responses:
+        200:
+          description: 200 response
+          schema:
+            $ref: '#/definitions/CreateResponse'
+        500:
+          description: 500 response
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - authenticate: []
+  /datasets/{dataset-id}/versions/{version}/editions/{edition}/distributions:
+    get:
+      summary: Get all distributions
+      description: Retrieves all distributions
+      produces:
+      - application/json
+      parameters:
+      - name: version
+        in: path
+        description: The version of the distributions you want to retrieve
+        required: true
+        type: string
+      - name: dataset-id
+        in: path
+        description: The dataset which contains the distributions you want to retrieve
+        required: true
+        type: string
+      - name: edition
+        in: path
+        description: The edition which contains the distributions you want to retrieve
+        required: true
+        type: string
+      responses:
+        200:
+          description: 200 response
+          schema:
+            $ref: '#/definitions/Distributions'
+        500:
+          description: 500 response
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    post:
+      summary: Post a dataset
+      description: Posts a new dataset
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: version
+        in: path
+        description: The version of the given dataset for which to create a new distribution
+        required: true
+        type: string
+      - name: dataset-id
+        in: path
+        description: The dataset for which to create a new distribution
+        required: true
+        type: string
+      - name: edition
+        in: path
+        description: The edition of the given dataset for which to create a new distribution
+        required: true
+        type: string
+      - in: body
+        name: Distribution
+        description: A dataset object
+        required: true
+        schema:
+          $ref: '#/definitions/Distribution'
+      responses:
+        200:
+          description: 200 response
+          schema:
+            $ref: '#/definitions/CreateResponse'
+        500:
+          description: 500 response
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - authenticate: []
+  /datasets/{dataset-id}/versions/{version}/editions/{edition}/distributions/{distribution}:
+    get:
+      summary: Get a distribution
+      description: Retrieves a specific distribution
+      produces:
+      - application/json
+      parameters:
+      - name: version
+        in: path
+        description: The version containing the distribution you want to retrieve
+        required: true
+        type: string
+      - name: dataset-id
+        in: path
+        description: The dataset containing the distribution you want to retrieve
+        required: true
+        type: string
+      - name: edition
+        in: path
+        description: The edition containing the distribution you want to retrieve
+        required: true
+        type: string
+      - name: distribution
+        in: path
+        description: The distribution you want to retrieve
+        required: true
+        type: string
+      responses:
+        200:
+          description: 200 response
+          schema:
+            $ref: '#/definitions/Distribution'
+        500:
+          description: 500 response
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    put:
+      summary: Update a distribution
+      description: Updates an existing distribution
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: version
+        in: path
+        description: The version which contains the distribution you want to update
+        required: true
+        type: string
+      - name: dataset-id
+        in: path
+        description: The dataset which contains the distribution you want to update
+        required: true
+        type: string
+      - name: edition
+        in: path
+        description: The edition which contains the distribution you want to update
+        required: true
+        type: string
+      - name: distribution
+        in: path
+        description: The distribution you want to update
+        required: true
+        type: string
+      - in: body
+        name: Distribution
+        description: The new object
+        required: true
+        schema:
+          $ref: '#/definitions/Distribution'
+      responses:
+        200:
+          description: 200 response
+          schema:
+            $ref: '#/definitions/CreateResponse'
+        500:
+          description: 500 response
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+      - authenticate: []
+securityDefinitions:
+  authenticate:
+    type: apiKey
+    name: Authorization
+    in: header
+    x-amazon-apigateway-authtype: custom
+definitions:
+  Datasets:
+    type: array
+    description: This is multiple datasets
+    items:
+      type: object
+      description: Metadata about a dataset
+      title: Dataset
+      properties:
+        keywords:
+          type: array
+          description: Extra keywords describing the dataset
+          items:
+            type: string
+            maxLength: 255
+        contactPoint:
+          type: object
+          description: Contact info
+          properties:
+            name:
+              type: string
+              maxLength: 255
+            email:
+              type: string
+              format: idn-email
+              maxLength: 255
+          required:
+          - email
+        parent_id:
+          type: string
+          description: Id of the parent dataset
+          maxLength: 128
+        confidentiality:
+          type: string
+          description: Classifier for how sensitive the dataset is.
+          enum:
+          - green
+          - yellow
+          - red
+          - purple
+        publisher:
+          type: string
+          description: Refrence to a unit responsible for making the dataset available.
+          maxLength: 255
+        description:
+          type: string
+          description: A description of what this dataset contains.
+          maxLength: 2048
+        theme:
+          type: string
+          description: Reference to a main theme for this dataset.
+          enum:
+          - economy and finance
+          - education, culture and sport
+          - energy
+          - environment
+          - government and public sector
+          - health
+          - international issues
+          - justice, legal system and public safety
+          - regions and cities
+          - population and society
+          - science and technology
+          - transport
+        processing_stage:
+          type: string
+          description: In what stage is the dataset stored.
+          enum:
+          - incoming
+          - raw
+          - processed
+        accessRights:
+          type: string
+          description: The level of access of this dataset. Should be used to indicate
+            if the dataset should have restricted public access.
+          enum:
+          - non-public
+          - public
+          - restricted
+        accruralPeriodicity:
+          type: string
+          description: Indicates how often a dataset is updated
+          enum:
+          - annual
+          - semiannual
+          - three times a year
+          - bidecennial
+          - biennial
+          - bihourly
+          - bimonthly
+          - biweekly
+          - continuous
+          - daily
+          - twice a day
+          - decennial
+          - hourly
+          - irregular
+          - monthly
+          - semimonthly
+          - three times a month
+          - never
+          - other
+          - quadrennial
+          - quarterly
+          - quinquennial
+          - tridecennial
+          - triennial
+          - trihourly
+          - unknown
+          - continuously updated
+          - weekly
+          - semiweekly
+          - three times a week
+        title:
+          type: string
+          description: The dataset title
+          maxLength: 128
+        objective:
+          type: string
+          description: A description on why this dataset was created.
+          maxLength: 2048
+      required:
+      - accessRights
+      - confidentiality
+      - contactPoint
+      - processing_stage
+      - publisher
+      - title
+  Versions:
+    type: array
+    description: This is multiple versions
+    items:
+      type: object
+      description: Metadata about a version
+      title: Version
+      properties:
+        version:
+          type: string
+          minLength: 1
+          maxLength: 128
+      required:
+      - version
+  Editions:
+    type: array
+    description: This is multiple editions
+    items:
+      type: object
+      description: Metadata about an edition
+      title: Edition
+      properties:
+        edition:
+          type: string
+          format: date-time
+      required:
+      - edition
+  Version:
+    type: object
+    required:
+    - version
+    properties:
+      version:
+        type: string
+        minLength: 1
+        maxLength: 128
+    title: Version
+    description: Create a version
+  CreateResponse:
+    type: string
+    description: Response from post
+  Dataset:
+    type: object
+    required:
+    - accessRights
+    - confidentiality
+    - contactPoint
+    - processing_stage
+    - publisher
+    - title
+    properties:
+      keywords:
+        type: array
+        description: Extra keywords describing the dataset
+        items:
+          type: string
+          maxLength: 255
+      contactPoint:
+        type: object
+        description: Contact info
+        properties:
+          name:
+            type: string
+            maxLength: 255
+          email:
+            type: string
+            format: idn-email
+            maxLength: 255
+        required:
+        - email
+      parent_id:
+        type: string
+        description: Id of the parent dataset
+        maxLength: 128
+      confidentiality:
+        type: string
+        description: Classifier for how sensitive the dataset is.
+        enum:
+        - green
+        - yellow
+        - red
+        - purple
+      publisher:
+        type: string
+        description: Refrence to a unit responsible for making the dataset available.
+        maxLength: 255
+      description:
+        type: string
+        description: A description of what this dataset contains.
+        maxLength: 2048
+      theme:
+        type: string
+        description: Reference to a main theme for this dataset.
+        enum:
+        - economy and finance
+        - education, culture and sport
+        - energy
+        - environment
+        - government and public sector
+        - health
+        - international issues
+        - justice, legal system and public safety
+        - regions and cities
+        - population and society
+        - science and technology
+        - transport
+      processing_stage:
+        type: string
+        description: In what stage is the dataset stored.
+        enum:
+        - incoming
+        - raw
+        - processed
+      accessRights:
+        type: string
+        description: The level of access of this dataset. Should be used to indicate
+          if the dataset should have restricted public access.
+        enum:
+        - non-public
+        - public
+        - restricted
+      accruralPeriodicity:
+        type: string
+        description: Indicates how often a dataset is updated
+        enum:
+        - annual
+        - semiannual
+        - three times a year
+        - bidecennial
+        - biennial
+        - bihourly
+        - bimonthly
+        - biweekly
+        - continuous
+        - daily
+        - twice a day
+        - decennial
+        - hourly
+        - irregular
+        - monthly
+        - semimonthly
+        - three times a month
+        - never
+        - other
+        - quadrennial
+        - quarterly
+        - quinquennial
+        - tridecennial
+        - triennial
+        - trihourly
+        - unknown
+        - continuously updated
+        - weekly
+        - semiweekly
+        - three times a week
+      title:
+        type: string
+        description: The dataset title
+        maxLength: 128
+      objective:
+        type: string
+        description: A description on why this dataset was created.
+        maxLength: 2048
+    title: Dataset
+    description: This is a dataset
+  Distribution:
+    type: object
+    required:
+    - filename
+    properties:
+      filename:
+        type: string
+        minLength: 1
+        maxLength: 255
+    title: Distribution
+    description: This is a distribution
+  Edition:
+    type: object
+    required:
+    - edition
+    properties:
+      edition:
+        type: string
+        format: date-time
+    title: Edition
+    description: Create a edition
+  Distributions:
+    type: array
+    description: This is multiple datasets
+    items:
+      type: object
+      description: Metadata about a distribution
+      title: Distribution
+      properties:
+        filename:
+          type: string
+          minLength: 1
+          maxLength: 255
+      required:
+      - filename
+  ErrorResponse:
+    type: object
+    required:
+    - message
+    properties:
+      message:
+        type: string
+        description: A mesage of what went wrong
+    description: An error response

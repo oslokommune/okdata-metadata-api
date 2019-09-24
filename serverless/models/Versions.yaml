@@ -1,0 +1,11 @@
+name: Versions
+description: This is multiple versions
+contentType: "application/json"
+schema:
+  type: array
+  items:
+    title: ${file(schema/version.json):title}
+    description: ${file(schema/version.json):description}
+    type: ${file(schema/version.json):type}
+    properties: ${file(schema/version.json):properties}
+    required: ${file(schema/version.json):required}

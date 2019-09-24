@@ -14,6 +14,7 @@ events:
         pathParams:
           - name: "dataset-id"
             description: "The dataset you want to update"
+            required: true
             schema:
               type: "string"
               pattern: "^[-a-z0-9_]+$"
@@ -21,6 +22,8 @@ events:
           - statusCode: "200"
             responseBody:
               description: "Dataset updated successfully"
+            responseModels:
+              application/json: "CreateResponse"
           - statusCode: "500"
             responseBody:
               description: "Was not able to update the dataset. Internal server error."

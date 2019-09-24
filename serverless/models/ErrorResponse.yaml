@@ -4,10 +4,8 @@ contentType: application/json
 schema:
   type: object
   required:
-    - statusCode
-    - body
+    - message
   properties:
-    statusCode:
-      type: number
-    body:
+    message:
       type: string
+      description: A mesage of what went wrong
