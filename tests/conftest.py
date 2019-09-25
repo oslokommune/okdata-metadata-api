@@ -6,6 +6,11 @@ import boto3
 from moto import mock_dynamodb2
 from auth import SimpleAuth
 
+from tests import common_test_helper
+from metadata.dataset import handler as dataset_handler
+from metadata.version import handler as version_handler
+from metadata.edition import handler as edition_handler
+
 AUTHORIZER_API = os.environ["AUTHORIZER_API"]
 good_token = "Bjørnepollett"
 
@@ -73,5 +78,31 @@ def event():
 
 
 @pytest.fixture()
-def auth_event():
+def auth_event(*args, **kwargs):
     return lambda_event_factory(good_token)
+
+
+@pytest.fixture()
+def put_dataset(auth_event):
+    dataset = common_test_helper.raw_dataset.copy()
+    response = dataset_handler.create_dataset(auth_event(dataset), None)
+    return json.loads(response["body"])
+
+
+@pytest.fixture()
+def put_version(auth_event, put_dataset):
+    dataset_id = put_dataset
+    raw_version = common_test_helper.raw_version.copy()
+    version_handler.create_version(auth_event(raw_version, dataset=dataset_id), None)
+    return dataset_id, raw_version["version"]
+
+
+@pytest.fixture()
+def put_edition(auth_event, put_version):
+    dataset_id, version = put_version
+    raw_edition = common_test_helper.raw_edition.copy()
+    response = edition_handler.create_edition(
+        auth_event(raw_edition, dataset=dataset_id, version=version), None
+    )
+    edition_id = json.loads(response["body"])
+    return dataset_id, version, edition_id.split("/")[-1]

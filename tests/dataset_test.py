@@ -14,14 +14,9 @@ def metadata_table(dynamodb):
     return common.create_metadata_table(dynamodb)
 
 
-@pytest.fixture(autouse=True)
-def dataset_table(dynamodb):
-    return common.create_dataset_table(dynamodb)
-
-
 class TestCreateDataset:
     def test_create(self, auth_event, metadata_table):
-        create_event = auth_event(common.new_dataset)
+        create_event = auth_event(common.raw_dataset.copy())
         response = dataset_handler.create_dataset(create_event, None)
         dataset_id = json.loads(response["body"])
         assert response["statusCode"] == 200
@@ -38,7 +33,7 @@ class TestCreateDataset:
         assert item["confidentiality"] == "green"
 
     def test_create_invalid(self, auth_event, metadata_table):
-        invalid_dataset = common.new_dataset.copy()
+        invalid_dataset = common.raw_dataset.copy()
         invalid_dataset["confidentiality"] = "blue"
         create_event = auth_event(invalid_dataset)
         response = dataset_handler.create_dataset(create_event, None)
@@ -49,10 +44,11 @@ class TestCreateDataset:
 
 class TestUpdateDataset:
     def test_update_dataset(self, auth_event, metadata_table):
-        metadata_table.put_item(Item=common.dataset_new_format)
+        dataset = common.raw_dataset.copy()
+        response = dataset_handler.create_dataset(auth_event(dataset), None)
 
-        dataset_id = common.dataset_new_format[table.ID_COLUMN]
-        event_for_update = auth_event(common.dataset_updated, dataset_id)
+        dataset_id = json.loads(response["body"])
+        event_for_update = auth_event(common.dataset_updated.copy(), dataset_id)
 
         response = dataset_handler.update_dataset(event_for_update, None)
         body = json.loads(response["body"])
@@ -69,19 +65,21 @@ class TestUpdateDataset:
         assert item["title"] == "UPDATED TITLE"
         assert item["confidentiality"] == "red"
 
-    def test_invalid_tokeN(self, event, metadata_table, auth_denied):
-        metadata_table.put_item(Item=common.dataset_new_format)
+    def test_invalid_tokeN(self, event, metadata_table, auth_event, auth_denied):
+        dataset = common.raw_dataset.copy()
+        response = dataset_handler.create_dataset(auth_event(dataset), None)
 
-        dataset_id = common.dataset_new_format[table.ID_COLUMN]
+        dataset_id = json.loads(response["body"])
         event_for_update = event(common.dataset_updated, dataset_id)
 
         response = dataset_handler.update_dataset(event_for_update, None)
         assert response["statusCode"] == 403
 
     def test_update_invalid(self, auth_event, metadata_table):
-        metadata_table.put_item(Item=common.dataset_new_format)
+        dataset = common.raw_dataset.copy()
+        dataset_handler.create_dataset(auth_event(dataset), None)
 
-        invalid_dataset = common.dataset_new_format.copy()
+        invalid_dataset = dataset.copy()
         invalid_dataset["confidentiality"] = "blue"
         update_event = auth_event(invalid_dataset)
 
@@ -89,57 +87,6 @@ class TestUpdateDataset:
         error_message = json.loads(response["body"])
         assert response["statusCode"] == 400
         assert "blue" in error_message
-
-
-class TestDataset:
-    def test_should_just_get_datasets_from_new_table(
-        self, metadata_table, dataset_table
-    ):
-        dataset_table.put_item(Item=common.dataset_updated)
-        metadata_table.put_item(Item=common.dataset_new_format)
-
-        response = dataset_handler.get_datasets(None, None)
-        datasets = json.loads(response["body"])
-
-        assert response["statusCode"] == 200
-        assert len(datasets) == 1
-
-    def test_should_not_get_datasets_legacy(self, dataset_table):
-        dataset_table.put_item(Item=common.dataset)
-        dataset_table.put_item(Item=common.dataset_updated)
-
-        response = dataset_handler.get_datasets(None, None)
-        datasets = json.loads(response["body"])
-
-        assert response["statusCode"] == 200
-        assert len(datasets) == 0
-
-    def test_should_fetch_dataset_from_new_table_if_present(
-        self, metadata_table, dataset_table, event
-    ):
-        dataset_id = common.dataset[table.DATASET_ID]
-        dataset_table.put_item(Item=common.dataset)
-        metadata_table.put_item(Item=common.dataset_new_format)
-
-        get_event = event({}, dataset_id)
-
-        response = dataset_handler.get_dataset(get_event, None)
-        dataset_from_db = json.loads(response["body"])
-
-        self_url = dataset_from_db.pop("_links")["self"]["href"]
-        assert self_url == f"/datasets/{dataset_id}"
-        assert dataset_from_db == common.dataset_new_format
-
-    def test_get_dataset_from_legacy_table(self, dataset_table, event):
-        dataset_table.put_item(Item=common.dataset)
-
-        dataset_id = common.dataset[table.DATASET_ID]
-        event_for_get = event({}, dataset_id)
-
-        response = dataset_handler.get_dataset(event_for_get, None)
-        dataset_from_db = json.loads(response["body"])
-
-        assert dataset_from_db == common.dataset
 
     def test_dataset_not_found(self, event):
         event_for_get = event({}, "1234")
