@@ -3,8 +3,7 @@ Metadata-api
 
 API for posting, updating and retrieving metadata.
 
-Feel free to add any fields you'd like/need. We do not currently validate input data, so what you put in,
- you'll get out.
+Feel free to add any fields you'd like/need.
 
 ## Setup
 
@@ -12,6 +11,10 @@ Feel free to add any fields you'd like/need. We do not currently validate input 
 2. Install Serverless plugins: `make init`
 3. Install Python toolchain: `python3 -m pip install (--user) tox black pip-tools`
    - If running with `--user` flag, add `$HOME/.local/bin` to `$PATH`
+   
+## Input Validation
+The input is validated with json schema, see the models under `schema/`
+
 
 ## Formatting code
 
@@ -93,30 +96,3 @@ POST /datasets/:dataset-id/versions/:version-id/editions/:edition-id/distributio
     "checksum": "..."
 }
 ```
-
-## TODOs
-
-- Validering av json som kommer inn
-- Cleanup-jobber
-
-***
-## Status utvikling
-
-| Objekt        | POST | PUT | GET 1 | GET ALL | DELETE |TESTER  | EGNE FILER | ERRORS | PATH |
-| ------------- |:-----|----:| -----:|--------:|------ :|-------:|-----------:|-------:|-----:|
-| Datasett      | ✓DRA |  ✓DR| ✓DR   | ✓DR     |   V    | ✓      |   ✓        |   ✓    |/datasets |
-| Versjon       | ✓DRA |  ✓DR| ✓DR   | ✓DR     |   V    | ✓      |   ✓        |   ✓    |/datasets/:dataset-id/versions |
-| Edition       | ✓DRA |  ✓DR| ✓DR   | ✓DR     |   V    | ✓      |   ✓        |   ✓    |/datasets/:dataset-id/versions/:version-id/editions |
-| Distribution  | ✓DRA |  ✓DR| ✓DR   | ✓DR     |   V    | ✓      |   ✓        |   ✓    |/datasets/:dataset-id/versions/:version-id/editions/:edition-id/distributions |
-
-[ ✓ ] = Implementert
-
-[ R ] = Gode returverdier
-
-[ T ] = Testet
-
-[ D ] = Dokumentert
-
-[ A ] = Autogenerert ID (Kun POST)
-
-[ V ] = Venter med implementasjon

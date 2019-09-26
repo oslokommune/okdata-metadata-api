@@ -1,8 +1,6 @@
 import boto3
-from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 
-from metadata import common
 from metadata.CommonRepository import CommonRepository
 from aws_xray_sdk.core import patch
 
@@ -14,11 +12,8 @@ class VersionRepository(CommonRepository):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
         self.metadata_table = dynamodb.Table("dataset-metadata")
-        self.version_table = dynamodb.Table(common.table_name_prefix + "-version")
 
-        super().__init__(
-            self.metadata_table, "Version", self.version_table, common.VERSION_ID
-        )
+        super().__init__(self.metadata_table, "Version")
 
     def version_exists(self, dataset_id, version):
         result = self.get_version(dataset_id, version)
@@ -26,11 +21,10 @@ class VersionRepository(CommonRepository):
 
     def get_version(self, dataset_id, version):
         version_id = f"{dataset_id}/{version}"
-        return self.get_item(version_id, version)
+        return self.get_item(version_id)
 
     def get_versions(self, dataset_id):
-        legacy_filter = Key(common.DATASET_ID).eq(dataset_id)
-        return self.get_items(dataset_id, legacy_filter)
+        return self.get_items(dataset_id)
 
     def create_version(self, dataset_id, content):
         version = content["version"]

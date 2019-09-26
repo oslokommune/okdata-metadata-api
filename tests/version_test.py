@@ -1,11 +1,11 @@
 import pytest
-from copy import deepcopy
 import json
 
 from boto3.dynamodb.conditions import Key
 
 import metadata.common as table
 import metadata.version.handler as version_handler
+from metadata import common
 from tests import common_test_helper
 
 
@@ -14,19 +14,12 @@ def metadata_table(dynamodb):
     return common_test_helper.create_metadata_table(dynamodb)
 
 
-@pytest.fixture(autouse=True)
-def version_table(dynamodb):
-    return common_test_helper.create_version_table(dynamodb)
-
-
 class TestCreateVersion:
-    def test_create_version(self, metadata_table, auth_event):
-        dataset = common_test_helper.dataset_new_format
-        dataset_id = dataset[table.ID_COLUMN]
-        metadata_table.put_item(Item=dataset)
+    def test_create_version(self, metadata_table, auth_event, put_dataset):
+        dataset_id = put_dataset
 
-        version = common_test_helper.new_version
-        create_event = auth_event(version, dataset_id)
+        version = common_test_helper.raw_version
+        create_event = auth_event(version, dataset=dataset_id)
 
         response = version_handler.create_version(create_event, None)
         version_id = json.loads(response["body"])
@@ -53,12 +46,12 @@ class TestCreateVersion:
         response = version_handler.create_version(bad_version_event, None)
         assert response["statusCode"] == 400
 
-    def test_create_duplicate_version_should_fail(self, metadata_table, auth_event):
-        dataset = common_test_helper.dataset_new_format
-        dataset_id = dataset[table.ID_COLUMN]
-        metadata_table.put_item(Item=dataset)
+    def test_create_duplicate_version_should_fail(
+        self, metadata_table, auth_event, put_dataset
+    ):
+        dataset_id = put_dataset
 
-        version = common_test_helper.new_version
+        version = common_test_helper.raw_version
         create_event = auth_event(version, dataset_id)
 
         response = version_handler.create_version(create_event, None)
@@ -69,26 +62,28 @@ class TestCreateVersion:
         assert str.startswith(json.loads(response["body"]), "Resource Conflict")
 
     def test_forbidden(self, event, metadata_table, auth_denied):
-        dataset = common_test_helper.dataset_new_format
-        dataset_id = dataset[table.ID_COLUMN]
+        dataset = common_test_helper.raw_dataset.copy()
+        dataset[table.ID_COLUMN] = "dataset-id"
+        dataset[table.TYPE_COLUMN] = "dataset"
         metadata_table.put_item(Item=dataset)
 
-        version = common_test_helper.new_version
-        create_event = event(version, dataset_id)
+        version = common_test_helper.raw_version
+        create_event = event(version, "dataset-id")
 
         response = version_handler.create_version(create_event, None)
         assert response["statusCode"] == 403
 
 
 class TestUpdateVersion:
-    def test_update_version(self, metadata_table, auth_event):
-        metadata_table.put_item(Item=common_test_helper.version_new_format)
-
-        dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
-        version_name = common_test_helper.version_new_format["version"]
+    def test_update_version(self, metadata_table, auth_event, put_dataset):
+        dataset_id = put_dataset
+        version_handler.create_version(
+            auth_event(common_test_helper.raw_version.copy(), dataset=dataset_id), None
+        )
+        version_name = common_test_helper.raw_version["version"]
 
         update_event = auth_event(
-            common_test_helper.version_updated, dataset_id, version_name
+            common_test_helper.version_updated, dataset=dataset_id, version=version_name
         )
 
         response = version_handler.update_version(update_event, None)
@@ -101,20 +96,21 @@ class TestUpdateVersion:
             KeyConditionExpression=Key(table.ID_COLUMN).eq(version_id)
         )
         version_from_db = db_response["Items"][0]
-        assert version_from_db["schema"] == "new schema"
+        assert version_from_db["version"] == "6-TEST"
 
-    def test_update_edition_latest_is_updated(self, metadata_table, auth_event):
-        dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
-        version_name = common_test_helper.version_new_format["version"]
+    def test_update_edition_latest_is_updated(
+        self, metadata_table, auth_event, put_dataset
+    ):
+        dataset_id = put_dataset
+        version_name = common_test_helper.raw_version["version"]
         create_event = auth_event(
-            common_test_helper.version_new_format, dataset_id, version_name
+            common_test_helper.raw_version, dataset=dataset_id, version=version_name
         )
         print(f"create_event: {create_event}")
         # Insert parent first:
-        metadata_table.put_item(Item=common_test_helper.dataset_new_format)
         version_handler.create_version(create_event, None)
         update_event = auth_event(
-            common_test_helper.version_updated, dataset_id, version_name
+            common_test_helper.version_updated, dataset=dataset_id, version=version_name
         )
         version_handler.update_version(update_event, None)
 
@@ -127,14 +123,17 @@ class TestUpdateVersion:
         assert version_from_db["Id"] == "antall-besokende-pa-gjenbruksstasjoner/latest"
         assert version_from_db["latest"] == "antall-besokende-pa-gjenbruksstasjoner/6"
 
-    def test_forbidden(self, event, metadata_table, auth_denied):
-        metadata_table.put_item(Item=common_test_helper.version_new_format)
+    def test_forbidden(self, event, metadata_table, put_dataset, auth_denied):
+        version = common_test_helper.raw_version.copy()
+        version[common.ID_COLUMN] = f"{put_dataset}/{version['version']}"
+        version[common.TYPE_COLUMN] = "version"
+        metadata_table.put_item(Item=version)
 
-        dataset_id = common_test_helper.dataset_new_format[table.ID_COLUMN]
-        version_name = common_test_helper.version_new_format["version"]
+        dataset_id = put_dataset
+        version_name = common_test_helper.raw_version["version"]
 
         update_event = event(
-            common_test_helper.version_updated, dataset_id, version_name
+            common_test_helper.version_updated, dataset=dataset_id, version=version_name
         )
         response = version_handler.update_version(update_event, None)
 
@@ -142,95 +141,24 @@ class TestUpdateVersion:
 
 
 class TestVersion:
-    def test_should_get_versions_from_new_table_if_present(
-        self, metadata_table, version_table, event
-    ):
-        version_table.put_item(Item=common_test_helper.version_updated)
-        metadata_table.put_item(Item=common_test_helper.version_new_format)
+    def test_get_all_versions(self, metadata_table, auth_event, put_dataset):
+        dataset_id = put_dataset
 
-        dataset_id = common_test_helper.version[table.DATASET_ID]
-        get_all_event = event({}, dataset_id)
+        version_1 = common_test_helper.raw_version.copy()
+        version_2 = common_test_helper.raw_version.copy()
+        version_2["version"] = "extra-version"
 
-        response = version_handler.get_versions(get_all_event, None)
+        version_handler.create_version(auth_event(version_1, dataset=dataset_id), None)
+        version_handler.create_version(auth_event(version_2, dataset=dataset_id), None)
 
-        versions = json.loads(response["body"])
+        get_all_versions_event = auth_event({}, dataset=dataset_id)
 
-        assert response["statusCode"] == 200
-        assert len(versions) == 1
-
-        self_url = versions[0].pop("_links")["self"]["href"]
-        assert self_url == f"/datasets/{dataset_id}/versions/6"
-        assert versions[0] == common_test_helper.version_new_format
-
-    def test_should_get_versions_from_legacy_table_if_not_present_in_new_table(
-        self, metadata_table, version_table, event
-    ):
-        version_new_table = deepcopy(common_test_helper.version_new_format)
-        version_new_table[table.ID_COLUMN] = "my-dataset/6"
-
-        version_table.put_item(Item=common_test_helper.version)
-        metadata_table.put_item(Item=version_new_table)
-
-        get_all_event = event({}, common_test_helper.version[table.DATASET_ID])
-
-        response = version_handler.get_versions(get_all_event, None)
-
-        versions = json.loads(response["body"])
-
-        assert response["statusCode"] == 200
-        assert len(versions) == 1
-        assert versions[0] == common_test_helper.version
-
-    def test_get_all_versions(self, metadata_table, event):
-        metadata_table.put_item(Item=common_test_helper.version_new_format)
-        metadata_table.put_item(Item=common_test_helper.next_version_new_format)
-
-        get_all_event = event(
-            {}, common_test_helper.dataset_new_format[table.ID_COLUMN]
-        )
-
-        response = version_handler.get_versions(get_all_event, None)
+        response = version_handler.get_versions(get_all_versions_event, None)
 
         versions = json.loads(response["body"])
 
         assert response["statusCode"] == 200
         assert len(versions) == 2
-
-    def test_should_fetch_version_from_new_metadata_table_if_present(
-        self, metadata_table, version_table, event
-    ):
-        version_table.put_item(Item=common_test_helper.version)
-        metadata_table.put_item(Item=common_test_helper.version_new_format)
-
-        dataset_id = common_test_helper.version[table.DATASET_ID]
-        version_name = common_test_helper.version["version"]
-        get_event = event({}, dataset_id, version_name)
-
-        response = version_handler.get_version(get_event, None)
-
-        version_from_db = json.loads(response["body"])
-
-        assert response["statusCode"] == 200
-        assert (
-            version_from_db[table.ID_COLUMN]
-            == common_test_helper.version_new_format[table.ID_COLUMN]
-        )
-        assert version_from_db[table.TYPE_COLUMN] == "Version"
-
-        self_url = version_from_db["_links"]["self"]["href"]
-        assert self_url == f"/datasets/{dataset_id}/versions/{version_name}"
-
-    def test_get_version_from_legacy_table(self, version_table, event):
-        version_table.put_item(Item=common_test_helper.version)
-
-        version_id = common_test_helper.version[table.VERSION_ID]
-        get_event = event({}, common_test_helper.version[table.DATASET_ID], version_id)
-
-        response = version_handler.get_version(get_event, None)
-        version_from_db = json.loads(response["body"])
-
-        assert response["statusCode"] == 200
-        assert version_from_db[table.VERSION_ID] == version_id
 
     def test_version_not_found(self, event):
         get_event = event({}, "1234", "1")

@@ -1,9 +1,7 @@
 import boto3
-from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 from datetime import datetime, timezone
 
-from metadata import common
 from metadata.CommonRepository import CommonRepository
 from aws_xray_sdk.core import patch
 
@@ -17,11 +15,8 @@ class EditionRepository(CommonRepository):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
         self.metadata_table = dynamodb.Table("dataset-metadata")
-        self.edition_table = dynamodb.Table(common.table_name_prefix + "-edition")
 
-        super().__init__(
-            self.metadata_table, "Edition", self.edition_table, common.EDITION_ID
-        )
+        super().__init__(self.metadata_table, "Edition")
 
     def edition_exists(self, dataset_id, version, edition):
         result = self.get_edition(dataset_id, version, edition)
@@ -29,14 +24,11 @@ class EditionRepository(CommonRepository):
 
     def get_edition(self, dataset_id, version, edition):
         edition_id = f"{dataset_id}/{version}/{edition}"
-        return self.get_item(edition_id, edition)
+        return self.get_item(edition_id)
 
     def get_editions(self, dataset_id, version):
         version_id = f"{dataset_id}/{version}"
-        legacy_filter = Key(common.DATASET_ID).eq(dataset_id) & Key(
-            common.VERSION_ID
-        ).eq(version)
-        return self.get_items(version_id, legacy_filter)
+        return self.get_items(version_id)
 
     def create_edition(self, dataset_id, version, content):
         edition_ts = datetime.fromisoformat(content["edition"]).astimezone(timezone.utc)

@@ -10,13 +10,11 @@ log = logging.getLogger()
 
 
 class CommonRepository:
-    def __init__(self, table, type, legacy_table, legacy_key):
+    def __init__(self, table, type):
         self.table = table
         self.type = type
-        self.legacy_table = legacy_table
-        self.legacy_key = legacy_key
 
-    def get_item(self, id, legacy_id):
+    def get_item(self, id):
         key = {common.ID_COLUMN: id, common.TYPE_COLUMN: self.type}
         db_response = self.table.get_item(Key=key)
 
@@ -29,23 +27,10 @@ class CommonRepository:
 
             return item
 
-        log.info(f"Item {id} not found. Attempting to fetch from legacy table.")
+        log.info(f"Item {id} not found.")
+        return None
 
-        db_response = self.legacy_table.query(
-            KeyConditionExpression=Key(self.legacy_key).eq(legacy_id)
-        )
-        items = db_response["Items"]
-
-        if len(items) == 0:
-            return None
-        elif len(items) > 1:
-            msg = f"Illegal state: Multiple items with id {legacy_id}"
-            log.exception(msg)
-            raise ValueError(msg)
-        else:
-            return items[0]
-
-    def get_items(self, parent_id=None, legacy_filter=None):
+    def get_items(self, parent_id=None):
         cond = Key(common.TYPE_COLUMN).eq(self.type)
         if parent_id:
             cond = cond & Key(common.ID_COLUMN).begins_with(f"{parent_id}/")
@@ -54,12 +39,6 @@ class CommonRepository:
             IndexName="IdByTypeIndex", KeyConditionExpression=cond
         )
         items = db_response["Items"]
-
-        if not items and legacy_filter:
-            log.info(f"Items not found. Attempting to fetch from legacy table.")
-
-            db_response = self.legacy_table.scan(FilterExpression=legacy_filter)
-            items = db_response["Items"]
 
         # Remove 'latest' version/edition
         items = list(filter(lambda i: "latest" not in i, items))
@@ -111,7 +90,7 @@ class CommonRepository:
             raise ValueError(msg)
 
     def update_item(self, id, content):
-        old_item = self.get_item(id, None)
+        old_item = self.get_item(id)
         if not old_item:
             raise KeyError(f"Item with id {id} does not exist")
 

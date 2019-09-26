@@ -17,18 +17,15 @@ class DatasetRepository(CommonRepository):
         dynamodb = boto3.resource("dynamodb", "eu-west-1")
 
         self.metadata_table = dynamodb.Table("dataset-metadata")
-        self.dataset_table = dynamodb.Table(common.table_name_prefix + "-dataset")
 
-        super().__init__(
-            self.metadata_table, "Dataset", self.dataset_table, common.DATASET_ID
-        )
+        super().__init__(self.metadata_table, "Dataset")
 
     def dataset_exists(self, dataset_id):
         dataset = self.get_dataset(dataset_id)
         return dataset is not None
 
     def get_dataset(self, dataset_id):
-        return self.get_item(dataset_id, dataset_id)
+        return self.get_item(dataset_id)
 
     def get_datasets(self):
         db_response = self.metadata_table.query(
@@ -51,18 +48,6 @@ class DatasetRepository(CommonRepository):
             return id + "-" + shortuuid.ShortUUID().random(length=5)
         else:
             return id
-
-    def check_similarity_to_other_datasets(self, input_json):
-        already_existing_datasets = self.dataset_table.scan()["Items"]
-        print("--- Datasets ---")
-        for dataset in already_existing_datasets:
-            print("-----" + dataset["title"])
-            for item in input_json:
-                print(
-                    item
-                    + ": "
-                    + str(similar(str(dataset[item]), str(input_json[item])))
-                )
 
 
 def slugify(title):
