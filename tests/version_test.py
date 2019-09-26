@@ -127,7 +127,6 @@ class TestUpdateVersion:
         version = common_test_helper.raw_version.copy()
         version[common.ID_COLUMN] = f"{put_dataset}/{version['version']}"
         version[common.TYPE_COLUMN] = "version"
-        print(version)
         metadata_table.put_item(Item=version)
 
         dataset_id = put_dataset

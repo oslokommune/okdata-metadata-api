@@ -77,7 +77,6 @@ class TestUpdateEdition:
         edition_id = json.loads(
             edition_handler.create_edition(create_event, None)["body"]
         ).split("/")[-1]
-        print(edition_id)
         update_event = auth_event(
             common_test_helper.edition_updated,
             dataset=dataset_id,
