@@ -2,7 +2,6 @@ import boto3
 from botocore.exceptions import ClientError
 from datetime import datetime, timezone
 
-from metadata import common
 from metadata.CommonRepository import CommonRepository
 from aws_xray_sdk.core import patch
 
