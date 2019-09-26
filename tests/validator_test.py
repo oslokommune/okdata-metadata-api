@@ -24,8 +24,11 @@ valid_dataset = {
     "accessRights": "public",
 }
 
-invalid_dataset = valid_dataset.copy()
-invalid_dataset["theme"] = "invalid choice"
+wrong_theme = valid_dataset.copy()
+wrong_theme["theme"] = "invalid choice"
+
+extra_properties = valid_dataset.copy()
+extra_properties["unknownProperty"] = "extra extra"
 
 
 def test_valid_dataset():
@@ -38,7 +41,12 @@ def test_valid_dataset():
 
 def test_invalid_dataset():
     with pytest.raises(ValidationError):
-        dataset.validate(invalid_dataset)
+        dataset.validate(wrong_theme)
+
+
+def test_extra_properties_dataset():
+    with pytest.raises(ValidationError):
+        dataset.validate(extra_properties)
 
 
 def test_missing_schema():

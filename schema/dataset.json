@@ -140,6 +140,7 @@
       "maxLength": 128
     }
   },
+  "additionalProperties": false,
   "required": [
     "title",
     "accessRights",

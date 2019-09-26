@@ -10,6 +10,7 @@
       "maxLength": 128
     }
   },
+  "additionalProperties": false,
   "required": [
     "version"
   ]
