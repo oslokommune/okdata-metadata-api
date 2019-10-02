@@ -39,7 +39,7 @@ class TestCreateDataset:
         response = dataset_handler.create_dataset(create_event, None)
         error_message = json.loads(response["body"])
         assert response["statusCode"] == 400
-        assert "blue" in error_message
+        assert "blue" in error_message["errors"][0]
 
 
 class TestUpdateDataset:
@@ -86,7 +86,7 @@ class TestUpdateDataset:
         response = dataset_handler.update_dataset(update_event, None)
         error_message = json.loads(response["body"])
         assert response["statusCode"] == 400
-        assert "blue" in error_message
+        assert "blue" in error_message["errors"][0]
 
     def test_dataset_not_found(self, event):
         event_for_get = event({}, "1234")

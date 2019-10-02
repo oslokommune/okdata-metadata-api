@@ -11,7 +11,7 @@ def validate_input(validator):
         def wrapper(event, *args, **kwargs):
             errors = validator.validate(json.loads(event["body"]))
             if errors:
-                return response(400, "\n".join(errors))
+                return response(400, {"errors": errors})
             return func(event, *args, **kwargs)
 
         return wrapper
