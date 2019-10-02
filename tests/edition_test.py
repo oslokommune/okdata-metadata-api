@@ -42,7 +42,7 @@ class TestCreateEdition:
         message = json.loads(response["body"])
 
         assert response["statusCode"] == 400
-        assert "is not a 'date-time'" in message
+        assert "is not a 'date-time'" in message["errors"][0]
 
     def test_create_duplicate_edition_should_fail(
         self, metadata_table, auth_event, put_version
