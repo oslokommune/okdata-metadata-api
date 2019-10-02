@@ -88,15 +88,15 @@ version_updated = {"version": "6-TEST"}
 raw_edition = {
     "edition": "2019-05-28T15:37:00+02:00",
     "description": "Data for one hour",
-    "startTime": "2018-12-21T08:00:00+01:00",
-    "endTime": "2018-12-21T09:00:00+01:00",
+    "startTime": "2018-12-21",
+    "endTime": "2018-12-21",
 }
 
 edition_updated = {
     "edition": "2019-05-28T15:37:00+02:00",
     "description": "CHANGED",
-    "startTime": "2018-12-21T08:00:00+01:00",
-    "endTime": "2018-12-21T09:00:00+01:00",
+    "startTime": "2018-12-21",
+    "endTime": "2018-12-21",
 }
 
 raw_distribution = {"filename": "BOOOM.csv"}

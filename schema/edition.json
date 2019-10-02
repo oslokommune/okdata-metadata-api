@@ -14,11 +14,11 @@
     },
     "startTime": {
       "type": "string",
-      "format": "date-time"
+      "format": "date"
     },
     "endTime": {
       "type": "string",
-      "format": "date-time"
+      "format": "date"
     }
   },
   "additionalProperties": false,
