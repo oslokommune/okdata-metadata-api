@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
-from jsonschema import validate as validate_object
-from jsonschema import FormatChecker
+from jsonschema import Draft7Validator, FormatChecker
 
 
 class Validator:
@@ -9,14 +8,17 @@ class Validator:
         self.path = Path(__file__).parent
         try:
             with open(f"{self.path.parent}/schema/{object_type}.json", "r") as f:
-                self.schema = json.loads(f.read())
+                schema = json.loads(f.read())
+                self.validator = Draft7Validator(
+                    schema=schema, format_checker=FormatChecker()
+                )
         except IOError as e:
             print(e)
             raise Exception(f"Missing schema for object {object_type}!")
 
     def validate(self, validation_object):
-        return validate_object(
-            instance=validation_object,
-            schema=self.schema,
-            format_checker=FormatChecker(),
-        )
+        errors = []
+        for e in self.validator.iter_errors(validation_object):
+            prefix = ".".join(e.path) + ": " if e.path else ""
+            errors.append(prefix + e.message)
+        return errors
