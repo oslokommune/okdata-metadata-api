@@ -19,6 +19,6 @@ class Validator:
     def validate(self, validation_object):
         errors = []
         for e in self.validator.iter_errors(validation_object):
-            prefix = ".".join(e.path) + ": " if e.path else ""
+            prefix = ".".join(str(x) for x in e.path) + ": " if e.path else ""
             errors.append(prefix + e.message)
         return errors
