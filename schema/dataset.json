@@ -15,21 +15,25 @@
     },
     "theme": {
       "description": "Reference to a main theme for this dataset.",
-      "type": "string",
-      "enum": [
-        "economy and finance",
-        "education, culture and sport",
-        "energy",
-        "environment",
-        "government and public sector",
-        "health",
-        "international issues",
-        "justice, legal system and public safety",
-        "regions and cities",
-        "population and society",
-        "science and technology",
-        "transport"
-      ]
+      "type": "array",
+       "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "economy and finance",
+          "education, culture and sport",
+          "energy",
+          "environment",
+          "government and public sector",
+          "health",
+          "international issues",
+          "justice, legal system and public safety",
+          "regions and cities",
+          "population and society",
+          "science and technology",
+          "transport"
+        ]
+      }
     },
     "processing_stage": {
       "description": "In what stage is the dataset stored.",

@@ -8,7 +8,7 @@ edition = Validator("edition")
 distribution = Validator("distribution")
 
 valid_dataset = {
-    "theme": "environment",
+    "theme": ["environment"],
     "processing_stage": "raw",
     "contactPoint": {
         "name": "Origo Dataplattform",
@@ -24,7 +24,7 @@ valid_dataset = {
 }
 
 wrong_theme = valid_dataset.copy()
-wrong_theme["theme"] = "invalid choice"
+wrong_theme["theme"] = ["invalid choice"]
 
 extra_properties = valid_dataset.copy()
 extra_properties["unknownProperty"] = "extra extra"
@@ -42,7 +42,7 @@ def test_valid_dataset():
 def test_invalid_dataset():
     errors = dataset.validate(wrong_theme)
     assert len(errors) == 1
-    assert errors[0].startswith("theme: 'invalid choice' is not one of")
+    assert errors[0].startswith("theme.0: 'invalid choice' is not one of")
 
 
 def test_extra_properties_dataset():
