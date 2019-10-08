@@ -7,7 +7,7 @@ provider:
   region: ${opt:region, 'eu-west-1'}
   stage: ${opt:stage, 'dev'}
   deploymentBucket:
-    name: ok-origo-dataplatform-config-${self:provider.stage}
+    name: ${self:custom.deploymentBucket.${self:provider.stage}, self:custom.deploymentBucket.dev}
     serverSideEncryption: AES256
   deploymentPrefix: deploy
   tracing:
@@ -86,6 +86,12 @@ custom:
     authorizers:
       - ${file(serverless/kc-authorizer.yaml)}
   exportGitVariables: false
+  deploymentBucket:
+    prod: ok-origo-dataplatform-config-prod
+    dev: ok-origo-dataplatform-config-dev
+  keycloakArn:
+    prod: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:keycloak-authorizer-prod-authenticate
+    dev: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:keycloak-authorizer-dev-authenticate
 
 functions:
   create_dataset: ${file(serverless/functions/create_dataset.yaml)}

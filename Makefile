@@ -30,6 +30,10 @@ test:
 deploy: init format test login-dev
 	sls deploy --stage dev --aws-profile $(.DEV_PROFILE)
 
+.PHONY: deploy-my-stage
+deploy-my-stage: init format test login-dev
+	@sls deploy --stage $${STAGE} --aws-profile $(.DEV_PROFILE)
+
 .PHONY: deploy-prod
 deploy-prod: init format is-git-clean test login-prod
 	sls deploy --stage prod --aws-profile $(.PROD_PROFILE) && \
