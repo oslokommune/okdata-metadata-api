@@ -35,6 +35,10 @@ deploy-prod: init format is-git-clean test login-prod
 	sls deploy --stage prod --aws-profile $(.PROD_PROFILE) && \
 	sls --stage prod downloadDocumentation --outputFileName swagger.yaml
 
+.PHONY: undeploy
+undeploy: login-dev
+	sls remove --stage $${STAGE} --aws-profile $(.DEV_PROFILE)
+
 .PHONY: login-dev
 login-dev:
 	saml2aws login --role=$(.DEV_ROLE) --profile=$(.DEV_PROFILE)
