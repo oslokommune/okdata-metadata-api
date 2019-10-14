@@ -31,10 +31,10 @@ provider:
     GIT_REV: ${git:branch}:${git:sha1}
     AUTHORIZER_API: ${ssm:/dataplatform/simple-dataset-authorizer/url}
     ENABLE_AUTH: true
-    KEYCLOAK_SERVER: ${ssm:/dataplatform/apis/metadata-api/auth/server}
+    KEYCLOAK_SERVER: ${ssm:/keycloak/client/server}
     KEYCLOAK_REALM: api-catalog
     CLIENT_ID: metadata-api
-    CLIENT_SECRET: ${ssm:/dataplatform/apis/metadata-api/auth/clientsecret~true}
+    CLIENT_SECRET: ${ssm:/dataplatform/apis/metadata-api/auth/client_secret~true}
 
 
 plugins:
