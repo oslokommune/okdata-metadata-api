@@ -70,6 +70,7 @@ custom:
   esLogs:
     endpoint: ***REMOVED***.eu-west-1.es.amazonaws.com
     index: metadata-api
+    filterPattern: '{ $.function_name = "*" }'
   documentation:
     info:
       version: ${git:sha1}
