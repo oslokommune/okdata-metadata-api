@@ -3,11 +3,12 @@
   "description": "",
   "version": "0.1.0",
   "devDependencies": {
-    "serverless-plugin-common-layers": "^1.0.0",
-    "serverless-pseudo-parameters": "^2.4.0",
     "serverless-aws-documentation": "^1.1.0",
+    "serverless-es-logs": "^3.1.0",
+    "serverless-plugin-common-layers": "^1.0.0",
+    "serverless-plugin-git-variables": "^3.3.2",
+    "serverless-pseudo-parameters": "^2.4.0",
     "serverless-python-requirements": "^5.0.0",
-    "serverless-scriptable-plugin": "^1.0.2",
-    "serverless-plugin-git-variables": "^3.3.2"
+    "serverless-scriptable-plugin": "^1.0.2"
   }
 }

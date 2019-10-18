@@ -44,6 +44,8 @@ plugins:
   - serverless-plugin-git-variables
   - serverless-plugin-common-layers
   - serverless-pseudo-parameters
+  - serverless-es-logs
+
 package:
   exclude:
     - './**'
@@ -57,16 +59,17 @@ package:
     - './metadata/distribution/*.py'
 
 resources:
-  Description: >
+  Description: |
     ${self:service} ${git:branch}:${git:sha1}
-
     ${git:message}
-
 
 custom:
   pythonRequirements:
     dockerizePip: non-linux
     usePoetry: false
+  esLogs:
+    endpoint: ***REMOVED***.eu-west-1.es.amazonaws.com
+    index: metadata-api
   documentation:
     info:
       version: ${git:sha1}
