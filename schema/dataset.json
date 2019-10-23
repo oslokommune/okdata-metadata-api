@@ -44,7 +44,7 @@
         "processed"
       ]
     },
-    "accruralPeriodicity": {
+    "accrualPeriodicity": {
       "description": "Indicates how often a dataset is updated",
       "type": "string",
       "enum": [
