@@ -1,18 +1,19 @@
 import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 
+from auth import SimpleAuth
+from dataplatform.awslambda.logging import logging_wrapper
 from metadata import common
 from metadata.CommonRepository import ResourceConflict
 from metadata.common import validate_input
 from metadata.distribution.repository import DistributionRepository
-from auth import SimpleAuth
-
 from metadata.validator import Validator
 
 distribution_repository = DistributionRepository()
 validator = Validator("distribution")
 
 
+@logging_wrapper
 @validate_input(validator)
 @xray_recorder.capture("create_distribution")
 def create_distribution(event, context):
@@ -43,6 +44,7 @@ def create_distribution(event, context):
         return common.response(400, f"Error creating distribution: {e}")
 
 
+@logging_wrapper
 @validate_input(validator)
 @xray_recorder.capture("update_distribution")
 def update_distribution(event, context):
@@ -70,6 +72,7 @@ def update_distribution(event, context):
         return common.response(400, f"Error updating distribution: {e}")
 
 
+@logging_wrapper
 @xray_recorder.capture("get_distributions")
 def get_distributions(event, context):
     """GET /datasets/:dataset-id/versions/:version/editions/:edition/distributions"""
@@ -88,6 +91,7 @@ def get_distributions(event, context):
     return common.response(200, distributions)
 
 
+@logging_wrapper
 @xray_recorder.capture("get_distribution")
 def get_distribution(event, context):
     """GET /datasets/:dataset-id/versions/:version/editions/:edition/distributions/:distribution"""

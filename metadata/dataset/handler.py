@@ -1,14 +1,13 @@
 import os
-
 import simplejson as json
+from aws_xray_sdk.core import xray_recorder
 
+from auth import SimpleAuth
+from dataplatform.awslambda.logging import logging_wrapper
 from metadata import common
 from metadata.CommonRepository import ResourceConflict
 from metadata.common import validate_input
 from metadata.dataset.repository import DatasetRepository
-from aws_xray_sdk.core import xray_recorder
-from auth import SimpleAuth
-
 from metadata.validator import Validator
 
 dataset_repository = DatasetRepository()
@@ -16,6 +15,7 @@ AUTHORIZER_API = os.environ["AUTHORIZER_API"]
 validator = Validator("dataset")
 
 
+@logging_wrapper
 @validate_input(validator)
 @xray_recorder.capture("create_dataset")
 def create_dataset(event, context):
@@ -39,6 +39,7 @@ def create_dataset(event, context):
         return common.response(400, f"Error creating dataset: {e}")
 
 
+@logging_wrapper
 @validate_input(validator)
 @xray_recorder.capture("update_dataset")
 def update_dataset(event, context):
@@ -59,6 +60,7 @@ def update_dataset(event, context):
         return common.response(400, f"Error updating dataset: {e}")
 
 
+@logging_wrapper
 @xray_recorder.capture("get_datasets")
 def get_datasets(event, context):
     """GET /datasets"""
@@ -70,6 +72,7 @@ def get_datasets(event, context):
     return common.response(200, datasets)
 
 
+@logging_wrapper
 @xray_recorder.capture("get_dataset")
 def get_dataset(event, context):
     """GET /datasets/:dataset-id"""

@@ -1,18 +1,20 @@
 import simplejson as json
+from aws_xray_sdk.core import xray_recorder
 
+from auth import SimpleAuth
+from dataplatform.awslambda.logging import logging_wrapper
 from metadata import common
 from metadata.CommonRepository import ResourceConflict
 from metadata.common import validate_input
 from metadata.edition.repository import EditionRepository
-from aws_xray_sdk.core import xray_recorder
-from auth import SimpleAuth
-
 from metadata.validator import Validator
+
 
 edition_repository = EditionRepository()
 validator = Validator("edition")
 
 
+@logging_wrapper
 @validate_input(validator)
 @xray_recorder.capture("create_edition")
 def create_edition(event, context):
@@ -40,6 +42,7 @@ def create_edition(event, context):
         return common.response(400, f"Error creating edition: {e}")
 
 
+@logging_wrapper
 @validate_input(validator)
 @xray_recorder.capture("update_edition")
 def update_edition(event, context):
@@ -65,6 +68,7 @@ def update_edition(event, context):
         return common.response(400, f"Error updating edition: {e}")
 
 
+@logging_wrapper
 @xray_recorder.capture("get_editions")
 def get_editions(event, context):
     """GET /datasets/:dataset-id/versions/:version/editions"""
@@ -79,6 +83,7 @@ def get_editions(event, context):
     return common.response(200, editions)
 
 
+@logging_wrapper
 @xray_recorder.capture("get_edition")
 def get_edition(event, context):
     """GET /datasets/:dataset-id/versions/:version/editions/:edition"""

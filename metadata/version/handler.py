@@ -1,16 +1,19 @@
 import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 
+from auth import SimpleAuth
+from dataplatform.awslambda.logging import logging_wrapper
 from metadata import common
 from metadata.CommonRepository import ResourceConflict
 from metadata.validator import Validator
 from metadata.version.repository import VersionRepository
-from auth import SimpleAuth
+
 
 version_repository = VersionRepository()
 validator = Validator("version")
 
 
+@logging_wrapper
 @xray_recorder.capture("create_version")
 def create_version(event, context):
     """POST /datasets/:dataset-id/versions"""
@@ -35,6 +38,7 @@ def create_version(event, context):
         return common.response(400, f"Error creating version: {e}")
 
 
+@logging_wrapper
 @xray_recorder.capture("update_version")
 def update_version(event, context):
     """PUT /datasets/:dataset-id/versions/:version"""
@@ -55,6 +59,7 @@ def update_version(event, context):
         return common.response(400, f"Error updating version: {e}")
 
 
+@logging_wrapper
 @xray_recorder.capture("get_versions")
 def get_versions(event, context):
     """GET /datasets/:dataset-id/versions"""
@@ -68,6 +73,7 @@ def get_versions(event, context):
     return common.response(200, versions)
 
 
+@logging_wrapper
 @xray_recorder.capture("get_version")
 def get_version(event, context):
     """GET /datasets/:dataset-id/versions/:version"""
