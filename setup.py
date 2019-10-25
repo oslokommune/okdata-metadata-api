@@ -31,5 +31,6 @@ setuptools.setup(
         "requests",
         "jsonschema[format]",
         "strict-rfc3339",
+        "dataplatform-common-python==0.0.7",
     ],
 )
