@@ -1,11 +1,9 @@
 import boto3
-from boto3.dynamodb.conditions import Key
 import re
 import shortuuid
 
 from difflib import SequenceMatcher
 
-from metadata import common
 from metadata.CommonRepository import CommonRepository
 from aws_xray_sdk.core import patch
 
@@ -28,11 +26,7 @@ class DatasetRepository(CommonRepository):
         return self.get_item(dataset_id)
 
     def get_datasets(self):
-        db_response = self.metadata_table.query(
-            IndexName="IdByTypeIndex",
-            KeyConditionExpression=Key(common.TYPE_COLUMN).eq("Dataset"),
-        )
-        return db_response["Items"]
+        return self.get_items()
 
     def create_dataset(self, content):
         title = content["title"]
