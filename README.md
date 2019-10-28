@@ -3,8 +3,6 @@ Metadata-api
 
 API for posting, updating and retrieving metadata.
 
-Feel free to add any fields you'd like/need.
-
 ## Setup
 
 1. Install [Serverless Framework](https://serverless.com/framework/docs/getting-started/)
@@ -37,19 +35,55 @@ For tests and linting we use [pytest](https://pypi.org/project/pytest/), [flake8
 
 `make deploy` or `make deploy-prod`
 
-## API usage
+Requires `saml2aws`
 
-### Register dataset
+
+# Concept
+The metadata API is structured around the following base concept - the `dataset`:
+```
++-- dataset-id=my-dataset
+|   +-- version=1
+|       +-- edition=20190101T105900
+|           +-- distribution=filename.txt
+|           +-- distribution=foo.txt
+|       +-- edition=20200101T105900
+|          +-- distribution=presentation.md
+|   +-- version=2
+|       +-- edition=20200101T105900
+|           +-- distribution=otherfile.md
+|       +-- edition=20210101T105900
+```
+`dataset/version/edition` - `my-dataset/1/20190101T105900`
+
+Each version and edition keeps a version named `latest` (a reserved name for a version and edition), that always contains the latest version/edition POSTed to that resource, and can be accessed with `datasets/my-dataset/versions/latest` to get the latest version and `datasets/my-dataset/version/1/editions/latest`
+
+
+## API usage
+The correct schema definition that is used for validation in the examples below: see `schema/*.json`
+
+### Access
+* Create dataset: valid keycloack access token in header: `"Authorization": f"Bearer {accessToken}"`
+* Create or update version or edition: valid keycloack access token and owner-access to `:dataset-id`
+* List dataset/version/edition: Logged in user
+
+### List alle dataset
+
+```
+GET /datasets
+```
+All available datasets
+
+### Create dataset
 
 ```
 POST /datasets
 
 {
-    "title": "Antall besøkende på gjenbruksstasjoner",
+    "title": "Besøksdata gjenbruksstasjoner",
     "description": "Sensordata fra tellere på gjenbruksstasjonene",
     "keywords": ["avfall", "besøkende", "gjenbruksstasjon"],
     "frequency": "hourly",
-    "accessRights": ":non-public",
+    "accessRights": "public",
     "privacyLevel": "green",
     "objective": "Formålsbeskrivelse",
     "contactPoint": {
@@ -60,15 +94,38 @@ POST /datasets
     "publisher": "REN"
 }
 ```
+This will create a dataset with ID=besoksdata-gjenbruksstasjoner, the id is derived from the title of the dataset. If another dataset exists with the same ID, a ID will be created with a random set of characters at the end of the id (eg: besoksdata-gjenbruksstasjoner-5C5uX)
 
 ### Update dataset
 
+```
+PUT /datasets/:dataset-id
+
+{
+    "title": "Besøksdata gjenbruksstasjoner oppdatert tittel",
+    "description": "Sensordata fra tellere på gjenbruksstasjonene",
+    "keywords": ["avfall", "besøkende", "gjenbruksstasjon"],
+    "frequency": "hourly",
+    "accessRights": "public",
+    "privacyLevel": "green",
+    "objective": "Formålsbeskrivelse",
+    "contactPoint": {
+        "name": "Tim",
+        "email": "tim@oslo.kommune.no",
+        "phone": "98765432"
+    },
+    "publisher": "REN"
+}
+```
+Updates a single `dataset-id`, replaces old json document
+
+### Get a single dataset
 
 ```
-PUT datasets/:dataset-id
+GET /datsets/:dataset-id
 ```
 
-### Create a new version
+### Create version for a dataset
 
 ```
 POST /datasets/:dataset-id/versions
@@ -79,6 +136,33 @@ POST /datasets/:dataset-id/versions
     "transformation": {}
 }
 ```
+`version` will become  `:version-id` in the examples below
+
+### Update version
+
+```
+PUT /datasets/:dataset-id/versions/:version-id
+
+{
+    "version": "1",
+    "schema": {},
+    "transformation": {}
+}
+```
+Updates a single `version-id`, replaces old json document, `version` key must maintain same value as `:version-id`
+
+### Get a version
+
+```
+GET /datasets/:dataset-id/versions/:version-id
+```
+
+### Get latest version
+
+```
+GET /datasets/:dataset-id/versions/latest
+```
+Get the latest version created on `dataset-id`
 
 ### Create new edition
 
@@ -91,6 +175,19 @@ POST /datasets/:dataset-id/versions/:version-id/editions
     "endTime": "2018-12-21T09:00:00+01:00"    // exclusive
 }
 ```
+
+### Get edition
+
+```
+GET /datasets/:dataset-id/versions/:version-id
+```
+
+### Get latest edition
+
+```
+GET /datasets/:dataset-id/versions/:version-id/latest
+```
+Get the latest edition created on `:version-id`
 
 ### Create new distribution
 
