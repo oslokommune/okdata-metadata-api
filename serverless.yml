@@ -68,7 +68,7 @@ custom:
     dockerizePip: non-linux
     usePoetry: false
   esLogs:
-    endpoint: ${self:custom.esEndpoint.${self:provider.stage}, self:custom.esEndpoint.dev}
+    endpoint: ${ssm:/dataplatform/elasticsearch/endpoint}
     index: metadata-api
     filterPattern: '{ $.function_name = "*" }'
   documentation:
@@ -96,8 +96,6 @@ custom:
   keycloakArn:
     prod: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:keycloak-authorizer-prod-authenticate
     dev: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:keycloak-authorizer-dev-authenticate
-  esEndpoint:
-    dev: https://***REMOVED***.eu-west-1.es.amazonaws.com/
 
 functions:
   create_dataset: ${file(serverless/functions/create_dataset.yaml)}
