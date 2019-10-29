@@ -11,7 +11,7 @@ aws-xray-sdk==2.4.2       # via dataplatform-common-python
 botocore==1.13.0          # via aws-xray-sdk
 certifi==2019.6.16        # via requests
 chardet==3.0.4            # via requests
-dataplatform-common-python==0.0.7
+dataplatform-common-python==0.0.8
 docutils==0.15.2          # via botocore
 ecdsa==0.13.3             # via python-jose
 future==0.18.1            # via aws-xray-sdk, python-jose
@@ -38,4 +38,4 @@ webcolors==1.10           # via jsonschema
 wrapt==1.11.2             # via aws-xray-sdk
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.4.0        # via jsonschema
+# setuptools==41.6.0        # via jsonschema
