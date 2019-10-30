@@ -17,9 +17,9 @@ class CommonRepository:
         self.table = table
         self.type = type
 
-    def get_item(self, id):
-        log_add(dynamodb_item_id=id, dynamodb_item_type=self.type)
-        key = {common.ID_COLUMN: id, common.TYPE_COLUMN: self.type}
+    def get_item(self, item_id):
+        log_add(dynamodb_item_id=item_id, dynamodb_item_type=self.type)
+        key = {common.ID_COLUMN: item_id, common.TYPE_COLUMN: self.type}
 
         db_response = log_duration(
             lambda: self.table.get_item(Key=key), "dynamodb_duration_ms"
@@ -29,7 +29,7 @@ class CommonRepository:
         log_add(dynamodb_status_code=status_code)
 
         if "Item" not in db_response:
-            log.info(f"Item {id} not found.")
+            log.info(f"Item {item_id} not found.")
             log_add(dynamodb_num_items=0)
             return None
 
@@ -70,9 +70,9 @@ class CommonRepository:
         return items
 
     def create_item(
-        self, id, content, parent_id=None, parent_type=None, update_on_exists=False
+        self, item_id, content, parent_id=None, parent_type=None, update_on_exists=False
     ):
-        log_add(dynamodb_item_id=id, dynamodb_item_type=self.type)
+        log_add(dynamodb_item_id=item_id, dynamodb_item_type=self.type)
         if parent_id:
             log_add(dynamodb_parent_id=parent_id)
             parent_key = {common.ID_COLUMN: parent_id, common.TYPE_COLUMN: parent_type}
@@ -84,7 +84,7 @@ class CommonRepository:
                 log.error(msg)
                 raise KeyError(msg)
 
-        content[common.ID_COLUMN] = id
+        content[common.ID_COLUMN] = item_id
         content[common.TYPE_COLUMN] = self.type
 
         db_response = log_duration(
@@ -95,7 +95,7 @@ class CommonRepository:
         log_add(dynamodb_status_code=status_code)
 
         if status_code == 200:
-            return id
+            return item_id
         else:
             msg = f"Error creating item ({status_code}): {db_response}"
             log.exception(msg)
@@ -116,7 +116,8 @@ class CommonRepository:
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code == "ConditionalCheckFailedException":
-                msg = f"Item with id {id} already exists"
+                item_id = content[common.ID_COLUMN]
+                msg = f"Item with id {item_id} already exists"
                 log.error(msg)
                 raise ResourceConflict(msg, e)
             else:
@@ -124,14 +125,14 @@ class CommonRepository:
                 log.error(msg)
                 raise ValueError(f"Error creating item ({error_code}): {msg}")
 
-    def update_item(self, id, content):
-        log_add(dynamodb_item_id=id, dynamodb_item_type=self.type)
-        old_item = self.get_item(id)
+    def update_item(self, item_id, content):
+        log_add(dynamodb_item_id=item_id, dynamodb_item_type=self.type)
+        old_item = self.get_item(item_id)
 
         item_exists = old_item is not None
         log_add(dynamodb_item_exists=item_exists)
         if not item_exists:
-            raise KeyError(f"Item with id {id} does not exist")
+            raise KeyError(f"Item with id {item_id} does not exist")
 
         content[common.ID_COLUMN] = old_item[common.ID_COLUMN]
         content[common.TYPE_COLUMN] = self.type
@@ -144,7 +145,7 @@ class CommonRepository:
         log_add(dynamodb_status_code=status_code)
 
         if status_code == 200:
-            return id
+            return item_id
         else:
             msg = f"Error updating item ({status_code}): {db_response}"
             log.exception(msg)
