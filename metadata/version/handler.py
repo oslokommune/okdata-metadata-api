@@ -36,8 +36,6 @@ def create_version(event, context):
         return common.response(200, version_id, headers)
     except ResourceConflict as d:
         return common.response(409, f"Resource Conflict: {d}")
-    except InvalidVersionError as e:
-        return common.response(409, f"Invalid version data: {e}")
     except Exception as e:
         return common.response(400, f"Error creating version: {e}")
 
