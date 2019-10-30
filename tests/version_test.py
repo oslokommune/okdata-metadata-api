@@ -52,7 +52,9 @@ class TestCreateVersion:
         version["version"] = "latest"
         create_event = auth_event(version, dataset=dataset_id)
         res = version_handler.create_version(create_event, None)
-        assert res["statusCode"] == 409
+        assert res["statusCode"] == 400
+        body = json.loads(res["body"])
+        assert len(body["errors"]) == 1
 
     def test_create_duplicate_version_should_fail(
         self, metadata_table, auth_event, put_dataset
