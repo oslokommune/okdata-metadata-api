@@ -7,7 +7,7 @@ from metadata import common
 from metadata.CommonRepository import ResourceConflict
 from metadata.validator import Validator
 from metadata.version.repository import VersionRepository
-
+from metadata.error import InvalidVersionError
 
 version_repository = VersionRepository()
 validator = Validator("version")
@@ -34,6 +34,8 @@ def create_version(event, context):
         return common.response(200, version_id, headers)
     except ResourceConflict as d:
         return common.response(409, f"Resource Conflict: {d}")
+    except InvalidVersionError as e:
+        return common.response(409, f"Invalid version data: {e}")
     except Exception as e:
         return common.response(400, f"Error creating version: {e}")
 
@@ -55,6 +57,8 @@ def update_version(event, context):
         return common.response(200, version_id)
     except KeyError:
         return common.response(404, "Version not found.")
+    except InvalidVersionError as e:
+        return common.response(409, f"Invalid version data: {e}")
     except ValueError as e:
         return common.response(400, f"Error updating version: {e}")
 

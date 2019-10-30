@@ -83,7 +83,7 @@ dataset_updated = {
 
 raw_version = {"version": "6"}
 
-version_updated = {"version": "6-TEST"}
+version_updated = {"version": "6"}
 
 raw_edition = {
     "edition": "2019-05-28T15:37:00+02:00",

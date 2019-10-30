@@ -46,6 +46,14 @@ class TestCreateVersion:
         response = version_handler.create_version(bad_version_event, None)
         assert response["statusCode"] == 400
 
+    def test_create_version_invalid_version_latest(self, auth_event):
+        dataset_id = "my-dataset"
+        version = {}
+        version["version"] = "latest"
+        create_event = auth_event(version, dataset=dataset_id)
+        res = version_handler.create_version(create_event, None)
+        assert res["statusCode"] == 409
+
     def test_create_duplicate_version_should_fail(
         self, metadata_table, auth_event, put_dataset
     ):
@@ -96,7 +104,19 @@ class TestUpdateVersion:
             KeyConditionExpression=Key(table.ID_COLUMN).eq(version_id)
         )
         version_from_db = db_response["Items"][0]
-        assert version_from_db["version"] == "6-TEST"
+        assert version_from_db["version"] == "6"
+
+    def test_update_version_invalid_version_latest_in_body(self, auth_event):
+        dataset_id = "my-dataset"
+        version_name = common_test_helper.raw_version["version"]
+        update_event = auth_event(
+            common_test_helper.version_updated, dataset=dataset_id, version=version_name
+        )
+        body = json.loads(update_event["body"])
+        body["version"] = "this-is-not-the-same-version"
+        update_event["body"] = json.dumps(body)
+        res = version_handler.update_version(update_event, None)
+        assert res["statusCode"] == 409
 
     def test_update_edition_latest_is_updated(
         self, metadata_table, auth_event, put_dataset
@@ -106,7 +126,6 @@ class TestUpdateVersion:
         create_event = auth_event(
             common_test_helper.raw_version, dataset=dataset_id, version=version_name
         )
-        print(f"create_event: {create_event}")
         # Insert parent first:
         version_handler.create_version(create_event, None)
         update_event = auth_event(

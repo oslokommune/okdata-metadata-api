@@ -2,6 +2,8 @@ import boto3
 from botocore.exceptions import ClientError
 
 from metadata.CommonRepository import CommonRepository
+from metadata.common import valid_version
+from metadata.error import InvalidVersionError
 from aws_xray_sdk.core import patch
 
 patch(["boto3"])
@@ -28,6 +30,9 @@ class VersionRepository(CommonRepository):
 
     def create_version(self, dataset_id, content):
         version = content["version"]
+        if valid_version(version) is False:
+            raise InvalidVersionError(f"{version} is not a valid version key")
+
         version_id = f"{dataset_id}/{version}"
 
         result = self.create_item(version_id, content, dataset_id, "Dataset")
@@ -61,6 +66,14 @@ class VersionRepository(CommonRepository):
         return False
 
     def update_version(self, dataset_id, version, content):
+        if valid_version(version) is False:
+            raise InvalidVersionError(f"{version} is not a valid version key")
+
+        if content["version"] != version:
+            content_version = content["version"]
+            raise InvalidVersionError(
+                f"Version {content_version} in body is not equal to {version} "
+            )
         version_id = f"{dataset_id}/{version}"
         result = self.update_item(version_id, content)
         if self.is_latest_version(dataset_id, version):

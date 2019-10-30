@@ -5,6 +5,12 @@ TYPE_COLUMN = "Type"
 
 table_name_prefix = "metadata-api"
 
+system_keys = ["latest"]
+
+
+def valid_version(version):
+    return version not in system_keys
+
 
 def validate_input(validator):
     def inner(func):
