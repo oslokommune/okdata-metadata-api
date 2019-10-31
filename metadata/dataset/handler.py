@@ -35,9 +35,9 @@ def create_dataset(event, context):
         add_self_url(body)
         return common.response(201, body, headers)
     except ResourceConflict as d:
-        return common.response(409, f"Resource Conflict: {d}")
+        return common.error_response(409, f"Resource Conflict: {d}")
     except Exception as e:
-        return common.response(400, f"Error creating dataset: {e}")
+        return common.error_response(400, f"Error creating dataset: {e}")
 
 
 @logging_wrapper
@@ -50,7 +50,7 @@ def update_dataset(event, context):
     dataset_id = event["pathParameters"]["dataset-id"]
 
     if not SimpleAuth().is_owner(event, dataset_id):
-        return common.response(403, "Forbidden")
+        return common.error_response(403, "Forbidden")
 
     try:
         dataset_repository.update_dataset(dataset_id, content)
@@ -58,9 +58,9 @@ def update_dataset(event, context):
         add_self_url(body)
         return common.response(200, body)
     except KeyError:
-        return common.response(404, "Dataset not found.")
+        return common.error_response(404, "Dataset not found.")
     except ValueError as e:
-        return common.response(400, f"Error updating dataset: {e}")
+        return common.error_response(400, f"Error updating dataset: {e}")
 
 
 @logging_wrapper
@@ -87,7 +87,7 @@ def get_dataset(event, context):
         add_self_url(dataset)
         return common.response(200, dataset)
     else:
-        return common.response(404, "Dataset not found.")
+        return common.error_response(404, "Dataset not found.")
 
 
 def add_self_url(dataset):

@@ -26,7 +26,7 @@ def create_distribution(event, context):
     edition = event["pathParameters"]["edition"]
 
     if not SimpleAuth().is_owner(event, dataset_id):
-        return common.response(403, "Forbidden")
+        return common.error_response(403, "Forbidden")
 
     try:
         distribution_id = distribution_repository.create_distribution(
@@ -42,9 +42,9 @@ def create_distribution(event, context):
         add_self_url(body)
         return common.response(201, body, headers)
     except ResourceConflict as d:
-        return common.response(409, f"Resource Conflict: {d}")
+        return common.error_response(409, f"Resource Conflict: {d}")
     except Exception as e:
-        return common.response(400, f"Error creating distribution: {e}")
+        return common.error_response(400, f"Error creating distribution: {e}")
 
 
 @logging_wrapper
@@ -61,7 +61,7 @@ def update_distribution(event, context):
     distribution = event["pathParameters"]["distribution"]
 
     if not SimpleAuth().is_owner(event, dataset_id):
-        return common.response(403, "Forbidden")
+        return common.error_response(403, "Forbidden")
 
     try:
         distribution_repository.update_distribution(
@@ -73,9 +73,9 @@ def update_distribution(event, context):
         add_self_url(body)
         return common.response(200, body)
     except KeyError:
-        return common.response(404, "Distribution not found.")
+        return common.error_response(404, "Distribution not found.")
     except ValueError as e:
-        return common.response(400, f"Error updating distribution: {e}")
+        return common.error_response(400, f"Error updating distribution: {e}")
 
 
 @logging_wrapper
@@ -114,7 +114,7 @@ def get_distribution(event, context):
         add_self_url(content)
         return common.response(200, content)
     else:
-        return common.response(404, "Distribution not found.")
+        return common.error_response(404, "Distribution not found.")
 
 
 def add_self_url(distribution):

@@ -26,3 +26,13 @@ def response(statusCode, body, headers=None):
     headers["Access-Control-Allow-Origin"] = "*"
 
     return {"statusCode": statusCode, "headers": headers, "body": json.dumps(body)}
+
+
+def error_response(statusCode, body, headers=None):
+    if isinstance(body, list):
+        return response(statusCode, body, headers)
+    if isinstance(body, dict):
+        return response(statusCode, [body], headers)
+    tmp = []
+    tmp.append({"message": body})
+    return response(statusCode, tmp, headers)

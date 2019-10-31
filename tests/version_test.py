@@ -70,7 +70,8 @@ class TestCreateVersion:
 
         response = version_handler.create_version(create_event, None)
         assert response["statusCode"] == 409
-        assert str.startswith(json.loads(response["body"]), "Resource Conflict")
+        body = json.loads(response["body"])
+        assert str.startswith(body[0]["message"], "Resource Conflict")
 
     def test_forbidden(self, event, metadata_table, auth_denied):
         dataset = common_test_helper.raw_dataset.copy()

@@ -24,7 +24,7 @@ def create_version(event, context):
     dataset_id = event["pathParameters"]["dataset-id"]
 
     if not SimpleAuth().is_owner(event, dataset_id):
-        return common.response(403, "Forbidden")
+        return common.error_response(403, "Forbidden")
 
     try:
         version_id = version_repository.create_version(dataset_id, content)
@@ -36,9 +36,9 @@ def create_version(event, context):
         add_self_url(body)
         return common.response(201, body, headers)
     except ResourceConflict as d:
-        return common.response(409, f"Resource Conflict: {d}")
+        return common.error_response(409, f"Resource Conflict: {d}")
     except Exception as e:
-        return common.response(400, f"Error creating version: {e}")
+        return common.error_response(400, f"Error creating version: {e}")
 
 
 @logging_wrapper
@@ -52,7 +52,7 @@ def update_version(event, context):
     version = event["pathParameters"]["version"]
 
     if not SimpleAuth().is_owner(event, dataset_id):
-        return common.response(403, "Forbidden")
+        return common.error_response(403, "Forbidden")
 
     try:
         version_repository.update_version(dataset_id, version, content)
@@ -60,11 +60,11 @@ def update_version(event, context):
         add_self_url(body)
         return common.response(200, body)
     except KeyError:
-        return common.response(404, "Version not found.")
+        return common.error_response(404, "Version not found.")
     except InvalidVersionError as e:
-        return common.response(409, f"Invalid version data: {e}")
+        return common.error_response(409, f"Invalid version data: {e}")
     except ValueError as e:
-        return common.response(400, f"Error updating version: {e}")
+        return common.error_response(400, f"Error updating version: {e}")
 
 
 @logging_wrapper
@@ -94,7 +94,7 @@ def get_version(event, context):
         add_self_url(content)
         return common.response(200, content)
     else:
-        return common.response(404, "Version not found.")
+        return common.error_response(404, "Version not found.")
 
 
 def add_self_url(version):

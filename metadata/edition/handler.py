@@ -26,7 +26,7 @@ def create_edition(event, context):
     version = event["pathParameters"]["version"]
 
     if not SimpleAuth().is_owner(event, dataset_id):
-        return common.response(403, "Forbidden")
+        return common.error_response(403, "Forbidden")
 
     try:
         edition_id = edition_repository.create_edition(dataset_id, version, content)
@@ -38,9 +38,9 @@ def create_edition(event, context):
         add_self_url(body)
         return common.response(201, body, headers)
     except ResourceConflict as d:
-        return common.response(409, f"Resource Conflict: {d}")
+        return common.error_response(409, f"Resource Conflict: {d}")
     except Exception as e:
-        return common.response(400, f"Error creating edition: {e}")
+        return common.error_response(400, f"Error creating edition: {e}")
 
 
 @logging_wrapper
@@ -56,7 +56,7 @@ def update_edition(event, context):
     edition = event["pathParameters"]["edition"]
 
     if not SimpleAuth().is_owner(event, dataset_id):
-        return common.response(403, "Forbidden")
+        return common.error_response(403, "Forbidden")
 
     try:
         edition_repository.update_edition(dataset_id, version, edition, content)
@@ -64,9 +64,9 @@ def update_edition(event, context):
         add_self_url(body)
         return common.response(200, body)
     except KeyError:
-        return common.response(404, "Edition not found.")
+        return common.error_response(404, "Edition not found.")
     except ValueError as e:
-        return common.response(400, f"Error updating edition: {e}")
+        return common.error_response(400, f"Error updating edition: {e}")
 
 
 @logging_wrapper
@@ -98,7 +98,7 @@ def get_edition(event, context):
         add_self_url(content)
         return common.response(200, content)
     else:
-        return common.response(404, "Edition not found.")
+        return common.error_response(404, "Edition not found.")
 
 
 def add_self_url(edition):
