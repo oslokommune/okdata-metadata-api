@@ -3,6 +3,7 @@ from botocore.exceptions import ClientError
 import logging
 
 from metadata import common
+from metadata.error import ResourceConflict
 from dataplatform.awslambda.logging import log_add, log_duration
 
 from aws_xray_sdk.core import patch
@@ -150,9 +151,3 @@ class CommonRepository:
             msg = f"Error updating item ({status_code}): {db_response}"
             log.exception(msg)
             raise ValueError(msg)
-
-
-class ResourceConflict(Exception):
-    def __init__(self, msg, errors):
-        super().__init__(msg)
-        self.errors = errors
