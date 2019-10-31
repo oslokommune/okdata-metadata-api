@@ -36,8 +36,11 @@ def create_distribution(event, context):
         distribution = distribution_id.split("/")[-1]
         location = f"/datasets/{dataset_id}/versions/{version}/editions/{edition}/distributions/{distribution}"
         headers = {"Location": location}
-
-        return common.response(200, distribution_id, headers)
+        body = distribution_repository.get_distribution(
+            dataset_id, version, edition, distribution
+        )
+        add_self_url(body)
+        return common.response(201, body, headers)
     except ResourceConflict as d:
         return common.response(409, f"Resource Conflict: {d}")
     except Exception as e:
@@ -61,11 +64,14 @@ def update_distribution(event, context):
         return common.response(403, "Forbidden")
 
     try:
-        distribution_id = distribution_repository.update_distribution(
+        distribution_repository.update_distribution(
             dataset_id, version, edition, distribution, content
         )
-
-        return common.response(200, distribution_id)
+        body = distribution_repository.get_distribution(
+            dataset_id, version, edition, distribution
+        )
+        add_self_url(body)
+        return common.response(200, body)
     except KeyError:
         return common.response(404, "Distribution not found.")
     except ValueError as e:

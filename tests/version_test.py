@@ -22,11 +22,12 @@ class TestCreateVersion:
         create_event = auth_event(version, dataset=dataset_id)
 
         response = version_handler.create_version(create_event, None)
-        version_id = json.loads(response["body"])
+        body = json.loads(response["body"])
+        version_id = body["Id"]
 
         expected_location = f'/datasets/{dataset_id}/versions/{version["version"]}'
 
-        assert response["statusCode"] == 200
+        assert response["statusCode"] == 201
         assert response["headers"]["Location"] == expected_location
         assert version_id == f'{dataset_id}/{version["version"]}'
 
@@ -65,7 +66,7 @@ class TestCreateVersion:
         create_event = auth_event(version, dataset_id)
 
         response = version_handler.create_version(create_event, None)
-        assert response["statusCode"] == 200
+        assert response["statusCode"] == 201
 
         response = version_handler.create_version(create_event, None)
         assert response["statusCode"] == 409
@@ -97,7 +98,8 @@ class TestUpdateVersion:
         )
 
         response = version_handler.update_version(update_event, None)
-        version_id = json.loads(response["body"])
+        body = json.loads(response["body"])
+        version_id = body["Id"]
 
         assert response["statusCode"] == 200
         assert version_id == f"{dataset_id}/{version_name}"

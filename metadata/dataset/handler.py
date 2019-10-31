@@ -31,8 +31,9 @@ def create_dataset(event, context):
         requests.post(f"{AUTHORIZER_API}/{dataset_id}", json={"principalId": user_id})
 
         headers = {"Location": f"/datasets/{dataset_id}"}
-
-        return common.response(200, dataset_id, headers)
+        body = dataset_repository.get_dataset(dataset_id)
+        add_self_url(body)
+        return common.response(201, body, headers)
     except ResourceConflict as d:
         return common.response(409, f"Resource Conflict: {d}")
     except Exception as e:
@@ -53,7 +54,9 @@ def update_dataset(event, context):
 
     try:
         dataset_repository.update_dataset(dataset_id, content)
-        return common.response(200, dataset_id)
+        body = dataset_repository.get_dataset(dataset_id)
+        add_self_url(body)
+        return common.response(200, body)
     except KeyError:
         return common.response(404, "Dataset not found.")
     except ValueError as e:

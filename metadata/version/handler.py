@@ -32,8 +32,9 @@ def create_version(event, context):
         version = version_id.split("/")[-1]
         location = f"/datasets/{dataset_id}/versions/{version}"
         headers = {"Location": location}
-
-        return common.response(200, version_id, headers)
+        body = version_repository.get_version(dataset_id, version)
+        add_self_url(body)
+        return common.response(201, body, headers)
     except ResourceConflict as d:
         return common.response(409, f"Resource Conflict: {d}")
     except Exception as e:
@@ -54,8 +55,10 @@ def update_version(event, context):
         return common.response(403, "Forbidden")
 
     try:
-        version_id = version_repository.update_version(dataset_id, version, content)
-        return common.response(200, version_id)
+        version_repository.update_version(dataset_id, version, content)
+        body = version_repository.get_version(dataset_id, version)
+        add_self_url(body)
+        return common.response(200, body)
     except KeyError:
         return common.response(404, "Version not found.")
     except InvalidVersionError as e:

@@ -34,8 +34,9 @@ def create_edition(event, context):
         edition = edition_id.split("/")[-1]
         location = f"/datasets/{dataset_id}/versions/{version}/editions/{edition}"
         headers = {"Location": location}
-
-        return common.response(200, edition_id, headers)
+        body = edition_repository.get_edition(dataset_id, version, edition)
+        add_self_url(body)
+        return common.response(201, body, headers)
     except ResourceConflict as d:
         return common.response(409, f"Resource Conflict: {d}")
     except Exception as e:
@@ -58,10 +59,10 @@ def update_edition(event, context):
         return common.response(403, "Forbidden")
 
     try:
-        edition_id = edition_repository.update_edition(
-            dataset_id, version, edition, content
-        )
-        return common.response(200, edition_id)
+        edition_repository.update_edition(dataset_id, version, edition, content)
+        body = edition_repository.get_edition(dataset_id, version, edition)
+        add_self_url(body)
+        return common.response(200, body)
     except KeyError:
         return common.response(404, "Edition not found.")
     except ValueError as e:

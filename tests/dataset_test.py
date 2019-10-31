@@ -18,8 +18,9 @@ class TestCreateDataset:
     def test_create(self, auth_event, metadata_table):
         create_event = auth_event(common.raw_dataset.copy())
         response = dataset_handler.create_dataset(create_event, None)
-        dataset_id = json.loads(response["body"])
-        assert response["statusCode"] == 200
+        body = json.loads(response["body"])
+        dataset_id = body["Id"]
+        assert response["statusCode"] == 201
         assert response["headers"]["Location"] == f"/datasets/{dataset_id}"
         assert dataset_id == "antall-besokende-pa-gjenbruksstasjoner"
 
@@ -47,13 +48,14 @@ class TestUpdateDataset:
         dataset = common.raw_dataset.copy()
         response = dataset_handler.create_dataset(auth_event(dataset), None)
 
-        dataset_id = json.loads(response["body"])
+        body = json.loads(response["body"])
+        dataset_id = body["Id"]
         event_for_update = auth_event(common.dataset_updated.copy(), dataset_id)
 
         response = dataset_handler.update_dataset(event_for_update, None)
         body = json.loads(response["body"])
 
-        assert body == dataset_id
+        assert body["Id"] == dataset_id
         assert response["statusCode"] == 200
 
         db_response = metadata_table.query(

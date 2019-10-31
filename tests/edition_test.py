@@ -21,13 +21,14 @@ class TestCreateEdition:
         )
 
         response = edition_handler.create_edition(create_event, None)
-        edition_id = json.loads(response["body"])
+        body = json.loads(response["body"])
+        edition_id = body["Id"]
 
         expected_location = (
             f"/datasets/{dataset_id}/versions/6/editions/20190528T133700"
         )
 
-        assert response["statusCode"] == 200
+        assert response["statusCode"] == 201
         assert response["headers"]["Location"] == expected_location
         assert edition_id == f"{dataset_id}/6/20190528T133700"
 
@@ -52,7 +53,7 @@ class TestCreateEdition:
             common_test_helper.raw_edition, dataset=dataset_id, version=version
         )
         response = edition_handler.create_edition(create_event, None)
-        assert response["statusCode"] == 200
+        assert response["statusCode"] == 201
 
         response = edition_handler.create_edition(create_event, None)
         assert response["statusCode"] == 409
@@ -74,9 +75,8 @@ class TestUpdateEdition:
         create_event = auth_event(
             common_test_helper.raw_edition, dataset=dataset_id, version=version
         )
-        edition_id = json.loads(
-            edition_handler.create_edition(create_event, None)["body"]
-        ).split("/")[-1]
+        body = json.loads(edition_handler.create_edition(create_event, None)["body"])
+        edition_id = body["Id"].split("/")[-1]
         update_event = auth_event(
             common_test_helper.edition_updated,
             dataset=dataset_id,
@@ -85,8 +85,8 @@ class TestUpdateEdition:
         )
 
         response = edition_handler.update_edition(update_event, None)
-        edition_id = json.loads(response["body"])
-
+        body = json.loads(response["body"])
+        edition_id = body["Id"]
         assert response["statusCode"] == 200
         assert edition_id == f"antall-besokende-pa-gjenbruksstasjoner/6/20190528T133700"
 
@@ -105,9 +105,8 @@ class TestUpdateEdition:
         create_event = auth_event(
             common_test_helper.raw_edition, dataset=dataset_id, version=version
         )
-        edition = json.loads(
-            edition_handler.create_edition(create_event, None)["body"]
-        ).split("/")[-1]
+        body = json.loads(edition_handler.create_edition(create_event, None)["body"])
+        edition = body["Id"].split("/")[-1]
         update_event = auth_event(
             common_test_helper.edition_updated,
             dataset=dataset_id,

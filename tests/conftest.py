@@ -86,7 +86,8 @@ def auth_event(*args, **kwargs):
 def put_dataset(auth_event):
     dataset = common_test_helper.raw_dataset.copy()
     response = dataset_handler.create_dataset(auth_event(dataset), None)
-    return json.loads(response["body"])
+    body = json.loads(response["body"])
+    return body["Id"]
 
 
 @pytest.fixture()
@@ -104,5 +105,10 @@ def put_edition(auth_event, put_version):
     response = edition_handler.create_edition(
         auth_event(raw_edition, dataset=dataset_id, version=version), None
     )
-    edition_id = json.loads(response["body"])
+    body = json.loads(response["body"])
+
+    # When we have a auth_denied call we must check if we get a Id key before accessing it
+    edition_id = ""
+    if "Id" in body:
+        edition_id = body["Id"]
     return dataset_id, version, edition_id.split("/")[-1]

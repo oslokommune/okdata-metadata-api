@@ -24,12 +24,12 @@ class TestCreateDistribution:
             edition=edition,
         )
         response = distribution_handler.create_distribution(create_event, None)
-        distribution_id = json.loads(response["body"])
-
+        body = json.loads(response["body"])
+        distribution_id = body["Id"]
         id_regex = f"{dataset_id}/{version}/{edition}/[0-9a-f-]+"
         location_regex = f"/datasets/{dataset_id}/versions/{version}/editions/{edition}/distributions/[0-9a-f-]+"
 
-        assert response["statusCode"] == 200
+        assert response["statusCode"] == 201
         assert re.fullmatch(id_regex, distribution_id)
         assert re.fullmatch(location_regex, response["headers"]["Location"])
 
@@ -62,7 +62,8 @@ class TestUpdateDistribution:
             edition=edition,
         )
         response = distribution_handler.create_distribution(create_event, None)
-        distribution_id = json.loads(response["body"])
+        body = json.loads(response["body"])
+        distribution_id = body["Id"]
 
         update_event = auth_event(
             common_test_helper.distribution_updated,
@@ -74,7 +75,8 @@ class TestUpdateDistribution:
 
         response = distribution_handler.update_distribution(update_event, None)
         assert response["statusCode"] == 200
-        assert json.loads(response["body"]) == distribution_id
+        body = json.loads(response["body"])
+        assert body["Id"] == distribution_id
 
         db_response = metadata_table.query(
             KeyConditionExpression=Key(table.ID_COLUMN).eq(distribution_id)
@@ -82,7 +84,10 @@ class TestUpdateDistribution:
         assert db_response["Items"][0]["filename"] == "UPDATED.csv"
 
     def test_forbidden(self, metadata_table, auth_event, auth_denied, put_edition):
-        dataset_id, version, edition = put_edition
+        # auth_denied will return Forbidden, and then no edition will be created....
+        edition = "my-edition"
+        dataset_id, version, _ = put_edition
+
         create_event = auth_event(
             common_test_helper.raw_distribution,
             dataset=dataset_id,
