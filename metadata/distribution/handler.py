@@ -4,7 +4,7 @@ from aws_xray_sdk.core import xray_recorder
 from auth import SimpleAuth
 from dataplatform.awslambda.logging import logging_wrapper
 from metadata import common
-from metadata.CommonRepository import ResourceConflict
+from metadata.error import ResourceConflict
 from metadata.common import validate_input
 from metadata.distribution.repository import DistributionRepository
 from metadata.validator import Validator
