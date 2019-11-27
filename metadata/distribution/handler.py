@@ -2,7 +2,7 @@ import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 
 from auth import SimpleAuth
-from dataplatform.awslambda.logging import logging_wrapper
+from dataplatform.awslambda.logging import logging_wrapper, log_add
 from metadata import common
 from metadata.error import ResourceConflict
 from metadata.common import validate_input
@@ -24,6 +24,7 @@ def create_distribution(event, context):
     dataset_id = event["pathParameters"]["dataset-id"]
     version = event["pathParameters"]["version"]
     edition = event["pathParameters"]["edition"]
+    log_add(dataset_id=dataset_id, version=version, edition=edition)
 
     if not SimpleAuth().is_owner(event, dataset_id):
         return common.error_response(403, "Forbidden")
@@ -34,6 +35,8 @@ def create_distribution(event, context):
         )
 
         distribution = distribution_id.split("/")[-1]
+        log_add(distribution=distribution)
+
         location = f"/datasets/{dataset_id}/versions/{version}/editions/{edition}/distributions/{distribution}"
         headers = {"Location": location}
         body = distribution_repository.get_distribution(
@@ -59,6 +62,7 @@ def update_distribution(event, context):
     version = event["pathParameters"]["version"]
     edition = event["pathParameters"]["edition"]
     distribution = event["pathParameters"]["distribution"]
+    log_add(dataset_id=dataset_id, version=version, edition=edition, distribution=distribution)
 
     if not SimpleAuth().is_owner(event, dataset_id):
         return common.error_response(403, "Forbidden")
@@ -86,10 +90,12 @@ def get_distributions(event, context):
     dataset_id = event["pathParameters"]["dataset-id"]
     version = event["pathParameters"]["version"]
     edition = event["pathParameters"]["edition"]
+    log_add(dataset_id=dataset_id, version=version, edition=edition)
 
     distributions = distribution_repository.get_distributions(
         dataset_id, version, edition
     )
+    log_add(num_distributions=len(distributions))
 
     for distribution in distributions:
         add_self_url(distribution)
@@ -106,6 +112,7 @@ def get_distribution(event, context):
     version = event["pathParameters"]["version"]
     edition = event["pathParameters"]["edition"]
     distribution = event["pathParameters"]["distribution"]
+    log_add(dataset_id=dataset_id, version=version, edition=edition, distribution=distribution)
 
     content = distribution_repository.get_distribution(
         dataset_id, version, edition, distribution
