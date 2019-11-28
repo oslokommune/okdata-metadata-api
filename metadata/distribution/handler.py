@@ -62,7 +62,12 @@ def update_distribution(event, context):
     version = event["pathParameters"]["version"]
     edition = event["pathParameters"]["edition"]
     distribution = event["pathParameters"]["distribution"]
-    log_add(dataset_id=dataset_id, version=version, edition=edition, distribution=distribution)
+    log_add(
+        dataset_id=dataset_id,
+        version=version,
+        edition=edition,
+        distribution=distribution,
+    )
 
     if not SimpleAuth().is_owner(event, dataset_id):
         return common.error_response(403, "Forbidden")
@@ -112,7 +117,12 @@ def get_distribution(event, context):
     version = event["pathParameters"]["version"]
     edition = event["pathParameters"]["edition"]
     distribution = event["pathParameters"]["distribution"]
-    log_add(dataset_id=dataset_id, version=version, edition=edition, distribution=distribution)
+    log_add(
+        dataset_id=dataset_id,
+        version=version,
+        edition=edition,
+        distribution=distribution,
+    )
 
     content = distribution_repository.get_distribution(
         dataset_id, version, edition, distribution
