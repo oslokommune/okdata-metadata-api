@@ -3,7 +3,7 @@ import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 
 from auth import SimpleAuth
-from dataplatform.awslambda.logging import logging_wrapper
+from dataplatform.awslambda.logging import logging_wrapper, log_add
 from metadata import common
 from metadata.error import ResourceConflict
 from metadata.common import validate_input
@@ -25,6 +25,8 @@ def create_dataset(event, context):
 
     try:
         dataset_id = dataset_repository.create_dataset(content)
+        log_add(dataset_id=dataset_id)
+
         user_id = event["requestContext"]["authorizer"]["principalId"]
 
         requests = SimpleAuth().request_from_client()
@@ -48,6 +50,7 @@ def update_dataset(event, context):
 
     content = json.loads(event["body"])
     dataset_id = event["pathParameters"]["dataset-id"]
+    log_add(dataset_id=dataset_id)
 
     if not SimpleAuth().is_owner(event, dataset_id):
         return common.error_response(403, "Forbidden")
@@ -69,6 +72,8 @@ def get_datasets(event, context):
     """GET /datasets"""
 
     datasets = dataset_repository.get_datasets()
+    log_add(num_datasets=len(datasets))
+
     for dataset in datasets:
         add_self_url(dataset)
 
@@ -81,6 +86,7 @@ def get_dataset(event, context):
     """GET /datasets/:dataset-id"""
 
     dataset_id = event["pathParameters"]["dataset-id"]
+    log_add(dataset_id=dataset_id)
     dataset = dataset_repository.get_dataset(dataset_id)
 
     if dataset:

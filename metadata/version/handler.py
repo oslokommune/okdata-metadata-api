@@ -2,7 +2,7 @@ import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 
 from auth import SimpleAuth
-from dataplatform.awslambda.logging import logging_wrapper
+from dataplatform.awslambda.logging import logging_wrapper, log_add
 from metadata import common
 from metadata.error import ResourceConflict
 from metadata.common import validate_input
@@ -22,6 +22,7 @@ def create_version(event, context):
 
     content = json.loads(event["body"])
     dataset_id = event["pathParameters"]["dataset-id"]
+    log_add(dataset_id=dataset_id)
 
     if not SimpleAuth().is_owner(event, dataset_id):
         return common.error_response(403, "Forbidden")
@@ -30,6 +31,8 @@ def create_version(event, context):
         version_id = version_repository.create_version(dataset_id, content)
 
         version = version_id.split("/")[-1]
+        log_add(version=version)
+
         location = f"/datasets/{dataset_id}/versions/{version}"
         headers = {"Location": location}
         body = version_repository.get_version(dataset_id, version)
@@ -50,6 +53,7 @@ def update_version(event, context):
     content = json.loads(event["body"])
     dataset_id = event["pathParameters"]["dataset-id"]
     version = event["pathParameters"]["version"]
+    log_add(dataset_id=dataset_id, version=version)
 
     if not SimpleAuth().is_owner(event, dataset_id):
         return common.error_response(403, "Forbidden")
@@ -73,8 +77,10 @@ def get_versions(event, context):
     """GET /datasets/:dataset-id/versions"""
 
     dataset_id = event["pathParameters"]["dataset-id"]
+    log_add(dataset_id=dataset_id)
 
     versions = version_repository.get_versions(dataset_id)
+    log_add(num_versions=len(versions))
     for version in versions:
         add_self_url(version)
 
@@ -88,6 +94,7 @@ def get_version(event, context):
 
     dataset_id = event["pathParameters"]["dataset-id"]
     version = event["pathParameters"]["version"]
+    log_add(dataset_id=dataset_id, version=version)
 
     content = version_repository.get_version(dataset_id, version)
     if content:

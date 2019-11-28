@@ -6,9 +6,9 @@ from metadata import common
 from metadata.error import ResourceConflict
 from dataplatform.awslambda.logging import log_add, log_duration
 
-from aws_xray_sdk.core import patch
+from aws_xray_sdk.core import patch_all
 
-patch(["boto3"])
+patch_all()
 
 log = logging.getLogger()
 

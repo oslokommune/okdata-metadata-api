@@ -2,7 +2,7 @@ import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 
 from auth import SimpleAuth
-from dataplatform.awslambda.logging import logging_wrapper
+from dataplatform.awslambda.logging import logging_wrapper, log_add
 from metadata import common
 from metadata.error import ResourceConflict
 from metadata.common import validate_input
@@ -24,6 +24,7 @@ def create_edition(event, context):
 
     dataset_id = event["pathParameters"]["dataset-id"]
     version = event["pathParameters"]["version"]
+    log_add(dataset_id=dataset_id, version=version)
 
     if not SimpleAuth().is_owner(event, dataset_id):
         return common.error_response(403, "Forbidden")
@@ -32,6 +33,8 @@ def create_edition(event, context):
         edition_id = edition_repository.create_edition(dataset_id, version, content)
 
         edition = edition_id.split("/")[-1]
+        log_add(edition=edition)
+
         location = f"/datasets/{dataset_id}/versions/{version}/editions/{edition}"
         headers = {"Location": location}
         body = edition_repository.get_edition(dataset_id, version, edition)
@@ -54,6 +57,7 @@ def update_edition(event, context):
     dataset_id = event["pathParameters"]["dataset-id"]
     version = event["pathParameters"]["version"]
     edition = event["pathParameters"]["edition"]
+    log_add(dataset_id=dataset_id, version=version, edition=edition)
 
     if not SimpleAuth().is_owner(event, dataset_id):
         return common.error_response(403, "Forbidden")
@@ -76,8 +80,10 @@ def get_editions(event, context):
 
     dataset_id = event["pathParameters"]["dataset-id"]
     version = event["pathParameters"]["version"]
+    log_add(dataset_id=dataset_id, version=version)
 
     editions = edition_repository.get_editions(dataset_id, version)
+    log_add(num_editions=len(editions))
     for edition in editions:
         add_self_url(edition)
 
@@ -92,6 +98,7 @@ def get_edition(event, context):
     dataset_id = event["pathParameters"]["dataset-id"]
     version = event["pathParameters"]["version"]
     edition = event["pathParameters"]["edition"]
+    log_add(dataset_id=dataset_id, version=version, edition=edition)
 
     content = edition_repository.get_edition(dataset_id, version, edition)
     if content:
