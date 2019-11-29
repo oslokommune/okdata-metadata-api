@@ -14,7 +14,7 @@ edition_repository = EditionRepository()
 validator = Validator("edition")
 
 
-@logging_wrapper("metadata-api")
+@logging_wrapper
 @validate_input(validator)
 @xray_recorder.capture("create_edition")
 def create_edition(event, context):
@@ -48,7 +48,7 @@ def create_edition(event, context):
         return common.error_response(400, f"Error creating edition: {e}")
 
 
-@logging_wrapper("metadata-api")
+@logging_wrapper
 @validate_input(validator)
 @xray_recorder.capture("update_edition")
 def update_edition(event, context):
@@ -77,7 +77,7 @@ def update_edition(event, context):
         return common.error_response(400, f"Error updating edition: {e}")
 
 
-@logging_wrapper("metadata-api")
+@logging_wrapper
 @xray_recorder.capture("get_editions")
 def get_editions(event, context):
     """GET /datasets/:dataset-id/versions/:version/editions"""
@@ -94,7 +94,7 @@ def get_editions(event, context):
     return common.response(200, editions)
 
 
-@logging_wrapper("metadata-api")
+@logging_wrapper
 @xray_recorder.capture("get_edition")
 def get_edition(event, context):
     """GET /datasets/:dataset-id/versions/:version/editions/:edition"""
