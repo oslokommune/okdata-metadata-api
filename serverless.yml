@@ -69,7 +69,7 @@ custom:
     usePoetry: false
   esLogs:
     endpoint: ${ssm:/dataplatform/elasticsearch/endpoint}
-    index: metadata-api
+    index: dataplatform-services
     filterPattern: '{ $.function_name = "*" }'
   documentation:
     info:
