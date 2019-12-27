@@ -19,9 +19,11 @@ class DistributionRepository(CommonRepository):
         result = self.get_distribution(dataset_id, version, edition, distribution)
         return result is not None
 
-    def get_distribution(self, dataset_id, version, edition, distribution):
+    def get_distribution(
+        self, dataset_id, version, edition, distribution, consistent_read=False
+    ):
         distribution_id = f"{dataset_id}/{version}/{edition}/{distribution}"
-        return self.get_item(distribution_id)
+        return self.get_item(distribution_id, consistent_read)
 
     def get_distributions(self, dataset_id, version, edition):
         edition_id = f"{dataset_id}/{version}/{edition}"

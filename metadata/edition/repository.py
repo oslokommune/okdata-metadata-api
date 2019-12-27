@@ -22,9 +22,9 @@ class EditionRepository(CommonRepository):
         result = self.get_edition(dataset_id, version, edition)
         return result is not None
 
-    def get_edition(self, dataset_id, version, edition):
+    def get_edition(self, dataset_id, version, edition, consistent_read=False):
         edition_id = f"{dataset_id}/{version}/{edition}"
-        return self.get_item(edition_id)
+        return self.get_item(edition_id, consistent_read)
 
     def get_editions(self, dataset_id, version):
         version_id = f"{dataset_id}/{version}"

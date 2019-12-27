@@ -33,7 +33,7 @@ def create_dataset(event, context):
         requests.post(f"{AUTHORIZER_API}/{dataset_id}", json={"principalId": user_id})
 
         headers = {"Location": f"/datasets/{dataset_id}"}
-        body = dataset_repository.get_dataset(dataset_id)
+        body = dataset_repository.get_dataset(dataset_id, consistent_read=True)
         add_self_url(body)
         return common.response(201, body, headers)
     except ResourceConflict as d:
@@ -57,7 +57,7 @@ def update_dataset(event, context):
 
     try:
         dataset_repository.update_dataset(dataset_id, content)
-        body = dataset_repository.get_dataset(dataset_id)
+        body = dataset_repository.get_dataset(dataset_id, consistent_read=True)
         add_self_url(body)
         return common.response(200, body)
     except KeyError:

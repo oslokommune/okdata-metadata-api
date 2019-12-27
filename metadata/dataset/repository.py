@@ -22,8 +22,8 @@ class DatasetRepository(CommonRepository):
         dataset = self.get_dataset(dataset_id)
         return dataset is not None
 
-    def get_dataset(self, dataset_id):
-        return self.get_item(dataset_id)
+    def get_dataset(self, dataset_id, consistent_read=False):
+        return self.get_item(dataset_id, consistent_read)
 
     def get_datasets(self):
         return self.get_items()

@@ -37,7 +37,9 @@ def create_edition(event, context):
 
         location = f"/datasets/{dataset_id}/versions/{version}/editions/{edition}"
         headers = {"Location": location}
-        body = edition_repository.get_edition(dataset_id, version, edition)
+        body = edition_repository.get_edition(
+            dataset_id, version, edition, consistent_read=True
+        )
         add_self_url(body)
         return common.response(201, body, headers)
     except ResourceConflict as d:
@@ -64,7 +66,9 @@ def update_edition(event, context):
 
     try:
         edition_repository.update_edition(dataset_id, version, edition, content)
-        body = edition_repository.get_edition(dataset_id, version, edition)
+        body = edition_repository.get_edition(
+            dataset_id, version, edition, consistent_read=True
+        )
         add_self_url(body)
         return common.response(200, body)
     except KeyError:

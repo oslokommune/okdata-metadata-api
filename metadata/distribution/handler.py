@@ -40,7 +40,7 @@ def create_distribution(event, context):
         location = f"/datasets/{dataset_id}/versions/{version}/editions/{edition}/distributions/{distribution}"
         headers = {"Location": location}
         body = distribution_repository.get_distribution(
-            dataset_id, version, edition, distribution
+            dataset_id, version, edition, distribution, consistent_read=True
         )
         add_self_url(body)
         return common.response(201, body, headers)
@@ -77,7 +77,7 @@ def update_distribution(event, context):
             dataset_id, version, edition, distribution, content
         )
         body = distribution_repository.get_distribution(
-            dataset_id, version, edition, distribution
+            dataset_id, version, edition, distribution, consistent_read=True
         )
         add_self_url(body)
         return common.response(200, body)

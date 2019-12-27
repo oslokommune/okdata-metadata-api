@@ -35,7 +35,7 @@ def create_version(event, context):
 
         location = f"/datasets/{dataset_id}/versions/{version}"
         headers = {"Location": location}
-        body = version_repository.get_version(dataset_id, version)
+        body = version_repository.get_version(dataset_id, version, consistent_read=True)
         add_self_url(body)
         return common.response(201, body, headers)
     except ResourceConflict as d:
@@ -60,7 +60,7 @@ def update_version(event, context):
 
     try:
         version_repository.update_version(dataset_id, version, content)
-        body = version_repository.get_version(dataset_id, version)
+        body = version_repository.get_version(dataset_id, version, consistent_read=True)
         add_self_url(body)
         return common.response(200, body)
     except KeyError:

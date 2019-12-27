@@ -18,12 +18,13 @@ class CommonRepository:
         self.table = table
         self.type = type
 
-    def get_item(self, item_id):
+    def get_item(self, item_id, consistent_read=False):
         log_add(dynamodb_item_id=item_id, dynamodb_item_type=self.type)
         key = {common.ID_COLUMN: item_id, common.TYPE_COLUMN: self.type}
 
         db_response = log_duration(
-            lambda: self.table.get_item(Key=key), "dynamodb_duration_ms"
+            lambda: self.table.get_item(Key=key, ConsistentRead=consistent_read),
+            "dynamodb_duration_ms",
         )
 
         status_code = db_response["ResponseMetadata"]["HTTPStatusCode"]

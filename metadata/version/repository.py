@@ -20,9 +20,9 @@ class VersionRepository(CommonRepository):
         result = self.get_version(dataset_id, version)
         return result is not None
 
-    def get_version(self, dataset_id, version):
+    def get_version(self, dataset_id, version, consistent_read=False):
         version_id = f"{dataset_id}/{version}"
-        return self.get_item(version_id)
+        return self.get_item(version_id, consistent_read)
 
     def get_versions(self, dataset_id):
         return self.get_items(dataset_id)
