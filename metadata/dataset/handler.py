@@ -15,7 +15,7 @@ AUTHORIZER_API = os.environ["AUTHORIZER_API"]
 validator = Validator("dataset")
 
 
-@logging_wrapper("metadata-api")
+@logging_wrapper
 @validate_input(validator)
 @xray_recorder.capture("create_dataset")
 def create_dataset(event, context):
@@ -42,7 +42,7 @@ def create_dataset(event, context):
         return common.error_response(400, f"Error creating dataset: {e}")
 
 
-@logging_wrapper("metadata-api")
+@logging_wrapper
 @validate_input(validator)
 @xray_recorder.capture("update_dataset")
 def update_dataset(event, context):
@@ -66,7 +66,7 @@ def update_dataset(event, context):
         return common.error_response(400, f"Error updating dataset: {e}")
 
 
-@logging_wrapper("metadata-api")
+@logging_wrapper
 @xray_recorder.capture("get_datasets")
 def get_datasets(event, context):
     """GET /datasets"""
@@ -80,7 +80,7 @@ def get_datasets(event, context):
     return common.response(200, datasets)
 
 
-@logging_wrapper("metadata-api")
+@logging_wrapper
 @xray_recorder.capture("get_dataset")
 def get_dataset(event, context):
     """GET /datasets/:dataset-id"""

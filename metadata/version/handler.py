@@ -14,7 +14,7 @@ version_repository = VersionRepository()
 validator = Validator("version")
 
 
-@logging_wrapper("metadata-api")
+@logging_wrapper
 @validate_input(validator)
 @xray_recorder.capture("create_version")
 def create_version(event, context):
@@ -44,7 +44,7 @@ def create_version(event, context):
         return common.error_response(400, f"Error creating version: {e}")
 
 
-@logging_wrapper("metadata-api")
+@logging_wrapper
 @validate_input(validator)
 @xray_recorder.capture("update_version")
 def update_version(event, context):
@@ -71,7 +71,7 @@ def update_version(event, context):
         return common.error_response(400, f"Error updating version: {e}")
 
 
-@logging_wrapper("metadata-api")
+@logging_wrapper
 @xray_recorder.capture("get_versions")
 def get_versions(event, context):
     """GET /datasets/:dataset-id/versions"""
@@ -87,7 +87,7 @@ def get_versions(event, context):
     return common.response(200, versions)
 
 
-@logging_wrapper("metadata-api")
+@logging_wrapper
 @xray_recorder.capture("get_version")
 def get_version(event, context):
     """GET /datasets/:dataset-id/versions/:version"""

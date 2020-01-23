@@ -28,6 +28,7 @@ provider:
   tags:
     GIT_REV: ${git:branch}:${git:sha1}
   environment:
+    SERVICE_NAME: ${self:service}
     GIT_REV: ${git:branch}:${git:sha1}
     AUTHORIZER_API: ${ssm:/dataplatform/simple-dataset-authorizer/url}
     ENABLE_AUTH: true
