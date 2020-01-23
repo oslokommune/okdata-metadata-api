@@ -28,15 +28,18 @@ test:
 
 .PHONY: deploy
 deploy: init format test login-dev
+	@echo "\n*** Deploying to stage \033[1;34m$${STAGE:-dev}\033[0m ***\n"
 	sls deploy --stage $${STAGE:-dev} --aws-profile $(.DEV_PROFILE)
 
 .PHONY: deploy-prod
 deploy-prod: init format is-git-clean test login-prod
+	@echo "\n*** Deploying to \033[1;34mprod\033[0m ***\n"
 	sls deploy --stage prod --aws-profile $(.PROD_PROFILE)
 	sls downloadDocumentation --outputFileName swagger.yaml --stage prod --aws-profile $(.PROD_PROFILE)
 
 .PHONY: undeploy
 undeploy: login-dev
+	@echo "\n*** Undeploying stage \033[1;34m$${STAGE}\033[0m ***\n"
 	sls remove --stage $${STAGE} --aws-profile $(.DEV_PROFILE)
 
 .PHONY: login-dev
