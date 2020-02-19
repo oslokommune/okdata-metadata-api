@@ -43,7 +43,10 @@ class TestCreateEdition:
         message = json.loads(response["body"])
 
         assert response["statusCode"] == 400
-        assert "is not a 'date-time'" in message["errors"][0]
+        assert message == {
+            "message": "Validation error",
+            "errors": ["edition: '2019-05-28T15:37:00' is not a 'date-time'"],
+        }
 
     def test_create_duplicate_edition_should_fail(
         self, metadata_table, auth_event, put_version

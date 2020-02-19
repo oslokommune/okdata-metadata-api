@@ -55,7 +55,10 @@ class TestCreateVersion:
         res = version_handler.create_version(create_event, None)
         assert res["statusCode"] == 400
         body = json.loads(res["body"])
-        assert len(body["errors"]) == 1
+        assert body == {
+            "message": "Validation error",
+            "errors": ["version: {'enum': ['latest']} is not allowed for 'latest'"],
+        }
 
     def test_create_duplicate_version_should_fail(
         self, metadata_table, auth_event, put_dataset
