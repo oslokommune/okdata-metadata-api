@@ -11,7 +11,7 @@ exclude = '''
     | .*\.egg
     | .*\.egg-info
     | env
-    | venv
+    | *venv
     | \.venv
     | \.serverless
 )/
