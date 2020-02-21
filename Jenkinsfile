@@ -5,7 +5,6 @@ import no.ok.build.k8s.jenkins.pipeline.stages.python.*
 import no.ok.build.k8s.jenkins.pipeline.stages.versionBumpers.*
 import no.ok.build.k8s.jenkins.pipeline.pipeline.*
 import no.ok.build.k8s.jenkins.pipeline.common.*
-import java.util.function.Predicate
 
 String test = """
               make test BUILD_VENV=/tmp/virtualenv
