@@ -4,11 +4,11 @@ requestBody:
 requestModels:
   application/json: "Dataset"
 methodResponses:
-  - statusCode: "200"
+  - statusCode: "201"
     responseBody:
-      description: "Successfully created dataset"
+      description: "Dataset object created"
     responseModels:
-      application/json: "StandardResponse"
+      application/json: "Dataset"
   - statusCode: "400"
     responseBody:
       description: "User error"

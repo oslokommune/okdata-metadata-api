@@ -28,7 +28,7 @@ methodResponses:
     responseBody:
       description: "Edition updated successfully"
     responseModels:
-      application/json: "StandardResponse"
+      application/json: "Edition"
   - statusCode: "401"
     responseBody:
       description: "Authentication failed"

@@ -34,7 +34,7 @@ methodResponses:
     responseBody:
       description: "Distribution updated successfully"
     responseModels:
-      application/json: "StandardResponse"
+      application/json: "Distribution"
   - statusCode: "401"
     responseBody:
       description: "Authentication failed"

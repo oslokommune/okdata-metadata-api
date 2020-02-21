@@ -12,9 +12,9 @@ pathParams:
       type: "string"
       pattern: "^[-a-z0-9_]+$"
 methodResponses:
-  - statusCode: "200"
+  - statusCode: "201"
     responseModels:
-      application/json: "StandardResponse"
+      application/json: "Version"
   - statusCode: "400"
     responseBody:
       description: "User error"

@@ -16,7 +16,7 @@ methodResponses:
     responseBody:
       description: "Dataset updated successfully"
     responseModels:
-      application/json: "StandardResponse"
+      application/json: "Dataset"
   - statusCode: "401"
     responseBody:
       description: "Authentication failed"
