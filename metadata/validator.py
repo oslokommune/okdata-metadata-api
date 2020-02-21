@@ -12,8 +12,7 @@ class Validator:
                 self.validator = Draft7Validator(
                     schema=schema, format_checker=FormatChecker()
                 )
-        except IOError as e:
-            print(e)
+        except IOError:
             raise Exception(f"Missing schema for object {object_type}!")
 
     def validate(self, validation_object):
