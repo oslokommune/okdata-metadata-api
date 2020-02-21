@@ -1,0 +1,57 @@
+summary: "Update a distribution"
+description: "Updates an existing distribution"
+pathParams:
+  - name: "dataset-id"
+    description: "The dataset which contains the distribution you want to update"
+    required: true
+    schema:
+      type: "string"
+      pattern: "^[-a-z0-9_]+$"
+  - name: "version"
+    description: "The version which contains the distribution you want to update"
+    required: true
+    schema:
+      type: "string"
+      pattern: "^[-a-z0-9_]+$"
+  - name: "edition"
+    description: "The edition which contains the distribution you want to update"
+    required: true
+    schema:
+      type: "string"
+      pattern: "^[-a-z0-9_]+$"
+  - name: "distribution"
+    description: "The distribution you want to update"
+    required: true
+    schema:
+      type: "string"
+      pattern: "^[-a-z0-9_]+$"
+requestBody:
+  description: "The new object"
+requestModels:
+  application/json: Distribution
+methodResponses:
+  - statusCode: "200"
+    responseBody:
+      description: "Distribution updated successfully"
+    responseModels:
+      application/json: "Distribution"
+  - statusCode: "401"
+    responseBody:
+      description: "Authentication failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "403"
+    responseBody:
+      description: "Authorization failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "404"
+    responseBody:
+      description: "Distribution does not exist"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "500"
+    responseBody:
+      description: "Was not able to update the distribution. Internal server error."
+    responseModels:
+      application/json: "StandardResponse"

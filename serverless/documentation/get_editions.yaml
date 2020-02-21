@@ -1,0 +1,36 @@
+summary: "Get all editions"
+description: "Retrieves all editions"
+pathParams:
+  - name: "dataset-id"
+    description: "The dataset which contains the editions you want to retrieve"
+    required: true
+    schema:
+      type: "string"
+      pattern: "^[-a-z0-9_]+$"
+  - name: "version"
+    description: "The version of the editions you want to retrieve"
+    required: true
+    schema:
+      type: "string"
+      pattern: "^[-a-z0-9_]+$"
+methodResponses:
+  - statusCode: "200"
+    responseBody:
+      description: "Editions retrieved successfully"
+    responseModels:
+      application/json: "Editions"
+  - statusCode: "401"
+    responseBody:
+      description: "Authentication failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "403"
+    responseBody:
+      description: "Authorization failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "500"
+    responseBody:
+      description: "Was not able to retrieve the editions. Internal server error."
+    responseModels:
+      application/json: "StandardResponse"

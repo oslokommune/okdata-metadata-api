@@ -1,6 +1,0 @@
-name: CreateResponse
-description: Response from post
-contentType: application/json
-schema:
-  type: string
-  description: ID for created resource

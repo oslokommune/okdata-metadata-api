@@ -1,0 +1,26 @@
+description: "Create a new dataset"
+requestBody:
+  description: "A dataset object"
+requestModels:
+  application/json: "Dataset"
+methodResponses:
+  - statusCode: "201"
+    responseBody:
+      description: "Dataset object created"
+    responseModels:
+      application/json: "Dataset"
+  - statusCode: "400"
+    responseBody:
+      description: "User error"
+    responseModels:
+      application/json: "UserErrorResponse"
+  - statusCode: "401"
+    responseBody:
+      description: "Authentication failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "500"
+    responseBody:
+      description: "Was not able to post the dataset. Internal server error."
+    responseModels:
+      application/json: "StandardResponse"

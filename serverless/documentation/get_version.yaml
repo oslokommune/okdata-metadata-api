@@ -1,0 +1,41 @@
+summary: "Get a version"
+description: "Retrieves a specific version"
+pathParams:
+  - name: "dataset-id"
+    description: "The dataset containing the version you want to retrieve"
+    required: true
+    schema:
+      type: "string"
+      pattern: "^[-a-z0-9_]+$"
+  - name: "version"
+    description: "The version you wish to retrieve"
+    required: true
+    schema:
+      type: "string"
+      pattern: "^[-a-z0-9_]+$"
+methodResponses:
+  - statusCode: "200"
+    responseBody:
+      description: "Dataset retrieved successfully"
+    responseModels:
+      application/json: "Version"
+  - statusCode: "401"
+    responseBody:
+      description: "Authentication failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "403"
+    responseBody:
+      description: "Authorization failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "404"
+    responseBody:
+      description: "Version does not exist"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "500"
+    responseBody:
+      description: "Was not able to retrieve the version. Internal server error."
+    responseModels:
+      application/json: "StandardResponse"

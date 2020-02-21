@@ -5,21 +5,4 @@ events:
       method: "post"
       cors: true
       authorizer: ${file(serverless/kc-authorizer.yaml)}
-      documentation:
-        summary: "Post a dataset"
-        description: "Posts a new dataset"
-        requestBody:
-          description: "A dataset object"
-        requestModels:
-          application/json: "Dataset"
-        methodResponses:
-        - statusCode: "200"
-          responseBody:
-            description: "Dataset posted successfully"
-          responseModels:
-            application/json: "CreateResponse"
-        - statusCode: "500"
-          responseBody:
-            description: "Was not able to post the dataset. Internal server error."
-          responseModels:
-            application/json: "ErrorResponse"
+      documentation: ${file(serverless/documentation/create_dataset.yaml)}
