@@ -1,9 +1,9 @@
 ---
 swagger: "2.0"
 info:
-  version: "2020-02-21T12:19:33Z"
-  title: "dev-metadata-api"
-host: "api.data-dev.oslo.systems"
+  version: "2020-02-21T13:27:03Z"
+  title: "prod-metadata-api"
+host: "api.data.oslo.systems"
 basePath: "/metadata"
 schemes:
 - "https"
@@ -45,10 +45,10 @@ paths:
         schema:
           $ref: "#/definitions/Dataset"
       responses:
-        200:
-          description: "200 response"
+        201:
+          description: "201 response"
           schema:
-            $ref: "#/definitions/StandardResponse"
+            $ref: "#/definitions/Dataset"
         400:
           description: "400 response"
           schema:
@@ -136,7 +136,7 @@ paths:
         200:
           description: "200 response"
           schema:
-            $ref: "#/definitions/StandardResponse"
+            $ref: "#/definitions/Dataset"
         500:
           description: "500 response"
           schema:
@@ -204,10 +204,10 @@ paths:
         schema:
           $ref: "#/definitions/Version"
       responses:
-        200:
-          description: "200 response"
+        201:
+          description: "201 response"
           schema:
-            $ref: "#/definitions/StandardResponse"
+            $ref: "#/definitions/Version"
         400:
           description: "400 response"
           schema:
@@ -309,7 +309,7 @@ paths:
         200:
           description: "200 response"
           schema:
-            $ref: "#/definitions/StandardResponse"
+            $ref: "#/definitions/Version"
         500:
           description: "500 response"
           schema:
@@ -387,10 +387,10 @@ paths:
         schema:
           $ref: "#/definitions/Edition"
       responses:
-        200:
-          description: "200 response"
+        201:
+          description: "201 response"
           schema:
-            $ref: "#/definitions/StandardResponse"
+            $ref: "#/definitions/Edition"
         400:
           description: "400 response"
           schema:
@@ -502,7 +502,7 @@ paths:
         200:
           description: "200 response"
           schema:
-            $ref: "#/definitions/StandardResponse"
+            $ref: "#/definitions/Edition"
         500:
           description: "500 response"
           schema:
@@ -590,10 +590,10 @@ paths:
         schema:
           $ref: "#/definitions/Distribution"
       responses:
-        200:
-          description: "200 response"
+        201:
+          description: "201 response"
           schema:
-            $ref: "#/definitions/StandardResponse"
+            $ref: "#/definitions/Version"
         400:
           description: "400 response"
           schema:
@@ -715,7 +715,7 @@ paths:
         200:
           description: "200 response"
           schema:
-            $ref: "#/definitions/StandardResponse"
+            $ref: "#/definitions/Distribution"
         500:
           description: "500 response"
           schema:
