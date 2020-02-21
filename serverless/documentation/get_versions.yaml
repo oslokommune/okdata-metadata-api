@@ -17,4 +17,4 @@ methodResponses:
     responseBody:
       description: "Was not able to retrieve the versions. Internal server error."
     responseModels:
-      application/json: "ErrorResponse"
+      application/json: "StandardResponse"

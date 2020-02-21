@@ -1,0 +1,17 @@
+name: UserErrorResponse
+description: Response on user errors
+contentType: application/json
+schema:
+  type: object
+  required:
+    - message
+    - errors
+  properties:
+    message:
+      type: string
+      description: A message of what went wrong
+    errors:
+      type: array
+      description: List of information on why the request failed
+      items:
+        type: string

@@ -34,9 +34,9 @@ methodResponses:
     responseBody:
       description: "Distribution updated successfully"
     responseModels:
-      application/json: "CreateResponse"
+      application/json: "StandardResponse"
   - statusCode: "500"
     responseBody:
       description: "Was not able to update the distribution. Internal server error."
     responseModels:
-      application/json: "ErrorResponse"
+      application/json: "StandardResponse"

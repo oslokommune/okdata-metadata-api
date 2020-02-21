@@ -35,4 +35,4 @@ methodResponses:
     responseBody:
       description: "Was not able to retrieve the distribution. Internal server error."
     responseModels:
-      application/json: "ErrorResponse"
+      application/json: "StandardResponse"

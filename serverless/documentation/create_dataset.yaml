@@ -9,9 +9,9 @@ methodResponses:
   responseBody:
     description: "Dataset posted successfully"
   responseModels:
-    application/json: "CreateResponse"
+    application/json: "StandardResponse"
 - statusCode: "500"
   responseBody:
     description: "Was not able to post the dataset. Internal server error."
   responseModels:
-    application/json: "ErrorResponse"
+    application/json: "StandardResponse"

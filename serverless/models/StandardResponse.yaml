@@ -1,0 +1,10 @@
+name: StandardResponse
+description: Standard response structure
+contentType: application/json
+schema:
+  type: object
+  required:
+    - message
+  properties:
+    message:
+      type: string

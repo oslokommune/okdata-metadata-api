@@ -78,8 +78,8 @@ custom:
       title: 'Metadata-api'
       description: 'Metadata-api for dataplattform'
     models:
-      - ${file(serverless/models/ErrorResponse.yaml)}
-      - ${file(serverless/models/CreateResponse.yaml)}
+      - ${file(serverless/models/UserErrorResponse.yaml)}
+      - ${file(serverless/models/StandardResponse.yaml)}
       - ${file(serverless/models/Dataset.yaml)}
       - ${file(serverless/models/Edition.yaml)}
       - ${file(serverless/models/Version.yaml)}
