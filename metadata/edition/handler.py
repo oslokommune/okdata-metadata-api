@@ -77,7 +77,10 @@ def update_edition(event, context):
     except KeyError:
         return common.error_response(404, "Edition not found.")
     except ValueError as e:
-        return common.error_response(400, f"Error updating edition: {e}")
+        log_exception(e)
+        return common.error_response(
+            500, f"Error updating edition. RequestId: {context.aws_request_id}"
+        )
 
 
 @logging_wrapper

@@ -71,7 +71,10 @@ def update_version(event, context):
     except InvalidVersionError as e:
         return common.error_response(409, f"Invalid version data: {e}")
     except ValueError as e:
-        return common.error_response(400, f"Error updating version: {e}")
+        log_exception(e)
+        return common.error_response(
+            500, f"Error updating version. RequestId: {context.aws_request_id}"
+        )
 
 
 @logging_wrapper

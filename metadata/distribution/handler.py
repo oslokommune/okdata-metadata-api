@@ -87,7 +87,10 @@ def update_distribution(event, context):
     except KeyError:
         return common.error_response(404, "Distribution not found.")
     except ValueError as e:
-        return common.error_response(400, f"Error updating distribution: {e}")
+        log_exception(e)
+        return common.error_response(
+            500, f"Error updating distribution. RequestId: {context.aws_request_id}"
+        )
 
 
 @logging_wrapper
