@@ -27,6 +27,21 @@ methodResponses:
   - statusCode: "200"
     responseModels:
       application/json: "StandardResponse"
+  - statusCode: "400"
+    responseBody:
+      description: "User error"
+    responseModels:
+      application/json: "UserErrorResponse"
+  - statusCode: "401"
+    responseBody:
+      description: "Authentication failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "403"
+    responseBody:
+      description: "Authorization failed"
+    responseModels:
+      application/json: "StandardResponse"
   - statusCode: "500"
     responseBody:
       description: "Was not able to post the distribution. Internal server error."

@@ -6,6 +6,16 @@ methodResponses:
       description: "Datasets retrieved successfully"
     responseModels:
       application/json: "Datasets"
+  - statusCode: "401"
+    responseBody:
+      description: "Authentication failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "403"
+    responseBody:
+      description: "Authorization failed"
+    responseModels:
+      application/json: "StandardResponse"
   - statusCode: "500"
     responseBody:
       description: "Was not able to retrieve the datasets. Internal server error."

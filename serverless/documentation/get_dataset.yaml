@@ -13,6 +13,21 @@ methodResponses:
       description: "Dataset retrieved successfully"
     responseModels:
       application/json: "Dataset"
+  - statusCode: "401"
+    responseBody:
+      description: "Authentication failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "403"
+    responseBody:
+      description: "Authorization failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "404"
+    responseBody:
+      description: "Dataset does not exist"
+    responseModels:
+      application/json: "StandardResponse"
   - statusCode: "500"
     responseBody:
       description: "Was not able to retrieve the dataset. Internal server error."

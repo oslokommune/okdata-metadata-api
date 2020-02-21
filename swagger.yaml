@@ -1,7 +1,7 @@
 ---
 swagger: "2.0"
 info:
-  version: "2020-02-21T09:34:42Z"
+  version: "2020-02-21T12:19:33Z"
   title: "dev-metadata-api"
 host: "api.data-dev.oslo.systems"
 basePath: "/metadata"
@@ -22,10 +22,17 @@ paths:
         500:
           description: "500 response"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        403:
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
     post:
-      summary: "Post a dataset"
-      description: "Posts a new dataset"
+      description: "Create a new dataset"
       consumes:
       - "application/json"
       produces:
@@ -41,11 +48,19 @@ paths:
         200:
           description: "200 response"
           schema:
-            $ref: "#/definitions/CreateResponse"
+            $ref: "#/definitions/StandardResponse"
+        400:
+          description: "400 response"
+          schema:
+            $ref: "#/definitions/UserErrorResponse"
         500:
           description: "500 response"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
     options:
@@ -85,7 +100,19 @@ paths:
         500:
           description: "500 response"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        403:
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        404:
+          description: "404 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
     put:
       summary: "Update a dataset"
       description: "Updates an existing dataset"
@@ -109,11 +136,23 @@ paths:
         200:
           description: "200 response"
           schema:
-            $ref: "#/definitions/CreateResponse"
+            $ref: "#/definitions/StandardResponse"
         500:
           description: "500 response"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        403:
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        404:
+          description: "404 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
   /datasets/{dataset-id}/versions:
@@ -136,7 +175,15 @@ paths:
         500:
           description: "500 response"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        403:
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
     post:
       summary: "Create new version"
       description: "Creates a version"
@@ -160,11 +207,23 @@ paths:
         200:
           description: "200 response"
           schema:
-            $ref: "#/definitions/CreateResponse"
+            $ref: "#/definitions/StandardResponse"
+        400:
+          description: "400 response"
+          schema:
+            $ref: "#/definitions/UserErrorResponse"
         500:
           description: "500 response"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        403:
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
     options:
@@ -209,7 +268,19 @@ paths:
         500:
           description: "500 response"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        403:
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        404:
+          description: "404 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
     put:
       summary: "Update a version"
       description: "Updates an existing version"
@@ -238,11 +309,23 @@ paths:
         200:
           description: "200 response"
           schema:
-            $ref: "#/definitions/CreateResponse"
+            $ref: "#/definitions/StandardResponse"
         500:
           description: "500 response"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        403:
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        404:
+          description: "404 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
   /datasets/{dataset-id}/versions/{version}/editions:
@@ -270,7 +353,15 @@ paths:
         500:
           description: "500 response"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        403:
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
     post:
       summary: "Post an edition"
       description: "Posts a new edition"
@@ -299,11 +390,23 @@ paths:
         200:
           description: "200 response"
           schema:
-            $ref: "#/definitions/CreateResponse"
+            $ref: "#/definitions/StandardResponse"
+        400:
+          description: "400 response"
+          schema:
+            $ref: "#/definitions/UserErrorResponse"
         500:
           description: "500 response"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        403:
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
     options:
@@ -353,7 +456,19 @@ paths:
         500:
           description: "500 response"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        403:
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        404:
+          description: "404 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
     put:
       summary: "Update an edition"
       description: "Updates an existing edition"
@@ -387,11 +502,23 @@ paths:
         200:
           description: "200 response"
           schema:
-            $ref: "#/definitions/CreateResponse"
+            $ref: "#/definitions/StandardResponse"
         500:
           description: "500 response"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        403:
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        404:
+          description: "404 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
   /datasets/{dataset-id}/versions/{version}/editions/{edition}/distributions:
@@ -424,7 +551,15 @@ paths:
         500:
           description: "500 response"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        403:
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
     post:
       summary: "Post a dataset"
       description: "Posts a new dataset"
@@ -458,11 +593,23 @@ paths:
         200:
           description: "200 response"
           schema:
-            $ref: "#/definitions/CreateResponse"
+            $ref: "#/definitions/StandardResponse"
+        400:
+          description: "400 response"
+          schema:
+            $ref: "#/definitions/UserErrorResponse"
         500:
           description: "500 response"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        403:
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
     options:
@@ -517,8 +664,22 @@ paths:
         500:
           description: "500 response"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        403:
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        404:
+          description: "404 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
     put:
+      summary: "Update a distribution"
+      description: "Updates an existing distribution"
       consumes:
       - "application/json"
       produces:
@@ -526,25 +687,27 @@ paths:
       parameters:
       - name: "version"
         in: "path"
-        description: "The version which contains the edition you want to update"
+        description: "The version which contains the distribution you want to update"
         required: true
         type: "string"
       - name: "dataset-id"
         in: "path"
-        description: "The dataset which contains the edition you want to update"
+        description: "The dataset which contains the distribution you want to update"
         required: true
         type: "string"
       - name: "edition"
         in: "path"
-        description: "The edition you want to update"
+        description: "The edition which contains the distribution you want to update"
         required: true
         type: "string"
       - name: "distribution"
         in: "path"
+        description: "The distribution you want to update"
         required: true
         type: "string"
       - in: "body"
         name: "Distribution"
+        description: "The new object"
         required: true
         schema:
           $ref: "#/definitions/Distribution"
@@ -552,11 +715,23 @@ paths:
         200:
           description: "200 response"
           schema:
-            $ref: "#/definitions/CreateResponse"
+            $ref: "#/definitions/StandardResponse"
         500:
           description: "500 response"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        403:
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        404:
+          description: "404 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
 securityDefinitions:
@@ -732,6 +907,14 @@ definitions:
           format: "date"
       required:
       - "edition"
+  StandardResponse:
+    type: "object"
+    required:
+    - "message"
+    properties:
+      message:
+        type: "string"
+    description: "Standard response structure"
   Version:
     type: "object"
     required:
@@ -743,9 +926,6 @@ definitions:
         maxLength: 128
     title: "Version"
     description: "Create a version"
-  CreateResponse:
-    type: "string"
-    description: "Response from post"
   Dataset:
     type: "object"
     required:
@@ -884,6 +1064,21 @@ definitions:
         maxLength: 255
     title: "Distribution"
     description: "This is a distribution"
+  UserErrorResponse:
+    type: "object"
+    required:
+    - "errors"
+    - "message"
+    properties:
+      message:
+        type: "string"
+        description: "A message of what went wrong"
+      errors:
+        type: "array"
+        description: "List of information on why the request failed"
+        items:
+          type: "string"
+    description: "Response on user errors"
   Edition:
     type: "object"
     required:
@@ -917,12 +1112,3 @@ definitions:
           maxLength: 255
       required:
       - "filename"
-  ErrorResponse:
-    type: "object"
-    required:
-    - "message"
-    properties:
-      message:
-        type: "string"
-        description: "A mesage of what went wrong"
-    description: "An error response"

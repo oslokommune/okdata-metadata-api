@@ -25,6 +25,16 @@ methodResponses:
       description: "Distributions retrieved successfully"
     responseModels:
       application/json: "Distributions"
+  - statusCode: "401"
+    responseBody:
+      description: "Authentication failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "403"
+    responseBody:
+      description: "Authorization failed"
+    responseModels:
+      application/json: "StandardResponse"
   - statusCode: "500"
     responseBody:
       description: "Was not able to retrieve the distributions. Internal server error."

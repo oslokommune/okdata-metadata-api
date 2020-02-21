@@ -29,6 +29,21 @@ methodResponses:
       description: "Edition updated successfully"
     responseModels:
       application/json: "StandardResponse"
+  - statusCode: "401"
+    responseBody:
+      description: "Authentication failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "403"
+    responseBody:
+      description: "Authorization failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "404"
+    responseBody:
+      description: "Edition does not exist"
+    responseModels:
+      application/json: "StandardResponse"
   - statusCode: "500"
     responseBody:
       description: "Was not able to update the edition. Internal server error."
