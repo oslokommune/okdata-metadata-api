@@ -4,28 +4,4 @@ events:
       path: "/datasets/{dataset-id}"
       method: "put"
       authorizer: ${file(serverless/kc-authorizer.yaml)}
-      documentation:
-        summary: "Update a dataset"
-        description: "Updates an existing dataset"
-        requestBody:
-          description: "The new object"
-        requestModels:
-          application/json: Dataset
-        pathParams:
-          - name: "dataset-id"
-            description: "The dataset you want to update"
-            required: true
-            schema:
-              type: "string"
-              pattern: "^[-a-z0-9_]+$"
-        methodResponses:
-          - statusCode: "200"
-            responseBody:
-              description: "Dataset updated successfully"
-            responseModels:
-              application/json: "CreateResponse"
-          - statusCode: "500"
-            responseBody:
-              description: "Was not able to update the dataset. Internal server error."
-            responseModels:
-              application/json: "ErrorResponse"
+      documentation: ${file(serverless/documentation/update_dataset.yaml)}

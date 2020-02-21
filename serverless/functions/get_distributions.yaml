@@ -3,36 +3,4 @@ events:
   - http:
       path: "datasets/{dataset-id}/versions/{version}/editions/{edition}/distributions"
       method: "get"
-      documentation:
-        summary: "Get all distributions"
-        description: "Retrieves all distributions"
-        pathParams:
-          - name: "dataset-id"
-            description: "The dataset which contains the distributions you want to retrieve"
-            required: true
-            schema:
-              type: "string"
-              pattern: "^[-a-z0-9_]+$"
-          - name: "version"
-            description: "The version of the distributions you want to retrieve"
-            required: true
-            schema:
-              type: "string"
-              pattern: "^[-a-z0-9_]+$"
-          - name: "edition"
-            description: "The edition which contains the distributions you want to retrieve"
-            required: true
-            schema:
-              type: "string"
-              pattern: "^[-a-z0-9_]+$"
-        methodResponses:
-          - statusCode: "200"
-            responseBody:
-              description: "Distributions retrieved successfully"
-            responseModels:
-              application/json: "Distributions"
-          - statusCode: "500"
-            responseBody:
-              description: "Was not able to retrieve the distributions. Internal server error."
-            responseModels:
-              application/json: "ErrorResponse"
+      documentation: ${file(serverless/documentation/get_distributions.yaml)}

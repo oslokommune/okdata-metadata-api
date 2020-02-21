@@ -5,32 +5,4 @@ events:
       method: "post"
       cors: true
       authorizer: ${file(serverless/kc-authorizer.yaml)}
-      documentation:
-        summary: "Post an edition"
-        description: "Posts a new edition"
-        requestBody:
-          description: "A dataset object"
-        requestModels:
-          application/json: Edition
-        pathParams:
-          - name: "dataset-id"
-            description: "The dataset for which to create a new edition"
-            required: true
-            schema:
-              type: "string"
-              pattern: "^[-a-z0-9_]+$"
-          - name: "version"
-            description: "The version of the given dataset for which to create a new edition"
-            required: true
-            schema:
-              type: "string"
-              pattern: "^[-a-z0-9_]+$"
-        methodResponses:
-          - statusCode: "200"
-            responseModels:
-              application/json: "CreateResponse"
-          - statusCode: "500"
-            responseBody:
-              description: "Was not able to post the edition. Internal server error."
-            responseModels:
-              application/json: "ErrorResponse"
+      documentation: ${file(serverless/documentation/create_edition.yaml)}

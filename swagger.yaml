@@ -1,9 +1,9 @@
 ---
 swagger: "2.0"
 info:
-  version: "2019-10-23T13:16:01Z"
-  title: "prod-metadata-api"
-host: "api.data.oslo.systems"
+  version: "2020-02-21T09:34:42Z"
+  title: "dev-metadata-api"
+host: "api.data-dev.oslo.systems"
 basePath: "/metadata"
 schemes:
 - "https"
@@ -519,8 +519,6 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
     put:
-      summary: "Update a distribution"
-      description: "Updates an existing distribution"
       consumes:
       - "application/json"
       produces:
@@ -528,27 +526,25 @@ paths:
       parameters:
       - name: "version"
         in: "path"
-        description: "The version which contains the distribution you want to update"
+        description: "The version which contains the edition you want to update"
         required: true
         type: "string"
       - name: "dataset-id"
         in: "path"
-        description: "The dataset which contains the distribution you want to update"
+        description: "The dataset which contains the edition you want to update"
         required: true
         type: "string"
       - name: "edition"
         in: "path"
-        description: "The edition which contains the distribution you want to update"
+        description: "The edition you want to update"
         required: true
         type: "string"
       - name: "distribution"
         in: "path"
-        description: "The distribution you want to update"
         required: true
         type: "string"
       - in: "body"
         name: "Distribution"
-        description: "The new object"
         required: true
         schema:
           $ref: "#/definitions/Distribution"

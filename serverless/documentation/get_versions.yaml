@@ -1,0 +1,20 @@
+summary: "Get all versions"
+description: "Retrieves all versions"
+pathParams:
+  - name: "dataset-id"
+    description: "The dataset which contains the versions you want to retrieve"
+    required: true
+    schema:
+      type: "string"
+      pattern: "^[-a-z0-9_]+$"
+methodResponses:
+  - statusCode: "200"
+    responseBody:
+      description: "Versions retrieved successfully"
+    responseModels:
+      application/json: "Versions"
+  - statusCode: "500"
+    responseBody:
+      description: "Was not able to retrieve the versions. Internal server error."
+    responseModels:
+      application/json: "ErrorResponse"
