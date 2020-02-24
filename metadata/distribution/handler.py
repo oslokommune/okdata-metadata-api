@@ -48,12 +48,8 @@ def create_distribution(event, context):
         return common.error_response(409, f"Resource Conflict: {d}")
     except Exception as e:
         log_exception(e)
-        return common.response(
-            500,
-            {
-                "message": f"Error creating distribution. RequestId: {context.aws_request_id}"
-            },
-        )
+        message = f"Error creating distribution. RequestId: {context.aws_request_id}"
+        return common.response(500, {"message": message},)
 
 
 @logging_wrapper
@@ -91,12 +87,8 @@ def update_distribution(event, context):
         return common.error_response(404, "Distribution not found.")
     except ValueError as e:
         log_exception(e)
-        return common.response(
-            500,
-            {
-                "message": f"Error updating distribution. RequestId: {context.aws_request_id}"
-            },
-        )
+        message = f"Error updating distribution. RequestId: {context.aws_request_id}"
+        return common.response(500, {"message": message},)
 
 
 @logging_wrapper
