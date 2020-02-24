@@ -44,8 +44,13 @@ class TestCreateVersion:
         bad_version_event = create_event
         bad_version_event["pathParameters"]["dataset-id"] = "ID NOT PRESENT"
 
-        response = version_handler.create_version(bad_version_event, None)
-        assert response["statusCode"] == 400
+        response = version_handler.create_version(
+            bad_version_event, common_test_helper.Context("1234")
+        )
+        assert response["statusCode"] == 500
+        assert json.loads(response["body"]) == {
+            "message": "Error creating version. RequestId: 1234"
+        }
 
     def test_create_version_invalid_version_latest(self, auth_event):
         dataset_id = "my-dataset"

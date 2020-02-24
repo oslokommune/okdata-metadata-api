@@ -46,8 +46,9 @@ def create_edition(event, context):
         return common.error_response(409, f"Resource Conflict: {d}")
     except Exception as e:
         log_exception(e)
-        return common.error_response(
-            500, f"Error creating Edition. RequestId: {context.aws_request_id}"
+        return common.response(
+            500,
+            {"message": f"Error creating edition. RequestId: {context.aws_request_id}"},
         )
 
 
@@ -78,8 +79,9 @@ def update_edition(event, context):
         return common.error_response(404, "Edition not found.")
     except ValueError as e:
         log_exception(e)
-        return common.error_response(
-            500, f"Error updating edition. RequestId: {context.aws_request_id}"
+        return common.response(
+            500,
+            {"message": f"Error updating edition. RequestId: {context.aws_request_id}"},
         )
 
 

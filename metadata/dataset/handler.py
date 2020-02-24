@@ -39,8 +39,9 @@ def create_dataset(event, context):
         return common.error_response(409, f"Resource Conflict: {d}")
     except Exception as e:
         log_exception(e)
-        return common.error_response(
-            500, f"Error creating dataset. RequestId: {context.aws_request_id}"
+        return common.response(
+            500,
+            {"message": f"Error creating dataset. RequestId: {context.aws_request_id}"},
         )
 
 
@@ -66,8 +67,9 @@ def update_dataset(event, context):
         return common.error_response(404, "Dataset not found.")
     except ValueError as e:
         log_exception(e)
-        return common.error_response(
-            500, f"Error updating dataset. RequestId: {context.aws_request_id}"
+        return common.response(
+            500,
+            {"message": f"Error updating dataset. RequestId: {context.aws_request_id}"},
         )
 
 

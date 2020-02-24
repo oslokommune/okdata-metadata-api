@@ -37,8 +37,13 @@ class TestCreateDistribution:
         bad_create_event = create_event
         bad_create_event["pathParameters"]["edition"] = "LOLOLFEIL"
 
-        response = distribution_handler.create_distribution(bad_create_event, None)
-        assert response["statusCode"] == 400
+        response = distribution_handler.create_distribution(
+            bad_create_event, common_test_helper.Context("1234")
+        )
+        assert response["statusCode"] == 500
+        assert json.loads(response["body"]) == {
+            "message": "Error creating distribution. RequestId: 1234"
+        }
 
     def test_forbidden(self, metadata_table, auth_event, put_edition, auth_denied):
         dataset_id, version, edition = put_edition

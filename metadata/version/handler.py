@@ -42,8 +42,9 @@ def create_version(event, context):
         return common.error_response(409, f"Resource Conflict: {d}")
     except Exception as e:
         log_exception(e)
-        return common.error_response(
-            500, f"Error creating version. RequestId: {context.aws_request_id}"
+        return common.response(
+            500,
+            {"message": f"Error creating version. RequestId: {context.aws_request_id}"},
         )
 
 
@@ -72,8 +73,9 @@ def update_version(event, context):
         return common.error_response(409, f"Invalid version data: {e}")
     except ValueError as e:
         log_exception(e)
-        return common.error_response(
-            500, f"Error updating version. RequestId: {context.aws_request_id}"
+        return common.response(
+            500,
+            {"message": f"Error updating version. RequestId: {context.aws_request_id}"},
         )
 
 
