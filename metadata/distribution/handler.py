@@ -2,7 +2,7 @@ import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 
 from auth import SimpleAuth
-from dataplatform.awslambda.logging import logging_wrapper, log_add
+from dataplatform.awslambda.logging import logging_wrapper, log_add, log_exception
 from metadata import common
 from metadata.error import ResourceConflict
 from metadata.common import validate_input
@@ -47,7 +47,9 @@ def create_distribution(event, context):
     except ResourceConflict as d:
         return common.error_response(409, f"Resource Conflict: {d}")
     except Exception as e:
-        return common.error_response(400, f"Error creating distribution: {e}")
+        log_exception(e)
+        message = f"Error creating distribution. RequestId: {context.aws_request_id}"
+        return common.response(500, {"message": message},)
 
 
 @logging_wrapper
@@ -84,7 +86,9 @@ def update_distribution(event, context):
     except KeyError:
         return common.error_response(404, "Distribution not found.")
     except ValueError as e:
-        return common.error_response(400, f"Error updating distribution: {e}")
+        log_exception(e)
+        message = f"Error updating distribution. RequestId: {context.aws_request_id}"
+        return common.response(500, {"message": message},)
 
 
 @logging_wrapper

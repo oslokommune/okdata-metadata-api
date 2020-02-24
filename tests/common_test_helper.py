@@ -103,3 +103,8 @@ raw_distribution = {"filename": "BOOOM.csv"}
 
 
 distribution_updated = {"filename": "UPDATED.csv"}
+
+
+class Context:
+    def __init__(self, aws_request_id):
+        self.aws_request_id = aws_request_id

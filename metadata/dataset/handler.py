@@ -3,7 +3,7 @@ import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 
 from auth import SimpleAuth
-from dataplatform.awslambda.logging import logging_wrapper, log_add
+from dataplatform.awslambda.logging import logging_wrapper, log_add, log_exception
 from metadata import common
 from metadata.error import ResourceConflict
 from metadata.common import validate_input
@@ -20,7 +20,6 @@ validator = Validator("dataset")
 @xray_recorder.capture("create_dataset")
 def create_dataset(event, context):
     """POST /datasets"""
-
     content = json.loads(event["body"])
 
     try:
@@ -39,7 +38,9 @@ def create_dataset(event, context):
     except ResourceConflict as d:
         return common.error_response(409, f"Resource Conflict: {d}")
     except Exception as e:
-        return common.error_response(400, f"Error creating dataset: {e}")
+        log_exception(e)
+        message = f"Error creating dataset. RequestId: {context.aws_request_id}"
+        return common.response(500, {"message": message},)
 
 
 @logging_wrapper
@@ -63,7 +64,9 @@ def update_dataset(event, context):
     except KeyError:
         return common.error_response(404, "Dataset not found.")
     except ValueError as e:
-        return common.error_response(400, f"Error updating dataset: {e}")
+        log_exception(e)
+        message = f"Error updating dataset. RequestId: {context.aws_request_id}"
+        return common.response(500, {"message": message},)
 
 
 @logging_wrapper
