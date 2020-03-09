@@ -66,7 +66,8 @@ def update_version(event, context):
         add_self_url(body)
         return common.response(200, body)
     except KeyError:
-        return common.error_response(404, "Version not found.")
+        message = "Version not found."
+        return common.response(404, {"message": message})
     except InvalidVersionError as e:
         return common.error_response(409, f"Invalid version data: {e}")
     except ValueError as e:
@@ -105,7 +106,8 @@ def get_version(event, context):
         add_self_url(content)
         return common.response(200, content)
     else:
-        return common.error_response(404, "Version not found.")
+        message = "Version not found."
+        return common.response(404, {"message": message})
 
 
 def add_self_url(version):

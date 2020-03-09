@@ -62,7 +62,8 @@ def update_dataset(event, context):
         add_self_url(body)
         return common.response(200, body)
     except KeyError:
-        return common.error_response(404, "Dataset not found.")
+        message = "Dataset not found"
+        return common.response(404, {"message": message})
     except ValueError as e:
         log_exception(e)
         message = f"Error updating dataset. RequestId: {context.aws_request_id}"
@@ -96,7 +97,8 @@ def get_dataset(event, context):
         add_self_url(dataset)
         return common.response(200, dataset)
     else:
-        return common.error_response(404, "Dataset not found.")
+        message = "Dataset not found."
+        return common.response(404, {"message": message})
 
 
 def add_self_url(dataset):

@@ -84,7 +84,8 @@ def update_distribution(event, context):
         add_self_url(body)
         return common.response(200, body)
     except KeyError:
-        return common.error_response(404, "Distribution not found.")
+        message = "Distribution not found."
+        return common.response(404, {"message": message})
     except ValueError as e:
         log_exception(e)
         message = f"Error updating distribution. RequestId: {context.aws_request_id}"
@@ -135,7 +136,8 @@ def get_distribution(event, context):
         add_self_url(content)
         return common.response(200, content)
     else:
-        return common.error_response(404, "Distribution not found.")
+        message = "Distribution not found."
+        return common.response(404, {"message": message})
 
 
 def add_self_url(distribution):

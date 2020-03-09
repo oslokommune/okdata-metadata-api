@@ -110,3 +110,4 @@ class TestDistribution:
         )
         response = distribution_handler.get_distribution(event_for_get, None)
         assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == {"message": "Distribution not found."}

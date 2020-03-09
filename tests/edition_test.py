@@ -152,3 +152,4 @@ class TestEdition:
         event_for_get = event({}, "1234", "1", "20190401T133700")
         response = edition_handler.get_edition(event_for_get, None)
         assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == {"message": "Edition not found."}

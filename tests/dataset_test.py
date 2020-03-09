@@ -106,6 +106,7 @@ class TestUpdateDataset:
         response = dataset_handler.get_dataset(event_for_get, None)
 
         assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == {"message": "Dataset not found."}
 
     def test_slugify(self):
         title = (

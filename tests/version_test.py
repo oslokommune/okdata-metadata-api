@@ -198,3 +198,4 @@ class TestVersion:
         response = version_handler.get_version(get_event, None)
 
         assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == {"message": "Version not found."}
