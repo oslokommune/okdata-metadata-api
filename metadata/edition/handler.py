@@ -74,7 +74,8 @@ def update_edition(event, context):
         add_self_url(body)
         return common.response(200, body)
     except KeyError:
-        return common.error_response(404, "Edition not found.")
+        message = "Edition not found."
+        return common.response(404, {"message": message})
     except ValueError as e:
         log_exception(e)
         message = f"Error updating edition. RequestId: {context.aws_request_id}"
@@ -113,7 +114,8 @@ def get_edition(event, context):
         add_self_url(content)
         return common.response(200, content)
     else:
-        return common.error_response(404, "Edition not found.")
+        message = "Edition not found."
+        return common.response(404, {"message": message})
 
 
 def add_self_url(edition):
