@@ -1,4 +1,4 @@
-frameworkVersion: ">=1.50.0 <2.0.0"
+frameworkVersion: ">=1.64.0 <2.0.0"
 service: metadata-api
 
 provider:
@@ -15,6 +15,7 @@ provider:
     apiGateway: true
   layers:
     - ${ssm:/dataplatform/python-base-lambda-layer/arn}
+  rolePermissionsBoundary: "arn:aws:iam::#{AWS::AccountId}:policy/oslokommune/oslokommune-boundary"
   iamManagedPolicies:
     - Fn::Join:
       - ':'
