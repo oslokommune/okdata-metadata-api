@@ -54,7 +54,6 @@ raw_dataset = {
     "accrualPeriodicity": "hourly",
     "accessRights": "non-public",
     "confidentiality": "green",
-    "processing_stage": "raw",
     "objective": "Formålsbeskrivelse",
     "contactPoint": {
         "name": "Tim",
@@ -71,7 +70,6 @@ dataset_updated = {
     "accrualPeriodicity": "hourly",
     "accessRights": "restricted",
     "confidentiality": "red",
-    "processing_stage": "raw",
     "objective": "Formålsbeskrivelse",
     "contactPoint": {
         "name": "Tim",

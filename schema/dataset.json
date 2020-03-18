@@ -35,15 +35,6 @@
         ]
       }
     },
-    "processing_stage": {
-      "description": "In what stage is the dataset stored.",
-      "type": "string",
-      "enum": [
-        "incoming",
-        "raw",
-        "processed"
-      ]
-    },
     "accrualPeriodicity": {
       "description": "Indicates how often a dataset is updated",
       "type": "string",
@@ -148,7 +139,6 @@
   "required": [
     "title",
     "accessRights",
-    "processing_stage",
     "contactPoint",
     "publisher",
     "confidentiality"

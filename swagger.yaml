@@ -806,13 +806,6 @@ definitions:
             - "population and society"
             - "science and technology"
             - "transport"
-        processing_stage:
-          type: "string"
-          description: "In what stage is the dataset stored."
-          enum:
-          - "incoming"
-          - "raw"
-          - "processed"
         accrualPeriodicity:
           type: "string"
           description: "Indicates how often a dataset is updated"
@@ -868,7 +861,6 @@ definitions:
       - "accessRights"
       - "confidentiality"
       - "contactPoint"
-      - "processing_stage"
       - "publisher"
       - "title"
   Versions:
@@ -932,7 +924,6 @@ definitions:
     - "accessRights"
     - "confidentiality"
     - "contactPoint"
-    - "processing_stage"
     - "publisher"
     - "title"
     properties:
@@ -993,13 +984,6 @@ definitions:
           - "population and society"
           - "science and technology"
           - "transport"
-      processing_stage:
-        type: "string"
-        description: "In what stage is the dataset stored."
-        enum:
-        - "incoming"
-        - "raw"
-        - "processed"
       accrualPeriodicity:
         type: "string"
         description: "Indicates how often a dataset is updated"

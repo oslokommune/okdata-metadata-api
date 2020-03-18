@@ -9,7 +9,6 @@ distribution = Validator("distribution")
 
 valid_dataset = {
     "theme": ["environment"],
-    "processing_stage": "raw",
     "contactPoint": {
         "name": "Origo Dataplattform",
         "email": "dataplattform@oslo.kommune.no",
