@@ -5,7 +5,7 @@ from auth import SimpleAuth
 from dataplatform.awslambda.logging import logging_wrapper, log_add, log_exception
 from metadata import common
 from metadata.error import ResourceConflict
-from metadata.common import validate_input
+from metadata.common import validate_input, resources_exists
 from metadata.validator import Validator
 from metadata.version.repository import VersionRepository
 from metadata.error import InvalidVersionError
@@ -16,6 +16,7 @@ validator = Validator("version")
 
 @logging_wrapper
 @validate_input(validator)
+@resources_exists(dataset_required=True)
 @xray_recorder.capture("create_version")
 def create_version(event, context):
     """POST /datasets/:dataset-id/versions"""
@@ -48,6 +49,7 @@ def create_version(event, context):
 
 @logging_wrapper
 @validate_input(validator)
+@resources_exists(dataset_required=True)
 @xray_recorder.capture("update_version")
 def update_version(event, context):
     """PUT /datasets/:dataset-id/versions/:version"""
