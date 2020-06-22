@@ -1,7 +1,6 @@
 import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 
-from auth import SimpleAuth
 from dataplatform.awslambda.logging import logging_wrapper, log_add, log_exception
 from metadata import common
 from metadata.error import ResourceConflict

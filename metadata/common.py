@@ -1,4 +1,6 @@
 import simplejson as json
+
+from auth import SimpleAuth
 from metadata.dataset.repository import DatasetRepository
 
 ID_COLUMN = "Id"
