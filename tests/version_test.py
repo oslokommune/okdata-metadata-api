@@ -146,7 +146,7 @@ class TestUpdateVersion:
         )
         version_handler.update_version(update_event, None)
 
-        version_id = f"antall-besokende-pa-gjenbruksstasjoner/latest"
+        version_id = "antall-besokende-pa-gjenbruksstasjoner/latest"
 
         db_response = metadata_table.query(
             KeyConditionExpression=Key(table.ID_COLUMN).eq(version_id)

@@ -92,7 +92,7 @@ class TestUpdateEdition:
         body = json.loads(response["body"])
         edition_id = body["Id"]
         assert response["statusCode"] == 200
-        assert edition_id == f"antall-besokende-pa-gjenbruksstasjoner/6/20190528T133700"
+        assert edition_id == "antall-besokende-pa-gjenbruksstasjoner/6/20190528T133700"
 
         db_response = metadata_table.query(
             KeyConditionExpression=Key(table.ID_COLUMN).eq(edition_id)
