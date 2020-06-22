@@ -1,7 +1,5 @@
 import simplejson as json
 from metadata.dataset.repository import DatasetRepository
-from metadata.version.repository import VersionRepository
-from metadata.edition.repository import EditionRepository
 
 ID_COLUMN = "Id"
 TYPE_COLUMN = "Type"
