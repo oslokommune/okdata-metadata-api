@@ -5,7 +5,7 @@ from auth import SimpleAuth
 from dataplatform.awslambda.logging import logging_wrapper, log_add, log_exception
 from metadata import common
 from metadata.error import ResourceConflict
-from metadata.common import validate_input, resources_exists
+from metadata.common import check_auth, validate_input
 from metadata.validator import Validator
 from metadata.version.repository import VersionRepository
 from metadata.error import InvalidVersionError
@@ -16,7 +16,7 @@ validator = Validator("version")
 
 @logging_wrapper
 @validate_input(validator)
-@resources_exists(dataset_required=True)
+@check_auth
 @xray_recorder.capture("create_version")
 def create_version(event, context):
     """POST /datasets/:dataset-id/versions"""
@@ -24,9 +24,6 @@ def create_version(event, context):
     content = json.loads(event["body"])
     dataset_id = event["pathParameters"]["dataset-id"]
     log_add(dataset_id=dataset_id)
-
-    if not SimpleAuth().is_owner(event, dataset_id):
-        return common.error_response(403, "Forbidden")
 
     try:
         version_id = version_repository.create_version(dataset_id, content)
@@ -49,7 +46,7 @@ def create_version(event, context):
 
 @logging_wrapper
 @validate_input(validator)
-@resources_exists(dataset_required=True)
+@check_auth
 @xray_recorder.capture("update_version")
 def update_version(event, context):
     """PUT /datasets/:dataset-id/versions/:version"""
@@ -58,9 +55,6 @@ def update_version(event, context):
     dataset_id = event["pathParameters"]["dataset-id"]
     version = event["pathParameters"]["version"]
     log_add(dataset_id=dataset_id, version=version)
-
-    if not SimpleAuth().is_owner(event, dataset_id):
-        return common.error_response(403, "Forbidden")
 
     try:
         version_repository.update_version(dataset_id, version, content)
