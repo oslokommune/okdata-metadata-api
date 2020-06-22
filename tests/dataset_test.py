@@ -76,7 +76,8 @@ class TestUpdateDataset:
         dataset = common.raw_dataset.copy()
         response = dataset_handler.create_dataset(auth_event(dataset), None)
 
-        dataset_id = json.loads(response["body"])
+        body = json.loads(response["body"])
+        dataset_id = body["Id"]
         event_for_update = event(common.dataset_updated, dataset_id)
 
         response = dataset_handler.update_dataset(event_for_update, None)

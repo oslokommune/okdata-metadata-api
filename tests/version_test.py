@@ -47,10 +47,10 @@ class TestCreateVersion:
         response = version_handler.create_version(
             bad_version_event, common_test_helper.Context("1234")
         )
-        assert response["statusCode"] == 500
-        assert json.loads(response["body"]) == {
-            "message": "Error creating version. RequestId: 1234"
-        }
+        assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == [
+            {"message": "Dataset ID NOT PRESENT does not exist"}
+        ]
 
     def test_create_version_invalid_version_latest(self, auth_event):
         dataset_id = "my-dataset"
@@ -84,7 +84,7 @@ class TestCreateVersion:
     def test_forbidden(self, event, metadata_table, auth_denied):
         dataset = common_test_helper.raw_dataset.copy()
         dataset[table.ID_COLUMN] = "dataset-id"
-        dataset[table.TYPE_COLUMN] = "dataset"
+        dataset[table.TYPE_COLUMN] = "Dataset"
         metadata_table.put_item(Item=dataset)
 
         version = common_test_helper.raw_version
@@ -119,8 +119,10 @@ class TestUpdateVersion:
         version_from_db = db_response["Items"][0]
         assert version_from_db["version"] == "6"
 
-    def test_update_version_invalid_version_latest_in_body(self, auth_event):
-        dataset_id = "my-dataset"
+    def test_update_version_invalid_version_latest_in_body(
+        self, auth_event, put_dataset
+    ):
+        dataset_id = put_dataset
         version_name = common_test_helper.raw_version["version"]
         update_event = auth_event(
             common_test_helper.version_updated, dataset=dataset_id, version=version_name
