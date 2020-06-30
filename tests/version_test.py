@@ -41,17 +41,6 @@ class TestCreateVersion:
         assert version_from_db[table.ID_COLUMN] == version_id
         assert version_from_db[table.TYPE_COLUMN] == "Version"
 
-        bad_version_event = create_event
-        bad_version_event["pathParameters"]["dataset-id"] = "ID NOT PRESENT"
-
-        response = version_handler.create_version(
-            bad_version_event, common_test_helper.Context("1234")
-        )
-        assert response["statusCode"] == 404
-        assert json.loads(response["body"]) == [
-            {"message": "Dataset ID NOT PRESENT does not exist"}
-        ]
-
     def test_create_version_invalid_version_latest(self, auth_event):
         dataset_id = "my-dataset"
         version = {}
@@ -92,6 +81,16 @@ class TestCreateVersion:
 
         response = version_handler.create_version(create_event, None)
         assert response["statusCode"] == 403
+
+    def test_daset_id_not_exist(self, auth_event, metadata_table):
+        dataset_id = "dataset-id"
+        create_event = auth_event(common_test_helper.raw_version, dataset=dataset_id)
+
+        response = version_handler.create_version(create_event, None)
+        assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == [
+            {"message": f"Dataset {dataset_id} does not exist"}
+        ]
 
 
 class TestUpdateVersion:
@@ -172,6 +171,17 @@ class TestUpdateVersion:
         response = version_handler.update_version(update_event, None)
 
         assert response["statusCode"] == 403
+
+    def test_daset_id_not_exist(self, auth_event, metadata_table):
+        dataset_id = "dataset-id"
+        update_event = auth_event(
+            common_test_helper.version_updated, dataset=dataset_id, version="1"
+        )
+        response = version_handler.update_version(update_event, None)
+        assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == [
+            {"message": f"Dataset {dataset_id} does not exist"}
+        ]
 
 
 class TestVersion:
