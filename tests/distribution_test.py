@@ -109,13 +109,15 @@ class TestUpdateDistribution:
         edition = "my-edition"
         dataset_id, version, _ = put_edition
 
-        create_event = auth_event(
-            common_test_helper.raw_distribution,
+        update_event = auth_event(
+            common_test_helper.distribution_updated,
             dataset=dataset_id,
             version=version,
             edition=edition,
+            distribution="52ee4425-3a3c-4a9f-b599-869de889d30c",
         )
-        response = distribution_handler.create_distribution(create_event, None)
+
+        response = distribution_handler.update_distribution(update_event, None)
         assert response["statusCode"] == 403
 
     def test_dataset_not_exist(self, metadata_table, auth_event):
