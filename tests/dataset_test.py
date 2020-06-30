@@ -72,7 +72,7 @@ class TestUpdateDataset:
         assert item["title"] == "UPDATED TITLE"
         assert item["confidentiality"] == "red"
 
-    def test_invalid_tokeN(self, event, metadata_table, auth_event, auth_denied):
+    def test_forbidden(self, event, metadata_table, auth_event, auth_denied):
         dataset = common.raw_dataset.copy()
         response = dataset_handler.create_dataset(auth_event(dataset), None)
 
@@ -101,13 +101,15 @@ class TestUpdateDataset:
             ],
         }
 
-    def test_dataset_not_found(self, event):
-        event_for_get = event({}, "1234")
+    def test_dataset_not_exist(self, auth_event, metadata_table):
+        dataset_id = "dataset-id"
+        event_for_update = auth_event(common.dataset_updated, dataset_id)
 
-        response = dataset_handler.get_dataset(event_for_get, None)
-
+        response = dataset_handler.update_dataset(event_for_update, None)
         assert response["statusCode"] == 404
-        assert json.loads(response["body"]) == {"message": "Dataset not found."}
+        assert json.loads(response["body"]) == [
+            {"message": f"Dataset {dataset_id} does not exist"}
+        ]
 
     def test_slugify(self):
         title = (
