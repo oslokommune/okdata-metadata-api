@@ -55,6 +55,9 @@ class TestCreateDistribution:
         )
         response = distribution_handler.create_distribution(create_event, None)
         assert response["statusCode"] == 403
+        assert json.loads(response["body"]) == [
+            {"message": f"You are not authorized to access dataset {dataset_id}"}
+        ]
 
     def test_dataset_not_exist(self, metadata_table, auth_event):
         dataset_id = "some-dataset_id"
@@ -119,6 +122,9 @@ class TestUpdateDistribution:
 
         response = distribution_handler.update_distribution(update_event, None)
         assert response["statusCode"] == 403
+        assert json.loads(response["body"]) == [
+            {"message": f"You are not authorized to access dataset {dataset_id}"}
+        ]
 
     def test_dataset_not_exist(self, metadata_table, auth_event):
         dataset_id = "some-dataset_id"

@@ -71,6 +71,9 @@ class TestCreateEdition:
 
         response = edition_handler.create_edition(create_event, None)
         assert response["statusCode"] == 403
+        assert json.loads(response["body"]) == [
+            {"message": f"You are not authorized to access dataset {dataset_id}"}
+        ]
 
     def test_dataset_not_exist(self, metadata_table, auth_event):
         dataset_id = "some-dataset_id"
@@ -158,6 +161,9 @@ class TestUpdateEdition:
 
         response = edition_handler.update_edition(update_event, None)
         assert response["statusCode"] == 403
+        assert json.loads(response["body"]) == [
+            {"message": f"You are not authorized to access dataset {dataset_id}"}
+        ]
 
     def test_dataset_not_exist(self, metadata_table, auth_event):
         dataset_id = "some-dataset_id"

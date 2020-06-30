@@ -82,6 +82,9 @@ class TestUpdateDataset:
 
         response = dataset_handler.update_dataset(event_for_update, None)
         assert response["statusCode"] == 403
+        assert json.loads(response["body"]) == [
+            {"message": f"You are not authorized to access dataset {dataset_id}"}
+        ]
 
     def test_update_invalid(self, auth_event, metadata_table):
         dataset = common.raw_dataset.copy()

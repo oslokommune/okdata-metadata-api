@@ -81,6 +81,11 @@ class TestCreateVersion:
 
         response = version_handler.create_version(create_event, None)
         assert response["statusCode"] == 403
+        assert json.loads(response["body"]) == [
+            {
+                "message": f"You are not authorized to access dataset {dataset[table.ID_COLUMN]}"
+            }
+        ]
 
     def test_daset_id_not_exist(self, auth_event, metadata_table):
         dataset_id = "dataset-id"
@@ -171,6 +176,9 @@ class TestUpdateVersion:
         response = version_handler.update_version(update_event, None)
 
         assert response["statusCode"] == 403
+        assert json.loads(response["body"]) == [
+            {"message": f"You are not authorized to access dataset {dataset_id}"}
+        ]
 
     def test_daset_id_not_exist(self, auth_event, metadata_table):
         dataset_id = "dataset-id"
