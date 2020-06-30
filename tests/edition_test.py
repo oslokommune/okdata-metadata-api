@@ -72,6 +72,19 @@ class TestCreateEdition:
         response = edition_handler.create_edition(create_event, None)
         assert response["statusCode"] == 403
 
+    def test_dataset_not_exist(self, metadata_table, auth_event):
+        dataset_id = "some-dataset_id"
+        create_event = auth_event(
+            common_test_helper.raw_edition, dataset=dataset_id, version="1"
+        )
+
+        response = edition_handler.create_edition(create_event, None)
+
+        assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == [
+            {"message": f"Dataset {dataset_id} does not exist"}
+        ]
+
 
 class TestUpdateEdition:
     def test_update_edition(self, metadata_table, auth_event, put_version):
@@ -145,6 +158,22 @@ class TestUpdateEdition:
 
         response = edition_handler.update_edition(update_event, None)
         assert response["statusCode"] == 403
+
+    def test_dataset_not_exist(self, metadata_table, auth_event):
+        dataset_id = "some-dataset_id"
+        update_event = auth_event(
+            common_test_helper.edition_updated,
+            dataset=dataset_id,
+            version="1",
+            edition="20190603T092711",
+        )
+
+        response = edition_handler.update_edition(update_event, None)
+
+        assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == [
+            {"message": f"Dataset {dataset_id} does not exist"}
+        ]
 
 
 class TestEdition:
