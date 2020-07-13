@@ -88,6 +88,24 @@ class TestCreateEdition:
             {"message": f"Dataset {dataset_id} does not exist"}
         ]
 
+    def test_version_not_exist(self, metadata_table, auth_event, put_version):
+        dataset_id, _ = put_version
+        version_not_exist = "10"
+        create_event = auth_event(
+            common_test_helper.raw_edition,
+            dataset=dataset_id,
+            version=version_not_exist,
+        )
+
+        response = edition_handler.create_edition(create_event, None)
+
+        assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == [
+            {
+                "message": f"'Parent item with id {dataset_id}/{version_not_exist} does not exist'"
+            }
+        ]
+
 
 class TestUpdateEdition:
     def test_update_edition(self, metadata_table, auth_event, put_version):
@@ -179,6 +197,30 @@ class TestUpdateEdition:
         assert response["statusCode"] == 404
         assert json.loads(response["body"]) == [
             {"message": f"Dataset {dataset_id} does not exist"}
+        ]
+
+    def test_version_not_exist(self, metadata_table, auth_event, put_version):
+        dataset_id, version = put_version
+        # create_event = auth_event(
+        #     common_test_helper.raw_edition, dataset=dataset_id, version=version
+        # )
+        # edition_id = edition_handler.create_edition(create_event, None)
+
+        version_not_exist = "10"
+        update_event = auth_event(
+            common_test_helper.raw_edition,
+            dataset=dataset_id,
+            version=version_not_exist,
+            edition="20190603T092711",
+        )
+
+        response = edition_handler.update_edition(update_event, None)
+
+        assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == [
+            {
+                "message": f"'Item with id {dataset_id}/{version_not_exist}/20190603T092711 does not exist'"
+            }
         ]
 
 

@@ -41,6 +41,8 @@ def create_edition(event, context):
         return common.response(201, body, headers)
     except ResourceConflict as d:
         return common.error_response(409, f"Resource Conflict: {d}")
+    except KeyError as ke:
+        return common.error_response(404, str(ke))
     except Exception as e:
         log_exception(e)
         message = f"Error creating edition. RequestId: {context.aws_request_id}"
@@ -68,9 +70,8 @@ def update_edition(event, context):
         )
         add_self_url(body)
         return common.response(200, body)
-    except KeyError:
-        message = "Edition not found."
-        return common.response(404, {"message": message})
+    except KeyError as ke:
+        return common.error_response(404, str(ke))
     except ValueError as e:
         log_exception(e)
         message = f"Error updating edition. RequestId: {context.aws_request_id}"
