@@ -1,11 +1,10 @@
 import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 
-from auth import SimpleAuth
 from dataplatform.awslambda.logging import logging_wrapper, log_add, log_exception
 from metadata import common
 from metadata.error import ResourceConflict
-from metadata.common import validate_input
+from metadata.common import check_auth, validate_input
 from metadata.distribution.repository import DistributionRepository
 from metadata.validator import Validator
 
@@ -15,6 +14,7 @@ validator = Validator("distribution")
 
 @logging_wrapper
 @validate_input(validator)
+@check_auth
 @xray_recorder.capture("create_distribution")
 def create_distribution(event, context):
     """POST /datasets/:dataset-id/versions/:version/editions/:edition/distributions"""
@@ -25,9 +25,6 @@ def create_distribution(event, context):
     version = event["pathParameters"]["version"]
     edition = event["pathParameters"]["edition"]
     log_add(dataset_id=dataset_id, version=version, edition=edition)
-
-    if not SimpleAuth().is_owner(event, dataset_id):
-        return common.error_response(403, "Forbidden")
 
     try:
         distribution_id = distribution_repository.create_distribution(
@@ -54,6 +51,7 @@ def create_distribution(event, context):
 
 @logging_wrapper
 @validate_input(validator)
+@check_auth
 @xray_recorder.capture("update_distribution")
 def update_distribution(event, context):
     """PUT /datasets/:dataset-id/versions/:version/editions/:edition/distributions/:distribution"""
@@ -70,9 +68,6 @@ def update_distribution(event, context):
         edition=edition,
         distribution=distribution,
     )
-
-    if not SimpleAuth().is_owner(event, dataset_id):
-        return common.error_response(403, "Forbidden")
 
     try:
         distribution_repository.update_distribution(

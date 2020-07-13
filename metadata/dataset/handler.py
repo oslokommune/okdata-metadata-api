@@ -6,7 +6,7 @@ from auth import SimpleAuth
 from dataplatform.awslambda.logging import logging_wrapper, log_add, log_exception
 from metadata import common
 from metadata.error import ResourceConflict
-from metadata.common import validate_input
+from metadata.common import check_auth, validate_input
 from metadata.dataset.repository import DatasetRepository
 from metadata.validator import Validator
 
@@ -45,6 +45,7 @@ def create_dataset(event, context):
 
 @logging_wrapper
 @validate_input(validator)
+@check_auth
 @xray_recorder.capture("update_dataset")
 def update_dataset(event, context):
     """PUT /datasets/:dataset-id"""
@@ -52,9 +53,6 @@ def update_dataset(event, context):
     content = json.loads(event["body"])
     dataset_id = event["pathParameters"]["dataset-id"]
     log_add(dataset_id=dataset_id)
-
-    if not SimpleAuth().is_owner(event, dataset_id):
-        return common.error_response(403, "Forbidden")
 
     try:
         dataset_repository.update_dataset(dataset_id, content)

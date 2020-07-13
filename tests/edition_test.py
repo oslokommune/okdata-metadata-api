@@ -71,6 +71,40 @@ class TestCreateEdition:
 
         response = edition_handler.create_edition(create_event, None)
         assert response["statusCode"] == 403
+        assert json.loads(response["body"]) == [
+            {"message": f"You are not authorized to access dataset {dataset_id}"}
+        ]
+
+    def test_dataset_not_exist(self, metadata_table, auth_event):
+        dataset_id = "some-dataset_id"
+        create_event = auth_event(
+            common_test_helper.raw_edition, dataset=dataset_id, version="1"
+        )
+
+        response = edition_handler.create_edition(create_event, None)
+
+        assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == [
+            {"message": f"Dataset {dataset_id} does not exist"}
+        ]
+
+    def test_version_not_exist(self, metadata_table, auth_event, put_version):
+        dataset_id, _ = put_version
+        version_not_exist = "10"
+        create_event = auth_event(
+            common_test_helper.raw_edition,
+            dataset=dataset_id,
+            version=version_not_exist,
+        )
+
+        response = edition_handler.create_edition(create_event, None)
+
+        assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == [
+            {
+                "message": f"'Parent item with id {dataset_id}/{version_not_exist} does not exist'"
+            }
+        ]
 
 
 class TestUpdateEdition:
@@ -92,7 +126,7 @@ class TestUpdateEdition:
         body = json.loads(response["body"])
         edition_id = body["Id"]
         assert response["statusCode"] == 200
-        assert edition_id == f"antall-besokende-pa-gjenbruksstasjoner/6/20190528T133700"
+        assert edition_id == "antall-besokende-pa-gjenbruksstasjoner/6/20190528T133700"
 
         db_response = metadata_table.query(
             KeyConditionExpression=Key(table.ID_COLUMN).eq(edition_id)
@@ -145,6 +179,49 @@ class TestUpdateEdition:
 
         response = edition_handler.update_edition(update_event, None)
         assert response["statusCode"] == 403
+        assert json.loads(response["body"]) == [
+            {"message": f"You are not authorized to access dataset {dataset_id}"}
+        ]
+
+    def test_dataset_not_exist(self, metadata_table, auth_event):
+        dataset_id = "some-dataset_id"
+        update_event = auth_event(
+            common_test_helper.edition_updated,
+            dataset=dataset_id,
+            version="1",
+            edition="20190603T092711",
+        )
+
+        response = edition_handler.update_edition(update_event, None)
+
+        assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == [
+            {"message": f"Dataset {dataset_id} does not exist"}
+        ]
+
+    def test_version_not_exist(self, metadata_table, auth_event, put_version):
+        dataset_id, version = put_version
+        # create_event = auth_event(
+        #     common_test_helper.raw_edition, dataset=dataset_id, version=version
+        # )
+        # edition_id = edition_handler.create_edition(create_event, None)
+
+        version_not_exist = "10"
+        update_event = auth_event(
+            common_test_helper.raw_edition,
+            dataset=dataset_id,
+            version=version_not_exist,
+            edition="20190603T092711",
+        )
+
+        response = edition_handler.update_edition(update_event, None)
+
+        assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == [
+            {
+                "message": f"'Item with id {dataset_id}/{version_not_exist}/20190603T092711 does not exist'"
+            }
+        ]
 
 
 class TestEdition:

@@ -72,15 +72,19 @@ class TestUpdateDataset:
         assert item["title"] == "UPDATED TITLE"
         assert item["confidentiality"] == "red"
 
-    def test_invalid_tokeN(self, event, metadata_table, auth_event, auth_denied):
+    def test_forbidden(self, event, metadata_table, auth_event, auth_denied):
         dataset = common.raw_dataset.copy()
         response = dataset_handler.create_dataset(auth_event(dataset), None)
 
-        dataset_id = json.loads(response["body"])
+        body = json.loads(response["body"])
+        dataset_id = body["Id"]
         event_for_update = event(common.dataset_updated, dataset_id)
 
         response = dataset_handler.update_dataset(event_for_update, None)
         assert response["statusCode"] == 403
+        assert json.loads(response["body"]) == [
+            {"message": f"You are not authorized to access dataset {dataset_id}"}
+        ]
 
     def test_update_invalid(self, auth_event, metadata_table):
         dataset = common.raw_dataset.copy()
@@ -100,13 +104,15 @@ class TestUpdateDataset:
             ],
         }
 
-    def test_dataset_not_found(self, event):
-        event_for_get = event({}, "1234")
+    def test_dataset_not_exist(self, auth_event, metadata_table):
+        dataset_id = "dataset-id"
+        event_for_update = auth_event(common.dataset_updated, dataset_id)
 
-        response = dataset_handler.get_dataset(event_for_get, None)
-
+        response = dataset_handler.update_dataset(event_for_update, None)
         assert response["statusCode"] == 404
-        assert json.loads(response["body"]) == {"message": "Dataset not found."}
+        assert json.loads(response["body"]) == [
+            {"message": f"Dataset {dataset_id} does not exist"}
+        ]
 
     def test_slugify(self):
         title = (

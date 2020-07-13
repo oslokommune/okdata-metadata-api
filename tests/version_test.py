@@ -41,17 +41,6 @@ class TestCreateVersion:
         assert version_from_db[table.ID_COLUMN] == version_id
         assert version_from_db[table.TYPE_COLUMN] == "Version"
 
-        bad_version_event = create_event
-        bad_version_event["pathParameters"]["dataset-id"] = "ID NOT PRESENT"
-
-        response = version_handler.create_version(
-            bad_version_event, common_test_helper.Context("1234")
-        )
-        assert response["statusCode"] == 500
-        assert json.loads(response["body"]) == {
-            "message": "Error creating version. RequestId: 1234"
-        }
-
     def test_create_version_invalid_version_latest(self, auth_event):
         dataset_id = "my-dataset"
         version = {}
@@ -84,7 +73,7 @@ class TestCreateVersion:
     def test_forbidden(self, event, metadata_table, auth_denied):
         dataset = common_test_helper.raw_dataset.copy()
         dataset[table.ID_COLUMN] = "dataset-id"
-        dataset[table.TYPE_COLUMN] = "dataset"
+        dataset[table.TYPE_COLUMN] = "Dataset"
         metadata_table.put_item(Item=dataset)
 
         version = common_test_helper.raw_version
@@ -92,6 +81,21 @@ class TestCreateVersion:
 
         response = version_handler.create_version(create_event, None)
         assert response["statusCode"] == 403
+        assert json.loads(response["body"]) == [
+            {
+                "message": f"You are not authorized to access dataset {dataset[table.ID_COLUMN]}"
+            }
+        ]
+
+    def test_daset_id_not_exist(self, auth_event, metadata_table):
+        dataset_id = "dataset-id"
+        create_event = auth_event(common_test_helper.raw_version, dataset=dataset_id)
+
+        response = version_handler.create_version(create_event, None)
+        assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == [
+            {"message": f"Dataset {dataset_id} does not exist"}
+        ]
 
 
 class TestUpdateVersion:
@@ -119,8 +123,10 @@ class TestUpdateVersion:
         version_from_db = db_response["Items"][0]
         assert version_from_db["version"] == "6"
 
-    def test_update_version_invalid_version_latest_in_body(self, auth_event):
-        dataset_id = "my-dataset"
+    def test_update_version_invalid_version_latest_in_body(
+        self, auth_event, put_dataset
+    ):
+        dataset_id = put_dataset
         version_name = common_test_helper.raw_version["version"]
         update_event = auth_event(
             common_test_helper.version_updated, dataset=dataset_id, version=version_name
@@ -146,7 +152,7 @@ class TestUpdateVersion:
         )
         version_handler.update_version(update_event, None)
 
-        version_id = f"antall-besokende-pa-gjenbruksstasjoner/latest"
+        version_id = "antall-besokende-pa-gjenbruksstasjoner/latest"
 
         db_response = metadata_table.query(
             KeyConditionExpression=Key(table.ID_COLUMN).eq(version_id)
@@ -170,6 +176,20 @@ class TestUpdateVersion:
         response = version_handler.update_version(update_event, None)
 
         assert response["statusCode"] == 403
+        assert json.loads(response["body"]) == [
+            {"message": f"You are not authorized to access dataset {dataset_id}"}
+        ]
+
+    def test_daset_id_not_exist(self, auth_event, metadata_table):
+        dataset_id = "dataset-id"
+        update_event = auth_event(
+            common_test_helper.version_updated, dataset=dataset_id, version="1"
+        )
+        response = version_handler.update_version(update_event, None)
+        assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == [
+            {"message": f"Dataset {dataset_id} does not exist"}
+        ]
 
 
 class TestVersion:

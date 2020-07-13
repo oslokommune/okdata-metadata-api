@@ -1,11 +1,10 @@
 import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 
-from auth import SimpleAuth
 from dataplatform.awslambda.logging import logging_wrapper, log_add, log_exception
 from metadata import common
 from metadata.error import ResourceConflict
-from metadata.common import validate_input
+from metadata.common import check_auth, validate_input
 from metadata.edition.repository import EditionRepository
 from metadata.validator import Validator
 
@@ -16,6 +15,7 @@ validator = Validator("edition")
 
 @logging_wrapper
 @validate_input(validator)
+@check_auth
 @xray_recorder.capture("create_edition")
 def create_edition(event, context):
     """POST /datasets/:dataset-id/versions/:version/editions"""
@@ -25,9 +25,6 @@ def create_edition(event, context):
     dataset_id = event["pathParameters"]["dataset-id"]
     version = event["pathParameters"]["version"]
     log_add(dataset_id=dataset_id, version=version)
-
-    if not SimpleAuth().is_owner(event, dataset_id):
-        return common.error_response(403, "Forbidden")
 
     try:
         edition_id = edition_repository.create_edition(dataset_id, version, content)
@@ -44,6 +41,8 @@ def create_edition(event, context):
         return common.response(201, body, headers)
     except ResourceConflict as d:
         return common.error_response(409, f"Resource Conflict: {d}")
+    except KeyError as ke:
+        return common.error_response(404, str(ke))
     except Exception as e:
         log_exception(e)
         message = f"Error creating edition. RequestId: {context.aws_request_id}"
@@ -52,6 +51,7 @@ def create_edition(event, context):
 
 @logging_wrapper
 @validate_input(validator)
+@check_auth
 @xray_recorder.capture("update_edition")
 def update_edition(event, context):
     """PUT /datasets/:dataset-id/versions/:version/editions/:edition"""
@@ -63,9 +63,6 @@ def update_edition(event, context):
     edition = event["pathParameters"]["edition"]
     log_add(dataset_id=dataset_id, version=version, edition=edition)
 
-    if not SimpleAuth().is_owner(event, dataset_id):
-        return common.error_response(403, "Forbidden")
-
     try:
         edition_repository.update_edition(dataset_id, version, edition, content)
         body = edition_repository.get_edition(
@@ -73,9 +70,8 @@ def update_edition(event, context):
         )
         add_self_url(body)
         return common.response(200, body)
-    except KeyError:
-        message = "Edition not found."
-        return common.response(404, {"message": message})
+    except KeyError as ke:
+        return common.error_response(404, str(ke))
     except ValueError as e:
         log_exception(e)
         message = f"Error updating edition. RequestId: {context.aws_request_id}"

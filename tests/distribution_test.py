@@ -55,6 +55,25 @@ class TestCreateDistribution:
         )
         response = distribution_handler.create_distribution(create_event, None)
         assert response["statusCode"] == 403
+        assert json.loads(response["body"]) == [
+            {"message": f"You are not authorized to access dataset {dataset_id}"}
+        ]
+
+    def test_dataset_not_exist(self, metadata_table, auth_event):
+        dataset_id = "some-dataset_id"
+        create_event = auth_event(
+            common_test_helper.raw_distribution,
+            dataset=dataset_id,
+            version="1",
+            edition="20190603T092711",
+        )
+
+        response = distribution_handler.create_distribution(create_event, None)
+
+        assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == [
+            {"message": f"Dataset {dataset_id} does not exist"}
+        ]
 
 
 class TestUpdateDistribution:
@@ -93,14 +112,36 @@ class TestUpdateDistribution:
         edition = "my-edition"
         dataset_id, version, _ = put_edition
 
-        create_event = auth_event(
-            common_test_helper.raw_distribution,
+        update_event = auth_event(
+            common_test_helper.distribution_updated,
             dataset=dataset_id,
             version=version,
             edition=edition,
+            distribution="52ee4425-3a3c-4a9f-b599-869de889d30c",
         )
-        response = distribution_handler.create_distribution(create_event, None)
+
+        response = distribution_handler.update_distribution(update_event, None)
         assert response["statusCode"] == 403
+        assert json.loads(response["body"]) == [
+            {"message": f"You are not authorized to access dataset {dataset_id}"}
+        ]
+
+    def test_dataset_not_exist(self, metadata_table, auth_event):
+        dataset_id = "some-dataset_id"
+        update_event = auth_event(
+            common_test_helper.distribution_updated,
+            dataset=dataset_id,
+            version="1",
+            edition="20190603T092711",
+            distribution="52ee4425-3a3c-4a9f-b599-869de889d30c",
+        )
+
+        response = distribution_handler.update_distribution(update_event, None)
+
+        assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == [
+            {"message": f"Dataset {dataset_id} does not exist"}
+        ]
 
 
 class TestDistribution:
