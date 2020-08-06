@@ -36,7 +36,7 @@ provider:
     KEYCLOAK_SERVER: ${ssm:/keycloak/client/server}
     KEYCLOAK_REALM: api-catalog
     CLIENT_ID: metadata-api
-    CLIENT_SECRET: ${ssm:/dataplatform/apis/metadata-api/auth/client_secret~true}
+    CLIENT_SECRET: ${ssm:/dataplatform/${self:service.name}/keycloak-client-secret~true}
 
 
 plugins:
