@@ -14,7 +14,7 @@ provider:
     lambda: true
     apiGateway: true
   layers:
-    - ${ssm:/dataplatform/python-base-lambda-layer/arn}
+    - ${ssm:/dataplatform/shared/python-base-layer-arn}
   rolePermissionsBoundary: "arn:aws:iam::#{AWS::AccountId}:policy/oslokommune/oslokommune-boundary"
   iamManagedPolicies:
     - Fn::Join:
