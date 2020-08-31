@@ -46,7 +46,7 @@ def create_edition(event, context):
     except Exception as e:
         log_exception(e)
         message = f"Error creating edition. RequestId: {context.aws_request_id}"
-        return common.response(500, {"message": message},)
+        return common.response(500, {"message": message})
 
 
 @logging_wrapper
@@ -75,7 +75,7 @@ def update_edition(event, context):
     except ValueError as e:
         log_exception(e)
         message = f"Error updating edition. RequestId: {context.aws_request_id}"
-        return common.response(500, {"message": message},)
+        return common.response(500, {"message": message})
 
 
 @logging_wrapper

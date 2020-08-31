@@ -40,7 +40,7 @@ def create_dataset(event, context):
     except Exception as e:
         log_exception(e)
         message = f"Error creating dataset. RequestId: {context.aws_request_id}"
-        return common.response(500, {"message": message},)
+        return common.response(500, {"message": message})
 
 
 @logging_wrapper
@@ -65,7 +65,7 @@ def update_dataset(event, context):
     except ValueError as e:
         log_exception(e)
         message = f"Error updating dataset. RequestId: {context.aws_request_id}"
-        return common.response(500, {"message": message},)
+        return common.response(500, {"message": message})
 
 
 @logging_wrapper

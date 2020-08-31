@@ -40,7 +40,7 @@ def create_version(event, context):
     except Exception as e:
         log_exception(e)
         message = f"Error creating version. RequestId: {context.aws_request_id}"
-        return common.response(500, {"message": message},)
+        return common.response(500, {"message": message})
 
 
 @logging_wrapper
@@ -68,7 +68,7 @@ def update_version(event, context):
     except ValueError as e:
         log_exception(e)
         message = f"Error updating version. RequestId: {context.aws_request_id}"
-        return common.response(500, {"message": message},)
+        return common.response(500, {"message": message})
 
 
 @logging_wrapper
