@@ -1,4 +1,6 @@
 import simplejson as json
+from functools import wraps
+
 
 from auth import SimpleAuth
 from metadata.dataset.repository import DatasetRepository
@@ -11,6 +13,7 @@ table_name_prefix = "metadata-api"
 
 def validate_input(validator):
     def inner(func):
+        @wraps(func)
         def wrapper(event, *args, **kwargs):
             errors = validator.validate(json.loads(event["body"]))
             if errors:
