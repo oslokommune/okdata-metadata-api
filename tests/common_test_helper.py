@@ -97,10 +97,10 @@ edition_updated = {
     "endTime": "2018-12-21",
 }
 
-raw_distribution = {"filename": "BOOOM.csv"}
+raw_distribution = {"filename": "BOOOM.csv", "filenames": ["BOOOM.csv"]}
 
 
-distribution_updated = {"filename": "UPDATED.csv"}
+distribution_updated = {"filename": "UPDATED.csv", "filenames": ["BOOOM.csv"]}
 
 
 class Context:
