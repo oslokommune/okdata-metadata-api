@@ -8,10 +8,16 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 255
+    },
+    "filenames": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      }
     }
   },
   "additionalProperties": false,
-  "required": [
-    "filename"
-  ]
+  "required": []
 }
