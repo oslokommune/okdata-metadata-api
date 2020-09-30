@@ -1,7 +1,7 @@
 ---
 swagger: "2.0"
 info:
-  version: "2020-03-09T10:59:20Z"
+  version: "2020-09-30T13:16:41Z"
   title: "prod-metadata-api"
 host: "api.data.oslo.systems"
 basePath: "/metadata"
@@ -75,8 +75,6 @@ paths:
             Access-Control-Allow-Origin:
               type: "string"
             Access-Control-Allow-Methods:
-              type: "string"
-            Access-Control-Allow-Credentials:
               type: "string"
             Access-Control-Allow-Headers:
               type: "string"
@@ -238,8 +236,6 @@ paths:
             Access-Control-Allow-Origin:
               type: "string"
             Access-Control-Allow-Methods:
-              type: "string"
-            Access-Control-Allow-Credentials:
               type: "string"
             Access-Control-Allow-Headers:
               type: "string"
@@ -421,8 +417,6 @@ paths:
             Access-Control-Allow-Origin:
               type: "string"
             Access-Control-Allow-Methods:
-              type: "string"
-            Access-Control-Allow-Credentials:
               type: "string"
             Access-Control-Allow-Headers:
               type: "string"
@@ -624,8 +618,6 @@ paths:
             Access-Control-Allow-Origin:
               type: "string"
             Access-Control-Allow-Methods:
-              type: "string"
-            Access-Control-Allow-Credentials:
               type: "string"
             Access-Control-Allow-Headers:
               type: "string"
@@ -1039,13 +1031,17 @@ definitions:
     description: "This is a dataset"
   Distribution:
     type: "object"
-    required:
-    - "filename"
     properties:
       filename:
         type: "string"
         minLength: 1
         maxLength: 255
+      filenames:
+        type: "array"
+        items:
+          type: "string"
+          minLength: 1
+          maxLength: 255
     title: "Distribution"
     description: "This is a distribution"
   UserErrorResponse:
@@ -1094,5 +1090,9 @@ definitions:
           type: "string"
           minLength: 1
           maxLength: 255
-      required:
-      - "filename"
+        filenames:
+          type: "array"
+          items:
+            type: "string"
+            minLength: 1
+            maxLength: 255
