@@ -1,7 +1,7 @@
 ---
 swagger: "2.0"
 info:
-  version: "2020-09-30T13:16:41Z"
+  version: "2020-10-06T13:51:55Z"
   title: "prod-metadata-api"
 host: "api.data.oslo.systems"
 basePath: "/metadata"
@@ -840,6 +840,10 @@ definitions:
           - "non-public"
           - "public"
           - "restricted"
+        timestamp_field:
+          type: "string"
+          description: "A timestamp field for eventstreams"
+          maxLength: 255
         title:
           type: "string"
           description: "The dataset title"
@@ -1018,6 +1022,10 @@ definitions:
         - "non-public"
         - "public"
         - "restricted"
+      timestamp_field:
+        type: "string"
+        description: "A timestamp field for eventstreams"
+        maxLength: 255
       title:
         type: "string"
         description: "The dataset title"
