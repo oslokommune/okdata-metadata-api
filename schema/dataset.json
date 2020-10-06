@@ -133,6 +133,11 @@
       "description": "Id of the parent dataset",
       "type": "string",
       "maxLength": 128
+    },
+    "timestamp_field": {
+      "description": "A timestamp field for eventstreams",
+      "type": "string",
+      "maxLength": 255
     }
   },
   "additionalProperties": false,
