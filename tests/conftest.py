@@ -7,9 +7,6 @@ from moto import mock_dynamodb2
 from auth import SimpleAuth
 
 from tests import common_test_helper
-from metadata.dataset import handler as dataset_handler
-from metadata.version import handler as version_handler
-from metadata.edition import handler as edition_handler
 
 AUTHORIZER_API = os.environ["AUTHORIZER_API"]
 good_token = "Bjørnepollett"
@@ -84,6 +81,8 @@ def auth_event(*args, **kwargs):
 
 @pytest.fixture()
 def put_dataset(auth_event):
+    from metadata.dataset import handler as dataset_handler
+
     dataset = common_test_helper.raw_dataset.copy()
     response = dataset_handler.create_dataset(auth_event(dataset), None)
     body = json.loads(response["body"])
@@ -92,6 +91,8 @@ def put_dataset(auth_event):
 
 @pytest.fixture()
 def put_version(auth_event, put_dataset):
+    from metadata.version import handler as version_handler
+
     dataset_id = put_dataset
     raw_version = common_test_helper.raw_version.copy()
     version_handler.create_version(auth_event(raw_version, dataset=dataset_id), None)
@@ -100,6 +101,8 @@ def put_version(auth_event, put_dataset):
 
 @pytest.fixture()
 def put_edition(auth_event, put_version):
+    from metadata.edition import handler as edition_handler
+
     dataset_id, version = put_version
     raw_edition = common_test_helper.raw_edition.copy()
     response = edition_handler.create_edition(

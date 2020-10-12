@@ -4,7 +4,6 @@ import json
 from boto3.dynamodb.conditions import Key
 
 import metadata.common as table
-import metadata.edition.handler as edition_handler
 from tests import common_test_helper
 
 
@@ -15,6 +14,8 @@ def metadata_table(dynamodb):
 
 class TestCreateEdition:
     def test_create_edition(self, metadata_table, auth_event, put_version):
+        import metadata.edition.handler as edition_handler
+
         dataset_id, version = put_version
         create_event = auth_event(
             common_test_helper.raw_edition, dataset=dataset_id, version=version
@@ -33,6 +34,8 @@ class TestCreateEdition:
         assert edition_id == f"{dataset_id}/6/20190528T133700"
 
     def test_create_invalid_edition(self, metadata_table, auth_event, put_version):
+        import metadata.edition.handler as edition_handler
+
         dataset_id, version = put_version
         invalid_edition = common_test_helper.raw_edition.copy()
         invalid_edition["edition"] = "2019-05-28T15:37:00"
@@ -51,6 +54,8 @@ class TestCreateEdition:
     def test_create_duplicate_edition_should_fail(
         self, metadata_table, auth_event, put_version
     ):
+        import metadata.edition.handler as edition_handler
+
         dataset_id, version = put_version
         create_event = auth_event(
             common_test_helper.raw_edition, dataset=dataset_id, version=version
@@ -64,6 +69,8 @@ class TestCreateEdition:
         assert str.startswith(body[0]["message"], "Resource Conflict")
 
     def test_forbidden(self, metadata_table, auth_event, put_version, auth_denied):
+        import metadata.edition.handler as edition_handler
+
         dataset_id, version = put_version
         create_event = auth_event(
             common_test_helper.raw_edition, dataset=dataset_id, version=version
@@ -76,6 +83,8 @@ class TestCreateEdition:
         ]
 
     def test_dataset_not_exist(self, metadata_table, auth_event):
+        import metadata.edition.handler as edition_handler
+
         dataset_id = "some-dataset_id"
         create_event = auth_event(
             common_test_helper.raw_edition, dataset=dataset_id, version="1"
@@ -89,6 +98,8 @@ class TestCreateEdition:
         ]
 
     def test_version_not_exist(self, metadata_table, auth_event, put_version):
+        import metadata.edition.handler as edition_handler
+
         dataset_id, _ = put_version
         version_not_exist = "10"
         create_event = auth_event(
@@ -109,6 +120,8 @@ class TestCreateEdition:
 
 class TestUpdateEdition:
     def test_update_edition(self, metadata_table, auth_event, put_version):
+        import metadata.edition.handler as edition_handler
+
         dataset_id, version = put_version
         create_event = auth_event(
             common_test_helper.raw_edition, dataset=dataset_id, version=version
@@ -139,6 +152,8 @@ class TestUpdateEdition:
     def test_update_edition_latest_is_updated(
         self, metadata_table, auth_event, put_version
     ):
+        import metadata.edition.handler as edition_handler
+
         dataset_id, version = put_version
         create_event = auth_event(
             common_test_helper.raw_edition, dataset=dataset_id, version=version
@@ -163,6 +178,8 @@ class TestUpdateEdition:
         assert edition_from_db["latest"] == f"{dataset_id}/{version}/{edition}"
 
     def test_forbidden(self, metadata_table, auth_event, put_version, auth_denied):
+        import metadata.edition.handler as edition_handler
+
         dataset_id, version = put_version
         create_event = auth_event(
             common_test_helper.raw_edition, dataset=dataset_id, version=version
@@ -184,6 +201,8 @@ class TestUpdateEdition:
         ]
 
     def test_dataset_not_exist(self, metadata_table, auth_event):
+        import metadata.edition.handler as edition_handler
+
         dataset_id = "some-dataset_id"
         update_event = auth_event(
             common_test_helper.edition_updated,
@@ -200,6 +219,8 @@ class TestUpdateEdition:
         ]
 
     def test_version_not_exist(self, metadata_table, auth_event, put_version):
+        import metadata.edition.handler as edition_handler
+
         dataset_id, version = put_version
         # create_event = auth_event(
         #     common_test_helper.raw_edition, dataset=dataset_id, version=version
@@ -226,6 +247,8 @@ class TestUpdateEdition:
 
 class TestEdition:
     def test_edition_not_found(self, event):
+        import metadata.edition.handler as edition_handler
+
         event_for_get = event({}, "1234", "1", "20190401T133700")
         response = edition_handler.get_edition(event_for_get, None)
         assert response["statusCode"] == 404

@@ -4,7 +4,6 @@ import json
 from boto3.dynamodb.conditions import Key
 
 import metadata.common as table
-import metadata.version.handler as version_handler
 from metadata import common
 from tests import common_test_helper
 
@@ -16,6 +15,8 @@ def metadata_table(dynamodb):
 
 class TestCreateVersion:
     def test_create_version(self, metadata_table, auth_event, put_dataset):
+        import metadata.version.handler as version_handler
+
         dataset_id = put_dataset
 
         version = common_test_helper.raw_version
@@ -42,6 +43,8 @@ class TestCreateVersion:
         assert version_from_db[table.TYPE_COLUMN] == "Version"
 
     def test_create_version_invalid_version_latest(self, auth_event):
+        import metadata.version.handler as version_handler
+
         dataset_id = "my-dataset"
         version = {}
         version["version"] = "latest"
@@ -57,6 +60,8 @@ class TestCreateVersion:
     def test_create_duplicate_version_should_fail(
         self, metadata_table, auth_event, put_dataset
     ):
+        import metadata.version.handler as version_handler
+
         dataset_id = put_dataset
 
         version = common_test_helper.raw_version
@@ -71,6 +76,8 @@ class TestCreateVersion:
         assert str.startswith(body[0]["message"], "Resource Conflict")
 
     def test_forbidden(self, event, metadata_table, auth_denied):
+        import metadata.version.handler as version_handler
+
         dataset = common_test_helper.raw_dataset.copy()
         dataset[table.ID_COLUMN] = "dataset-id"
         dataset[table.TYPE_COLUMN] = "Dataset"
@@ -88,6 +95,8 @@ class TestCreateVersion:
         ]
 
     def test_daset_id_not_exist(self, auth_event, metadata_table):
+        import metadata.version.handler as version_handler
+
         dataset_id = "dataset-id"
         create_event = auth_event(common_test_helper.raw_version, dataset=dataset_id)
 
@@ -100,6 +109,8 @@ class TestCreateVersion:
 
 class TestUpdateVersion:
     def test_update_version(self, metadata_table, auth_event, put_dataset):
+        import metadata.version.handler as version_handler
+
         dataset_id = put_dataset
         version_handler.create_version(
             auth_event(common_test_helper.raw_version.copy(), dataset=dataset_id), None
@@ -126,6 +137,8 @@ class TestUpdateVersion:
     def test_update_version_invalid_version_latest_in_body(
         self, auth_event, put_dataset
     ):
+        import metadata.version.handler as version_handler
+
         dataset_id = put_dataset
         version_name = common_test_helper.raw_version["version"]
         update_event = auth_event(
@@ -140,6 +153,8 @@ class TestUpdateVersion:
     def test_update_edition_latest_is_updated(
         self, metadata_table, auth_event, put_dataset
     ):
+        import metadata.version.handler as version_handler
+
         dataset_id = put_dataset
         version_name = common_test_helper.raw_version["version"]
         create_event = auth_event(
@@ -162,6 +177,8 @@ class TestUpdateVersion:
         assert version_from_db["latest"] == "antall-besokende-pa-gjenbruksstasjoner/6"
 
     def test_forbidden(self, event, metadata_table, put_dataset, auth_denied):
+        import metadata.version.handler as version_handler
+
         version = common_test_helper.raw_version.copy()
         version[common.ID_COLUMN] = f"{put_dataset}/{version['version']}"
         version[common.TYPE_COLUMN] = "version"
@@ -181,6 +198,8 @@ class TestUpdateVersion:
         ]
 
     def test_daset_id_not_exist(self, auth_event, metadata_table):
+        import metadata.version.handler as version_handler
+
         dataset_id = "dataset-id"
         update_event = auth_event(
             common_test_helper.version_updated, dataset=dataset_id, version="1"
@@ -194,6 +213,8 @@ class TestUpdateVersion:
 
 class TestVersion:
     def test_get_all_versions(self, metadata_table, auth_event, put_dataset):
+        import metadata.version.handler as version_handler
+
         dataset_id = put_dataset
 
         version_1 = common_test_helper.raw_version.copy()
@@ -213,6 +234,8 @@ class TestVersion:
         assert len(versions) == 2
 
     def test_version_not_found(self, event):
+        import metadata.version.handler as version_handler
+
         get_event = event({}, "1234", "1")
 
         response = version_handler.get_version(get_event, None)
