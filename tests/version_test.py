@@ -231,7 +231,7 @@ class TestVersion:
         versions = json.loads(response["body"])
 
         assert response["statusCode"] == 200
-        assert len(versions) == 2
+        assert len(versions) == 3  # Including initial version
 
     def test_version_not_found(self, event):
         import metadata.version.handler as version_handler

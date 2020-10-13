@@ -2,8 +2,11 @@ import boto3
 import re
 import shortuuid
 
+from botocore.exceptions import ClientError
 from difflib import SequenceMatcher
 
+from dataplatform.awslambda.logging import log_dynamodb, log_exception
+from metadata import common
 from metadata.CommonRepository import CommonRepository
 from aws_xray_sdk.core import patch
 
@@ -31,7 +34,42 @@ class DatasetRepository(CommonRepository):
     def create_dataset(self, content):
         title = content["title"]
         dataset_id = self.generate_unique_id_based_on_title(title)
-        return self.create_item(dataset_id, content)
+
+        content[common.ID_COLUMN] = dataset_id
+        content[common.TYPE_COLUMN] = self.type
+
+        version = {
+            "version": "1",
+            common.ID_COLUMN: f"{dataset_id}/1",
+            common.TYPE_COLUMN: "Version",
+        }
+
+        latest = version.copy()
+        latest["latest"] = version[common.ID_COLUMN]
+        latest[common.ID_COLUMN] = f"{dataset_id}/latest"
+
+        try:
+            db_response = log_dynamodb(
+                lambda: self.metadata_table.meta.client.transact_write_items(
+                    TransactItems=[
+                        {"Put": {"Item": item, "TableName": "dataset-metadata"}}
+                        for item in [content, version, latest]
+                    ]
+                )
+            )
+        except ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            msg = e.response["Error"]["Message"]
+            log_exception(msg)
+            raise ValueError(f"Error creating dataset ({error_code}): {msg}")
+
+        status_code = db_response["ResponseMetadata"]["HTTPStatusCode"]
+        if status_code == 200:
+            return dataset_id
+        else:
+            msg = f"Error creating dataset ({status_code}): {db_response}"
+            log_exception(msg)
+            raise ValueError(msg)
 
     def update_dataset(self, dataset_id, content):
         return self.update_item(dataset_id, content)
