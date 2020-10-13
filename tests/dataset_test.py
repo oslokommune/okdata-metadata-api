@@ -4,7 +4,6 @@ import json
 from boto3.dynamodb.conditions import Key
 
 import metadata.common as table
-import metadata.dataset.handler as dataset_handler
 import metadata.dataset.repository as dataset_repository
 import tests.common_test_helper as common
 
@@ -16,6 +15,8 @@ def metadata_table(dynamodb):
 
 class TestCreateDataset:
     def test_create(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
         create_event = auth_event(common.raw_dataset.copy())
         response = dataset_handler.create_dataset(create_event, None)
         body = json.loads(response["body"])
@@ -34,6 +35,8 @@ class TestCreateDataset:
         assert item["confidentiality"] == "green"
 
     def test_create_invalid(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
         invalid_dataset = common.raw_dataset.copy()
         invalid_dataset["confidentiality"] = "blue"
         create_event = auth_event(invalid_dataset)
@@ -50,6 +53,8 @@ class TestCreateDataset:
 
 class TestUpdateDataset:
     def test_update_dataset(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
         dataset = common.raw_dataset.copy()
         response = dataset_handler.create_dataset(auth_event(dataset), None)
 
@@ -73,6 +78,8 @@ class TestUpdateDataset:
         assert item["confidentiality"] == "red"
 
     def test_forbidden(self, event, metadata_table, auth_event, auth_denied):
+        import metadata.dataset.handler as dataset_handler
+
         dataset = common.raw_dataset.copy()
         response = dataset_handler.create_dataset(auth_event(dataset), None)
 
@@ -87,6 +94,8 @@ class TestUpdateDataset:
         ]
 
     def test_update_invalid(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
         dataset = common.raw_dataset.copy()
         dataset_handler.create_dataset(auth_event(dataset), None)
 
@@ -105,6 +114,8 @@ class TestUpdateDataset:
         }
 
     def test_dataset_not_exist(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
         dataset_id = "dataset-id"
         event_for_update = auth_event(common.dataset_updated, dataset_id)
 

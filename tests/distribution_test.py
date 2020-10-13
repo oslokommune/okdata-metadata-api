@@ -5,7 +5,6 @@ import re
 from boto3.dynamodb.conditions import Key
 
 import metadata.common as table
-import metadata.distribution.handler as distribution_handler
 from tests import common_test_helper
 
 
@@ -16,6 +15,8 @@ def metadata_table(dynamodb):
 
 class TestCreateDistribution:
     def test_create_distribution(self, metadata_table, auth_event, put_edition):
+        import metadata.distribution.handler as distribution_handler
+
         dataset_id, version, edition = put_edition
         create_event = auth_event(
             common_test_helper.raw_distribution,
@@ -46,6 +47,8 @@ class TestCreateDistribution:
         }
 
     def test_forbidden(self, metadata_table, auth_event, put_edition, auth_denied):
+        import metadata.distribution.handler as distribution_handler
+
         dataset_id, version, edition = put_edition
         create_event = auth_event(
             common_test_helper.raw_distribution,
@@ -60,6 +63,8 @@ class TestCreateDistribution:
         ]
 
     def test_dataset_not_exist(self, metadata_table, auth_event):
+        import metadata.distribution.handler as distribution_handler
+
         dataset_id = "some-dataset_id"
         create_event = auth_event(
             common_test_helper.raw_distribution,
@@ -78,6 +83,8 @@ class TestCreateDistribution:
 
 class TestUpdateDistribution:
     def test_update_distribution(self, metadata_table, auth_event, put_edition):
+        import metadata.distribution.handler as distribution_handler
+
         dataset_id, version, edition = put_edition
         create_event = auth_event(
             common_test_helper.raw_distribution,
@@ -108,6 +115,8 @@ class TestUpdateDistribution:
         assert db_response["Items"][0]["filename"] == "UPDATED.csv"
 
     def test_forbidden(self, metadata_table, auth_event, auth_denied, put_edition):
+        import metadata.distribution.handler as distribution_handler
+
         # auth_denied will return Forbidden, and then no edition will be created....
         edition = "my-edition"
         dataset_id, version, _ = put_edition
@@ -127,6 +136,8 @@ class TestUpdateDistribution:
         ]
 
     def test_dataset_not_exist(self, metadata_table, auth_event):
+        import metadata.distribution.handler as distribution_handler
+
         dataset_id = "some-dataset_id"
         update_event = auth_event(
             common_test_helper.distribution_updated,
@@ -146,6 +157,8 @@ class TestUpdateDistribution:
 
 class TestDistribution:
     def test_distribution_not_found(self, event):
+        import metadata.distribution.handler as distribution_handler
+
         event_for_get = event(
             {}, "1234", "1", "20190401T133700", "6f563c62-8fe4-4591-a999-5fbf0798e268"
         )
