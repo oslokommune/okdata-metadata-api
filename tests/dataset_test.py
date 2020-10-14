@@ -34,6 +34,29 @@ class TestCreateDataset:
         assert item["title"] == "Antall besøkende på gjenbruksstasjoner"
         assert item["confidentiality"] == "green"
 
+        # Check that we create the initial version
+
+        version_id = f"{dataset_id}/1"
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(table.ID_COLUMN).eq(version_id)
+        )
+        item = db_response["Items"][0]
+        assert item[table.ID_COLUMN] == version_id
+        assert item[table.TYPE_COLUMN] == "Version"
+        assert item["version"] == "1"
+
+        # Check that we create the "latest" version alias
+
+        latest_id = f"{dataset_id}/latest"
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(table.ID_COLUMN).eq(latest_id)
+        )
+        item = db_response["Items"][0]
+        assert item[table.ID_COLUMN] == latest_id
+        assert item[table.TYPE_COLUMN] == "Version"
+        assert item["version"] == "1"
+        assert item["latest"] == version_id
+
     def test_create_invalid(self, auth_event, metadata_table):
         import metadata.dataset.handler as dataset_handler
 

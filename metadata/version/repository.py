@@ -28,6 +28,11 @@ class VersionRepository(CommonRepository):
         return self.get_items(dataset_id)
 
     def create_version(self, dataset_id, content):
+        """Create a new version of `dataset_id` with `content` and return its ID.
+
+        Also create (or update if it exists) a "latest" version pointing to the
+        new version.
+        """
         version = content["version"]
 
         version_id = f"{dataset_id}/{version}"
