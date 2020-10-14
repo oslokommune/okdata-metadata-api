@@ -32,6 +32,7 @@ class DatasetRepository(CommonRepository):
         return self.get_items()
 
     def create_dataset(self, content):
+        """Create a new dataset with `content` and return its ID."""
         title = content["title"]
         dataset_id = self.generate_unique_id_based_on_title(title)
 

@@ -74,6 +74,17 @@ class CommonRepository:
     def create_item(
         self, item_id, content, parent_id=None, parent_type=None, update_on_exists=False
     ):
+        """Add `content` to `self.table` under the key `item_id`.
+
+        Return the inserted key on success.
+
+        When `parent_id` is given, perform an additional check that an entry
+        exists with the given ID and type `parent_type`.
+
+        When `update_on_exists` is true, any existing entry will be updated
+        with the new content. Otherwise it's required that an entry with the ID
+        doesn't already exist.
+        """
         log_add(dynamodb_item_id=item_id, dynamodb_item_type=self.type)
         if parent_id:
             log_add(dynamodb_parent_id=parent_id)
@@ -104,6 +115,14 @@ class CommonRepository:
             raise ValueError(msg)
 
     def _create_item(self, content, update_on_exists):
+        """Helper for adding `content` to `self.table`.
+
+        Return the DynamoDB response on success.
+
+        When `update_on_exists` is true, any existing entry will be updated
+        with the new content. Otherwise it's required that an entry with the ID
+        doesn't already exist.
+        """
         try:
             log_add(dynamodb_update_on_exists=update_on_exists)
             if update_on_exists:
