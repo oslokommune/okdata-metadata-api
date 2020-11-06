@@ -36,12 +36,12 @@ upgrade-deps: $(BUILD_VENV)/bin/pip-compile
 	$(BUILD_VENV)/bin/pip-compile -U
 
 .PHONY: deploy
-deploy: node_modules login-dev
+deploy: init format test login-dev
 	@echo "\nDeploying to stage: $${STAGE:-dev}\n"
 	sls deploy --stage $${STAGE:-dev} --aws-profile $(.DEV_PROFILE)
 
 .PHONY: deploy-prod
-deploy-prod: node_modules is-git-clean test login-prod
+deploy-prod: init format is-git-clean test login-prod
 	sls deploy --stage prod --aws-profile $(.PROD_PROFILE)
 	sls downloadDocumentation --outputFileName swagger.yaml --stage prod --aws-profile $(.PROD_PROFILE)
 
@@ -75,10 +75,6 @@ is-git-clean:
 		false; \
 	fi
 
-.PHONY: build
-build: $(BUILD_VENV)/bin/wheel $(BUILD_VENV)/bin/twine
-	$(BUILD_PY) setup.py sdist bdist_wheel
-
 
 ###
 # Python build dependencies
@@ -86,10 +82,6 @@ build: $(BUILD_VENV)/bin/wheel $(BUILD_VENV)/bin/twine
 
 $(BUILD_VENV)/bin/pip-compile: $(BUILD_VENV)
 	$(BUILD_PY) -m pip install -U pip-tools
-
-$(BUILD_VENV)/bin/tox: $(BUILD_VENV)
-	$(BUILD_PY) -m pip install -I virtualenv==16.7.9
-	$(BUILD_PY) -m pip install -U tox
 
 $(BUILD_VENV)/bin/%: $(BUILD_VENV)
 	$(BUILD_PY) -m pip install -U $*
