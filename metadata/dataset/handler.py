@@ -13,6 +13,7 @@ from metadata.validator import Validator
 dataset_repository = DatasetRepository()
 AUTHORIZER_API = os.environ["AUTHORIZER_API"]
 validator = Validator("dataset")
+BASE_URL = os.environ.get("BASE_URL", "")
 
 
 @logging_wrapper
@@ -101,5 +102,5 @@ def get_dataset(event, context):
 
 def add_self_url(dataset):
     if "Id" in dataset:
-        self_url = f'/datasets/{dataset["Id"]}'
+        self_url = f'{BASE_URL}/datasets/{dataset["Id"]}'
         dataset["_links"] = {"self": {"href": self_url}}

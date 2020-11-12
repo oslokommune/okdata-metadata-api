@@ -1,3 +1,4 @@
+import os
 import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 
@@ -11,6 +12,7 @@ from metadata.validator import Validator
 
 edition_repository = EditionRepository()
 validator = Validator("edition")
+BASE_URL = os.environ.get("BASE_URL", "")
 
 
 @logging_wrapper
@@ -117,5 +119,5 @@ def get_edition(event, context):
 def add_self_url(edition):
     if "Id" in edition:
         (dataset_id, version, edition_name) = edition["Id"].split("/")
-        self_url = f"/datasets/{dataset_id}/versions/{version}/editions/{edition_name}"
+        self_url = f"{BASE_URL}/datasets/{dataset_id}/versions/{version}/editions/{edition_name}"
         edition["_links"] = {"self": {"href": self_url}}

@@ -37,7 +37,7 @@ provider:
     KEYCLOAK_REALM: api-catalog
     CLIENT_ID: metadata-api
     CLIENT_SECRET: ${ssm:/dataplatform/${self:service.name}/keycloak-client-secret~true}
-
+    BASE_URL: /metadata
 
 plugins:
   - serverless-aws-documentation
