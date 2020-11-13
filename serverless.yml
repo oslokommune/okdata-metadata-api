@@ -37,7 +37,7 @@ provider:
     KEYCLOAK_REALM: api-catalog
     CLIENT_ID: metadata-api
     CLIENT_SECRET: ${ssm:/dataplatform/${self:service.name}/keycloak-client-secret~true}
-
+    BASE_URL: ${self:custom.baseUrl.${self:provider.stage}, self:custom.baseUrl.dev}
 
 plugins:
   - serverless-aws-documentation
@@ -95,6 +95,9 @@ custom:
   deploymentBucket:
     prod: ok-origo-dataplatform-config-prod
     dev: ok-origo-dataplatform-config-dev
+  baseUrl:
+    prod: https://dataplatform.api.oslo.kommune.no/metadata
+    dev: https://api.data-dev.oslo.systems/metadata
   keycloakArn:
     prod: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:keycloak-authorizer-prod-authenticate
     dev: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:keycloak-authorizer-dev-authenticate

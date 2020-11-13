@@ -1,3 +1,4 @@
+import os
 import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 
@@ -11,6 +12,7 @@ from metadata.error import InvalidVersionError
 
 version_repository = VersionRepository()
 validator = Validator("version")
+BASE_URL = os.environ.get("BASE_URL", "")
 
 
 @logging_wrapper
@@ -108,5 +110,5 @@ def get_version(event, context):
 def add_self_url(version):
     if "Id" in version:
         (dataset_id, version_name) = version["Id"].split("/")
-        self_url = f"/datasets/{dataset_id}/versions/{version_name}"
+        self_url = f"{BASE_URL}/datasets/{dataset_id}/versions/{version_name}"
         version["_links"] = {"self": {"href": self_url}}
