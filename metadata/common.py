@@ -49,7 +49,11 @@ def response(statusCode, body, headers=None):
 
     headers["Access-Control-Allow-Origin"] = "*"
 
-    return {"statusCode": statusCode, "headers": headers, "body": json.dumps(body)}
+    return {
+        "statusCode": statusCode,
+        "headers": headers,
+        "body": json.dumps(body, use_decimal=True),
+    }
 
 
 def error_response(statusCode, body, headers=None):

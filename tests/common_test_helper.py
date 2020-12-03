@@ -98,9 +98,49 @@ edition_updated = {
 }
 
 raw_distribution = {"filename": "BOOOM.csv", "filenames": ["BOOOM.csv"]}
+distribution_updated = {
+    "filename": "UPDATED.csv",
+    "filenames": ["BOOOM.csv"],
+    "license": "Norsk lisens for offentlige data (NLOD) 2.0",
+}
 
+raw_geo_dataset = {
+    "title": "Akebakker under kommunal forvaltning i Oslo",
+    "description": "Oversikt over akebakker som er under kommunal forvalting i Oslo",
+    "keywords": ["adspredelse", "bymiljø", "geodata"],
+    "accrualPeriodicity": "irregular",
+    "accessRights": "public",
+    "confidentiality": "green",
+    "objective": "Formidle akebakker",
+    "spatial": ["Bydel Østafor", "Bydel Vestafor"],
+    "spatialResolutionInMeters": 720.31,
+    "conformsTo": ["EUREF89 UTM sone 32, 2d"],
+    "contactPoint": {
+        "name": "Tim",
+        "email": "tim@oslo.kommune.no",
+        "phone": "98765432",
+    },
+    "publisher": "BYM",
+}
 
-distribution_updated = {"filename": "UPDATED.csv", "filenames": ["BOOOM.csv"]}
+updated_geo_dataset = {
+    "title": "Akebakker under kommunal forvaltning i Oslo",
+    "description": "Oversikt over akebakker som er under kommunal forvalting i Oslo",
+    "keywords": ["adspredelse", "bymiljø", "geodata"],
+    "accrualPeriodicity": "irregular",
+    "accessRights": "public",
+    "confidentiality": "green",
+    "objective": "Formidle akebakker",
+    "spatial": ["Oslo"],
+    "spatialResolutionInMeters": 500,
+    "license": "https://data.norge.no/nlod/no/2.0",
+    "contactPoint": {
+        "name": "Timian",
+        "email": "tim@oslo.kommune.no",
+        "phone": "98765432",
+    },
+    "publisher": "BYM",
+}
 
 
 class Context:

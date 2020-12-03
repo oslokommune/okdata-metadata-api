@@ -21,7 +21,7 @@ BASE_URL = os.environ.get("BASE_URL", "")
 @xray_recorder.capture("create_dataset")
 def create_dataset(event, context):
     """POST /datasets"""
-    content = json.loads(event["body"])
+    content = json.loads(event["body"], use_decimal=True)
 
     try:
         dataset_id = dataset_repository.create_dataset(content)
@@ -51,7 +51,7 @@ def create_dataset(event, context):
 def update_dataset(event, context):
     """PUT /datasets/:dataset-id"""
 
-    content = json.loads(event["body"])
+    content = json.loads(event["body"], use_decimal=True)
     dataset_id = event["pathParameters"]["dataset-id"]
     log_add(dataset_id=dataset_id)
 

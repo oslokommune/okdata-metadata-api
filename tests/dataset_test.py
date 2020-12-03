@@ -1,5 +1,6 @@
 import pytest
 import json
+from decimal import Decimal
 
 from boto3.dynamodb.conditions import Key
 
@@ -70,6 +71,39 @@ class TestCreateDataset:
             "message": "Validation error",
             "errors": [
                 "confidentiality: 'blue' is not one of ['green', 'yellow', 'red', 'purple']"
+            ],
+        }
+
+    def test_create_geo(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        create_event = auth_event(common.raw_geo_dataset.copy())
+        response = dataset_handler.create_dataset(create_event, None)
+        body = json.loads(response["body"])
+        dataset_id = body["Id"]
+
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(table.ID_COLUMN).eq(dataset_id)
+        )
+        item = db_response["Items"][0]
+
+        assert item["spatial"] == ["Bydel Østafor", "Bydel Vestafor"]
+        assert item["spatialResolutionInMeters"] == Decimal("720.31")
+        assert item["conformsTo"] == ["EUREF89 UTM sone 32, 2d"]
+
+    def test_create_geo_invalid(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        invalid_dataset = common.raw_geo_dataset.copy()
+        invalid_dataset["spatialResolutionInMeters"] = -12.2
+        create_event = auth_event(invalid_dataset)
+        response = dataset_handler.create_dataset(create_event, None)
+        error_message = json.loads(response["body"])
+        assert response["statusCode"] == 400
+        assert error_message == {
+            "message": "Validation error",
+            "errors": [
+                "spatialResolutionInMeters: -12.2 is less than the minimum of 0"
             ],
         }
 
@@ -155,3 +189,46 @@ class TestUpdateDataset:
         result = dataset_repository.slugify(title)
 
         assert result == "tittel-pa-datasett-42-med-spesialtegn-og-norske-tegn-eoa"
+
+    def test_update_geo_dataset(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        dataset = common.raw_geo_dataset.copy()
+        response = dataset_handler.create_dataset(auth_event(dataset), None)
+
+        body = json.loads(response["body"])
+        dataset_id = body["Id"]
+        event_for_update = auth_event(common.updated_geo_dataset.copy(), dataset_id)
+        response = dataset_handler.update_dataset(event_for_update, None)
+
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(table.ID_COLUMN).eq(dataset_id)
+        )
+        item = db_response["Items"][0]
+
+        assert item[table.ID_COLUMN] == dataset_id
+        assert item["contactPoint"]["name"] == "Timian"
+        assert item["spatial"] == ["Oslo"]
+        assert item["spatialResolutionInMeters"] == Decimal("500")
+        assert item["license"] == "https://data.norge.no/nlod/no/2.0"
+        assert "conformsTo" not in item
+
+
+class TestGetDataset:
+    def test_get_dataset(self, event, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        dataset = common.raw_geo_dataset.copy()
+        response = dataset_handler.create_dataset(auth_event(dataset), None)
+        body = json.loads(response["body"])
+        dataset_id = body["Id"]
+
+        event_for_get = event({}, dataset_id)
+        response = dataset_handler.get_dataset(event_for_get, None)
+
+        assert response["statusCode"] == 200
+        dataset = json.loads(response["body"])
+        assert dataset["Id"] == "akebakker-under-kommunal-forvaltning-i-oslo"
+        assert dataset["spatial"] == ["Bydel Østafor", "Bydel Vestafor"]
+        assert dataset["spatialResolutionInMeters"] == 720.31
+        assert dataset["conformsTo"] == ["EUREF89 UTM sone 32, 2d"]

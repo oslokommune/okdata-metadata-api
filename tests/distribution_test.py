@@ -112,7 +112,10 @@ class TestUpdateDistribution:
         db_response = metadata_table.query(
             KeyConditionExpression=Key(table.ID_COLUMN).eq(distribution_id)
         )
-        assert db_response["Items"][0]["filename"] == "UPDATED.csv"
+        item = db_response["Items"][0]
+
+        assert item["filename"] == "UPDATED.csv"
+        assert item["license"] == "Norsk lisens for offentlige data (NLOD) 2.0"
 
     def test_forbidden(self, metadata_table, auth_event, auth_denied, put_edition):
         import metadata.distribution.handler as distribution_handler

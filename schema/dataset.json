@@ -139,6 +139,31 @@
       "description": "A timestamp field for eventstreams",
       "type": "string",
       "maxLength": 255
+    },
+    "spatial": {
+      "description": "The geographical area covered by the dataset.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "spatialResolutionInMeters": {
+      "description": "Minimum spatial separation resolvable in the dataset, measured in meters.",
+      "type": "number",
+      "minimum": 0
+    },
+    "conformsTo": {
+      "description": "An established standard to which the described resource conforms.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "license": {
+      "description": "A legal document under which the resource is made available.",
+      "type": "string"
     }
   },
   "additionalProperties": false,

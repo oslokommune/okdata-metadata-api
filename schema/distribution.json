@@ -16,6 +16,10 @@
         "minLength": 1,
         "maxLength": 255
       }
+    },
+    "license": {
+      "description": "A legal document under which the resource is made available.",
+      "type": "string"
     }
   },
   "additionalProperties": false
