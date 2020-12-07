@@ -786,7 +786,7 @@ definitions:
           items:
             type: "string"
             enum:
-            - "agriculture, fisheries, forestry and food",
+            - "agriculture, fisheries, forestry and food"
             - "economy and finance"
             - "education, culture and sport"
             - "energy"
@@ -969,7 +969,7 @@ definitions:
         items:
           type: "string"
           enum:
-          - "agriculture, fisheries, forestry and food",
+          - "agriculture, fisheries, forestry and food"
           - "economy and finance"
           - "education, culture and sport"
           - "energy"
