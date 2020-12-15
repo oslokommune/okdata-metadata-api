@@ -98,6 +98,8 @@ This will create a dataset with ID=besoksdata-gjenbruksstasjoner, the id is deri
 
 ### Update dataset
 
+#### Replace
+
 ```
 PUT /datasets/:dataset-id
 
@@ -112,12 +114,38 @@ PUT /datasets/:dataset-id
     "contactPoint": {
         "name": "Tim",
         "email": "tim@oslo.kommune.no",
-        "phone": "98765432"
+        "phone": "11111111"
     },
     "publisher": "REN"
 }
 ```
 Updates a single `dataset-id`, replaces old json document
+
+#### Partial update
+
+```
+PATCH /datasets/:dataset-id
+
+{
+    "title": "Besøksdata gjenbruksstasjoner kun oppdatert tittel"
+}
+```
+
+Partially updates a single `dataset-id`. **Note** that patching is top-level shallow, i.e. updates inside deep structure values will behave as a PUT.
+
+E.g. `phone` must be supplied in the following PATCH, even though we are just changing `name` and `email`. If `phone` was not supplied, it would be removed.
+
+```
+PATCH /datasets/:dataset-id
+
+{
+    "contactPoint": {
+        "name": "Kim",
+        "email": "kim@oslo.kommune.no",
+        "phone": "11111111"
+    }
+}
+```
 
 ### Get a single dataset
 

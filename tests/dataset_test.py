@@ -132,7 +132,7 @@ class TestUpdateDataset:
         assert item[table.ID_COLUMN] == dataset_id
         assert item[table.TYPE_COLUMN] == "Dataset"
         assert item["title"] == "UPDATED TITLE"
-        assert item["confidentiality"] == "red"
+        assert item["accrualPeriodicity"] == "daily"
 
     def test_forbidden(self, event, metadata_table, auth_event, auth_denied):
         import metadata.dataset.handler as dataset_handler
@@ -168,6 +168,26 @@ class TestUpdateDataset:
             "errors": [
                 "confidentiality: 'blue' is not one of ['green', 'yellow', 'red', 'purple']"
             ],
+        }
+
+    def test_update_invalid_change(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        dataset = common.raw_dataset.copy()
+        response = dataset_handler.create_dataset(auth_event(dataset), None)
+
+        body = json.loads(response["body"])
+        dataset_id = body["Id"]
+
+        invalid_dataset = dataset.copy()
+        invalid_dataset["parent_id"] = "dataset-42"
+        update_event = auth_event(invalid_dataset, dataset_id)
+
+        response = dataset_handler.update_dataset(update_event, None)
+        error_message = json.loads(response["body"])
+        assert response["statusCode"] == 400
+        assert error_message == {
+            "message": "The value of parent_id cannot be changed.",
         }
 
     def test_dataset_not_exist(self, auth_event, metadata_table):
@@ -212,6 +232,86 @@ class TestUpdateDataset:
         assert item["spatialResolutionInMeters"] == Decimal("500")
         assert item["license"] == "https://data.norge.no/nlod/no/2.0"
         assert "conformsTo" not in item
+
+
+class TestPatchDataset:
+    def test_patch_dataset(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        dataset = common.raw_dataset.copy()
+        response = dataset_handler.create_dataset(auth_event(dataset), None)
+
+        body = json.loads(response["body"])
+        dataset_id = body["Id"]
+        event_for_patch = auth_event(common.dataset_patched.copy(), dataset_id)
+
+        response = dataset_handler.patch_dataset(event_for_patch, None)
+        body = json.loads(response["body"])
+
+        assert body["Id"] == dataset_id
+        assert response["statusCode"] == 200
+
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(table.ID_COLUMN).eq(dataset_id)
+        )
+        item = db_response["Items"][0]
+        assert item[table.ID_COLUMN] == dataset_id
+        assert item[table.TYPE_COLUMN] == "Dataset"
+        # Changed:
+        assert item["title"] == "PATCHED TITLE"
+        assert item["keywords"][0] == "saksbehandling"
+        assert item["contactPoint"]["name"] == "Kim"
+        # Unchanged:
+        assert item["accrualPeriodicity"] == "hourly"
+        assert item["objective"] == "Formålsbeskrivelse"
+
+    def test_forbidden(self, event, metadata_table, auth_event, auth_denied):
+        import metadata.dataset.handler as dataset_handler
+
+        dataset = common.raw_dataset.copy()
+        response = dataset_handler.create_dataset(auth_event(dataset), None)
+
+        body = json.loads(response["body"])
+        dataset_id = body["Id"]
+        event_for_patch = event(common.dataset_patched.copy(), dataset_id)
+
+        response = dataset_handler.patch_dataset(event_for_patch, None)
+        assert response["statusCode"] == 403
+        assert json.loads(response["body"]) == [
+            {"message": f"You are not authorized to access dataset {dataset_id}"}
+        ]
+
+    def test_update_invalid(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        dataset = common.raw_dataset.copy()
+        dataset_handler.create_dataset(auth_event(dataset), None)
+
+        invalid_dataset = common.dataset_patched.copy()
+        invalid_dataset["confidentiality"] = "red"
+        update_event = auth_event(invalid_dataset)
+
+        response = dataset_handler.patch_dataset(update_event, None)
+        error_message = json.loads(response["body"])
+        assert response["statusCode"] == 400
+        assert error_message == {
+            "message": "Validation error",
+            "errors": [
+                "Additional properties are not allowed ('confidentiality' was unexpected)",
+            ],
+        }
+
+    def test_dataset_not_exist(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        dataset_id = "dataset-id"
+        event_for_patch = auth_event(common.dataset_patched, dataset_id)
+
+        response = dataset_handler.patch_dataset(event_for_patch, None)
+        assert response["statusCode"] == 404
+        assert json.loads(response["body"]) == [
+            {"message": f"Dataset {dataset_id} does not exist"}
+        ]
 
 
 class TestGetDataset:

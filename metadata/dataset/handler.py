@@ -5,7 +5,7 @@ from aws_xray_sdk.core import xray_recorder
 from auth import SimpleAuth
 from dataplatform.awslambda.logging import logging_wrapper, log_add, log_exception
 from metadata import common
-from metadata.error import ResourceConflict
+from metadata.error import ResourceConflict, ValidationError
 from metadata.common import check_auth, validate_input
 from metadata.dataset.repository import DatasetRepository
 from metadata.validator import Validator
@@ -13,6 +13,7 @@ from metadata.validator import Validator
 dataset_repository = DatasetRepository()
 AUTHORIZER_API = os.environ["AUTHORIZER_API"]
 validator = Validator("dataset")
+patch_validator = Validator("dataset_patch")
 BASE_URL = os.environ.get("BASE_URL", "")
 
 
@@ -51,22 +52,17 @@ def create_dataset(event, context):
 def update_dataset(event, context):
     """PUT /datasets/:dataset-id"""
 
-    content = json.loads(event["body"], use_decimal=True)
-    dataset_id = event["pathParameters"]["dataset-id"]
-    log_add(dataset_id=dataset_id)
+    return _update_dataset(event, context, patch=False)
 
-    try:
-        dataset_repository.update_dataset(dataset_id, content)
-        body = dataset_repository.get_dataset(dataset_id, consistent_read=True)
-        add_self_url(body)
-        return common.response(200, body)
-    except KeyError:
-        message = "Dataset not found"
-        return common.response(404, {"message": message})
-    except ValueError as e:
-        log_exception(e)
-        message = f"Error updating dataset. RequestId: {context.aws_request_id}"
-        return common.response(500, {"message": message})
+
+@logging_wrapper
+@validate_input(patch_validator)
+@check_auth
+@xray_recorder.capture("patch_dataset")
+def patch_dataset(event, context):
+    """PATCH /datasets/:dataset-id"""
+
+    return _update_dataset(event, context, patch=True)
 
 
 @logging_wrapper
@@ -104,3 +100,28 @@ def add_self_url(dataset):
     if "Id" in dataset:
         self_url = f'{BASE_URL}/datasets/{dataset["Id"]}'
         dataset["_links"] = {"self": {"href": self_url}}
+
+
+def _update_dataset(event, context, patch):
+    content = json.loads(event["body"], use_decimal=True)
+    dataset_id = event["pathParameters"]["dataset-id"]
+    log_add(dataset_id=dataset_id)
+
+    try:
+        if patch:
+            dataset_repository.patch_dataset(dataset_id, content)
+        else:
+            dataset_repository.update_dataset(dataset_id, content)
+        body = dataset_repository.get_dataset(dataset_id, consistent_read=True)
+        add_self_url(body)
+        return common.response(200, body)
+    except KeyError:
+        message = "Dataset not found"
+        return common.response(404, {"message": message})
+    except ValidationError as e:
+        log_exception(e)
+        return common.response(400, {"message": str(e)})
+    except ValueError as e:
+        log_exception(e)
+        message = f"Error updating dataset. RequestId: {context.aws_request_id}"
+        return common.response(500, {"message": message})

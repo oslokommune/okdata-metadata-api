@@ -1,0 +1,7 @@
+handler: metadata.dataset.handler.patch_dataset
+events:
+  - http:
+      path: "/datasets/{dataset-id}"
+      method: "patch"
+      authorizer: ${file(serverless/kc-authorizer.yaml)}
+      documentation: ${file(serverless/documentation/patch_dataset.yaml)}

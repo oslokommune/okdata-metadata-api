@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DatasetPatch",
+  "description": "PATCH request with metadata about a dataset",
+  "type": "object",
+  "properties": {
+    "theme": {
+      "description": "Reference to a main theme for this dataset.",
+      "type": "array",
+       "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "agriculture, fisheries, forestry and food",
+          "economy and finance",
+          "education, culture and sport",
+          "energy",
+          "environment",
+          "government and public sector",
+          "health",
+          "international issues",
+          "justice, legal system and public safety",
+          "regions and cities",
+          "population and society",
+          "science and technology",
+          "transport"
+        ]
+      }
+    },
+    "accrualPeriodicity": {
+      "description": "Indicates how often a dataset is updated",
+      "type": "string",
+      "enum": [
+        "annual",
+        "semiannual",
+        "three times a year",
+        "bidecennial",
+        "biennial",
+        "bihourly",
+        "bimonthly",
+        "biweekly",
+        "continuous",
+        "daily",
+        "twice a day",
+        "decennial",
+        "hourly",
+        "irregular",
+        "monthly",
+        "semimonthly",
+        "three times a month",
+        "never",
+        "other",
+        "quadrennial",
+        "quarterly",
+        "quinquennial",
+        "tridecennial",
+        "triennial",
+        "trihourly",
+        "unknown",
+        "continuously updated",
+        "weekly",
+        "semiweekly",
+        "three times a week"
+      ]
+    },
+    "contactPoint": {
+      "description": "Contact info",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "email": {
+          "type": "string",
+          "format": "idn-email",
+          "maxLength": 255
+        }
+      },
+      "required": [
+        "email"
+      ]
+    },
+    "publisher": {
+      "description": "Refrence to a unit responsible for making the dataset available.",
+      "type": "string",
+      "maxLength": 255
+    },
+    "keywords": {
+      "description": "Extra keywords describing the dataset",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "maxLength": 255
+      }
+    },
+    "objective": {
+      "description": "A description on why this dataset was created.",
+      "type": "string",
+      "maxLength": 2048
+    },
+    "description": {
+      "description": "A description of what this dataset contains.",
+      "type": "string",
+      "maxLength": 2048
+    },
+    "title": {
+      "description": "The dataset title",
+      "type": "string",
+      "pattern": "^[- a-zA-Z0-9åÅæÆøØ]+$",
+      "maxLength": 128
+    },
+    "timestamp_field": {
+      "description": "A timestamp field for eventstreams",
+      "type": "string",
+      "maxLength": 255
+    },
+    "spatial": {
+      "description": "The geographical area covered by the dataset.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "spatialResolutionInMeters": {
+      "description": "Minimum spatial separation resolvable in the dataset, measured in meters.",
+      "type": "number",
+      "minimum": 0
+    },
+    "conformsTo": {
+      "description": "An established standard to which the described resource conforms.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "license": {
+      "description": "A legal document under which the resource is made available.",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

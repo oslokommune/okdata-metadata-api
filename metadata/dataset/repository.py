@@ -75,6 +75,9 @@ class DatasetRepository(CommonRepository):
     def update_dataset(self, dataset_id, content):
         return self.update_item(dataset_id, content)
 
+    def patch_dataset(self, dataset_id, content):
+        return self.patch_item(dataset_id, content)
+
     def generate_unique_id_based_on_title(self, title):
         id = slugify(title)[:64]
         if self.dataset_exists(id):

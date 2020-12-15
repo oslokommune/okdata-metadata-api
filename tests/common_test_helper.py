@@ -67,9 +67,9 @@ dataset_updated = {
     "title": "UPDATED TITLE",
     "description": "Sensordata fra tellere på gamle gjenbruksstasjoner",
     "keywords": ["avfall", "besøkende", "gjenbruksstasjon"],
-    "accrualPeriodicity": "hourly",
-    "accessRights": "restricted",
-    "confidentiality": "red",
+    "accrualPeriodicity": "daily",
+    "accessRights": "non-public",
+    "confidentiality": "green",
     "objective": "Formålsbeskrivelse",
     "contactPoint": {
         "name": "Tim",
@@ -77,6 +77,16 @@ dataset_updated = {
         "phone": "12345678",
     },
     "publisher": "REN",
+}
+
+dataset_patched = {
+    "title": "PATCHED TITLE",
+    "keywords": ["saksbehandling", "forankring", "ressursinnsats"],
+    "contactPoint": {
+        "name": "Kim",
+        "email": "kim@oslo.kommune.no",
+        "phone": "12345678",
+    },
 }
 
 raw_version = {"version": "6"}

@@ -1,0 +1,4 @@
+name: Dataset
+description: This is a dataset
+contentType: "application/json"
+schema: ${file(schema/dataset_patch.json)}

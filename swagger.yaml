@@ -153,6 +153,48 @@ paths:
             $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
+    patch:
+      summary: "Partially update a dataset"
+      description: "Partially updates an existing dataset"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "dataset-id"
+        in: "path"
+        description: "The dataset you want to update"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "DatasetPatch"
+        description: "The new values"
+        required: true
+        schema:
+          $ref: "#/definitions/DatasetPatch"
+      responses:
+        200:
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Dataset"
+        500:
+          description: "500 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        401:
+          description: "401 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        403:
+          description: "403 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        404:
+          description: "404 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+      security:
+      - authenticate: []
   /datasets/{dataset-id}/versions:
     get:
       summary: "Get all versions"
@@ -1024,6 +1066,104 @@ definitions:
         - "non-public"
         - "public"
         - "restricted"
+      timestamp_field:
+        type: "string"
+        description: "A timestamp field for eventstreams"
+        maxLength: 255
+      title:
+        type: "string"
+        description: "The dataset title"
+        maxLength: 128
+        pattern: "^[- a-zA-Z0-9åÅæÆøØ]+$"
+      objective:
+        type: "string"
+        description: "A description on why this dataset was created."
+        maxLength: 2048
+    title: "Dataset"
+    description: "This is a dataset"
+  DatasetPatch:
+    type: "object"
+    properties:
+      keywords:
+        type: "array"
+        description: "Extra keywords describing the dataset"
+        items:
+          type: "string"
+          maxLength: 255
+      contactPoint:
+        type: "object"
+        description: "Contact info"
+        properties:
+          name:
+            type: "string"
+            maxLength: 255
+          email:
+            type: "string"
+            format: "idn-email"
+            maxLength: 255
+        required:
+        - "email"
+      publisher:
+        type: "string"
+        description: "Refrence to a unit responsible for making the dataset available."
+        maxLength: 255
+      description:
+        type: "string"
+        description: "A description of what this dataset contains."
+        maxLength: 2048
+      theme:
+        type: "array"
+        description: "Reference to a main theme for this dataset."
+        items:
+          type: "string"
+          enum:
+          - "agriculture, fisheries, forestry and food",
+          - "economy and finance"
+          - "education, culture and sport"
+          - "energy"
+          - "environment"
+          - "government and public sector"
+          - "health"
+          - "international issues"
+          - "justice, legal system and public safety"
+          - "regions and cities"
+          - "population and society"
+          - "science and technology"
+          - "transport"
+      accrualPeriodicity:
+        type: "string"
+        description: "Indicates how often a dataset is updated"
+        enum:
+        - "annual"
+        - "semiannual"
+        - "three times a year"
+        - "bidecennial"
+        - "biennial"
+        - "bihourly"
+        - "bimonthly"
+        - "biweekly"
+        - "continuous"
+        - "daily"
+        - "twice a day"
+        - "decennial"
+        - "hourly"
+        - "irregular"
+        - "monthly"
+        - "semimonthly"
+        - "three times a month"
+        - "never"
+        - "other"
+        - "quadrennial"
+        - "quarterly"
+        - "quinquennial"
+        - "tridecennial"
+        - "triennial"
+        - "trihourly"
+        - "unknown"
+        - "continuously updated"
+        - "weekly"
+        - "semiweekly"
+        - "three times a week"
       timestamp_field:
         type: "string"
         description: "A timestamp field for eventstreams"

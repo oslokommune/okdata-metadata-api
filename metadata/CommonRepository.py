@@ -3,7 +3,7 @@ from botocore.exceptions import ClientError
 import logging
 
 from metadata import common
-from metadata.error import ResourceConflict
+from metadata.error import ResourceConflict, ValidationError
 from dataplatform.awslambda.logging import log_add, log_duration
 
 from aws_xray_sdk.core import patch_all
@@ -147,6 +147,12 @@ class CommonRepository:
                 raise ValueError(f"Error creating item ({error_code}): {msg}")
 
     def update_item(self, item_id, content):
+        return self._update_item(item_id, content, patch=False)
+
+    def patch_item(self, item_id, content):
+        return self._update_item(item_id, content, patch=True)
+
+    def _update_item(self, item_id, content, patch):
         log_add(dynamodb_item_id=item_id, dynamodb_item_type=self.type)
         old_item = self.get_item(item_id)
 
@@ -155,11 +161,17 @@ class CommonRepository:
         if not item_exists:
             raise KeyError(f"Item with id {item_id} does not exist")
 
-        content[common.ID_COLUMN] = old_item[common.ID_COLUMN]
-        content[common.TYPE_COLUMN] = self.type
+        new_content = {**old_item, **content} if patch else content
+
+        new_content[common.ID_COLUMN] = old_item[common.ID_COLUMN]
+        new_content[common.TYPE_COLUMN] = self.type
+
+        for key in ["accessRights", "confidentiality", "parent_id"]:
+            if old_item.get(key) != new_content.get(key):
+                raise ValidationError(f"The value of {key} cannot be changed.")
 
         db_response = log_duration(
-            lambda: self.table.put_item(Item=content), "dynamodb_duration_ms"
+            lambda: self.table.put_item(Item=new_content), "dynamodb_duration_ms"
         )
 
         status_code = db_response["ResponseMetadata"]["HTTPStatusCode"]
@@ -167,7 +179,7 @@ class CommonRepository:
 
         if status_code == 200:
             return item_id
-        else:
-            msg = f"Error updating item ({status_code}): {db_response}"
-            log.exception(msg)
-            raise ValueError(msg)
+
+        msg = f"Error updating item ({status_code}): {db_response}"
+        log.exception(msg)
+        raise ValueError(msg)

@@ -1,0 +1,39 @@
+summary: "Partially update a dataset"
+description: "Partially updates an existing dataset"
+requestBody:
+  description: "The new values"
+requestModels:
+  application/json: DatasetPatch
+pathParams:
+  - name: "dataset-id"
+    description: "The dataset you want to update"
+    required: true
+    schema:
+      type: "string"
+      pattern: "^[-a-z0-9_]+$"
+methodResponses:
+  - statusCode: "200"
+    responseBody:
+      description: "Dataset updated successfully"
+    responseModels:
+      application/json: "Dataset"
+  - statusCode: "401"
+    responseBody:
+      description: "Authentication failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "403"
+    responseBody:
+      description: "Authorization failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "404"
+    responseBody:
+      description: "Dataset does not exist"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "500"
+    responseBody:
+      description: "Was not able to update the dataset. Internal server error."
+    responseModels:
+      application/json: "StandardResponse"
