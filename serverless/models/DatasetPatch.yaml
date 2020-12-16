@@ -1,4 +1,4 @@
-name: Dataset
-description: This is a dataset
+name: DatasetPatch
+description: This is a dataset patch
 contentType: "application/json"
 schema: ${file(schema/dataset_patch.json)}
