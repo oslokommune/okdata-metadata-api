@@ -82,6 +82,7 @@ custom:
       - ${file(serverless/models/UserErrorResponse.yaml)}
       - ${file(serverless/models/StandardResponse.yaml)}
       - ${file(serverless/models/Dataset.yaml)}
+      - ${file(serverless/models/DatasetPatch.yaml)}
       - ${file(serverless/models/Edition.yaml)}
       - ${file(serverless/models/Version.yaml)}
       - ${file(serverless/models/Distribution.yaml)}
@@ -106,6 +107,7 @@ functions:
   create_dataset: ${file(serverless/functions/create_dataset.yaml)}
   get_datasets: ${file(serverless/functions/get_datasets.yaml)}
   get_dataset:  ${file(serverless/functions/get_dataset.yaml)}
+  patch_dataset: ${file(serverless/functions/patch_dataset.yaml)}
   update_dataset: ${file(serverless/functions/update_dataset.yaml)}
   create_version: ${file(serverless/functions/create_version.yaml)}
   update_version: ${file(serverless/functions/update_version.yaml)}
