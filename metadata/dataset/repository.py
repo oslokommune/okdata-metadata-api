@@ -5,7 +5,7 @@ import shortuuid
 from botocore.exceptions import ClientError
 from difflib import SequenceMatcher
 
-from dataplatform.awslambda.logging import log_dynamodb, log_exception
+from okdata.aws.logging import log_dynamodb, log_exception
 from metadata import common
 from metadata.CommonRepository import CommonRepository
 from aws_xray_sdk.core import patch

@@ -46,11 +46,11 @@ class TestCreateDistribution:
             "message": "Error creating distribution. RequestId: 1234"
         }
 
-    def test_forbidden(self, metadata_table, auth_event, put_edition, auth_denied):
+    def test_forbidden(self, metadata_table, event, put_edition):
         import metadata.distribution.handler as distribution_handler
 
         dataset_id, version, edition = put_edition
-        create_event = auth_event(
+        create_event = event(
             common_test_helper.raw_distribution,
             dataset=dataset_id,
             version=version,
@@ -117,14 +117,14 @@ class TestUpdateDistribution:
         assert item["filename"] == "UPDATED.csv"
         assert item["license"] == "Norsk lisens for offentlige data (NLOD) 2.0"
 
-    def test_forbidden(self, metadata_table, auth_event, auth_denied, put_edition):
+    def test_forbidden(self, metadata_table, event, put_edition):
         import metadata.distribution.handler as distribution_handler
 
         # auth_denied will return Forbidden, and then no edition will be created....
         edition = "my-edition"
         dataset_id, version, _ = put_edition
 
-        update_event = auth_event(
+        update_event = event(
             common_test_helper.distribution_updated,
             dataset=dataset_id,
             version=version,

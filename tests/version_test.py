@@ -75,7 +75,7 @@ class TestCreateVersion:
         body = json.loads(response["body"])
         assert str.startswith(body[0]["message"], "Resource Conflict")
 
-    def test_forbidden(self, event, metadata_table, auth_denied):
+    def test_forbidden(self, event, metadata_table):
         import metadata.version.handler as version_handler
 
         dataset = common_test_helper.raw_dataset.copy()
@@ -176,7 +176,7 @@ class TestUpdateVersion:
         assert version_from_db["Id"] == "antall-besokende-pa-gjenbruksstasjoner/latest"
         assert version_from_db["latest"] == "antall-besokende-pa-gjenbruksstasjoner/6"
 
-    def test_forbidden(self, event, metadata_table, put_dataset, auth_denied):
+    def test_forbidden(self, event, metadata_table, put_dataset):
         import metadata.version.handler as version_handler
 
         version = common_test_helper.raw_version.copy()

@@ -134,7 +134,7 @@ class TestUpdateDataset:
         assert item["title"] == "UPDATED TITLE"
         assert item["accrualPeriodicity"] == "daily"
 
-    def test_forbidden(self, event, metadata_table, auth_event, auth_denied):
+    def test_forbidden(self, event, metadata_table, auth_event):
         import metadata.dataset.handler as dataset_handler
 
         dataset = common.raw_dataset.copy()
@@ -265,7 +265,7 @@ class TestPatchDataset:
         assert item["accrualPeriodicity"] == "hourly"
         assert item["objective"] == "Formålsbeskrivelse"
 
-    def test_forbidden(self, event, metadata_table, auth_event, auth_denied):
+    def test_forbidden(self, event, metadata_table, auth_event):
         import metadata.dataset.handler as dataset_handler
 
         dataset = common.raw_dataset.copy()
