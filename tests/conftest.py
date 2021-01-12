@@ -4,7 +4,7 @@ import json
 import pytest
 import boto3
 from moto import mock_dynamodb2
-from auth import SimpleAuth
+from metadata import auth
 
 from tests import common_test_helper
 
@@ -21,24 +21,27 @@ def dynamodb():
 @pytest.fixture(autouse=True)
 def auth_mock(requests_mock, mocker):
     matcher = re.compile(f"{AUTHORIZER_API}/.*")
+    client_credentials_header = {
+        "Authorization": "Bearer Magic-keycloak-stuff",
+    }
 
     requests_mock.register_uri("GET", matcher, json={"access": False})
     requests_mock.register_uri(
         "GET",
         matcher,
-        request_headers={"Authorization": good_token},
+        request_headers={"Authorization": f"Bearer {good_token}"},
         json={"access": True},
     )
-    mocker.patch.object(SimpleAuth, "request_from_client")
-    mocker.patch.object(SimpleAuth, "request_with_token_exchange")
-    mocker.patch.object(SimpleAuth, "is_owner", return_value=True)
-
-
-@pytest.fixture()
-def auth_denied(mocker):
-    mocker.patch.object(SimpleAuth, "request_from_client")
-    mocker.patch.object(SimpleAuth, "request_with_token_exchange")
-    mocker.patch.object(SimpleAuth, "is_owner", return_value=False)
+    requests_mock.register_uri(
+        "POST",
+        matcher,
+        request_headers=client_credentials_header,
+    )
+    mocker.patch.object(
+        auth,
+        "service_client_authorization_header",
+        return_value=client_credentials_header,
+    )
 
 
 def lambda_event_factory(token=None):
@@ -55,10 +58,13 @@ def lambda_event_factory(token=None):
         if distribution:
             path["distribution"] = distribution
 
-        event = {"body": json.dumps(body)}
+        event = {
+            "body": json.dumps(body),
+            "headers": {"Authorization": "blarf"},
+        }
 
         if token:
-            event["headers"] = {"Authorization": token}
+            event["headers"]["Authorization"] = f"Bearer {token}"
 
         if path:
             event["pathParameters"] = path

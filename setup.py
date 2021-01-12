@@ -25,5 +25,15 @@ setuptools.setup(
         "metadata.edition.repository",
         "metadata.distribution.repository",
     ],
-    install_requires=["shortuuid", "jsonschema[format]", "strict-rfc3339"],
+    install_requires=[
+        "boto3",
+        "aws-xray-sdk",
+        "requests",
+        "shortuuid",
+        "simplejson",
+        "jsonschema[format]",
+        "strict-rfc3339",
+        "okdata-aws",
+        "python-keycloak",
+    ],
 )

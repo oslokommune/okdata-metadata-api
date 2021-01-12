@@ -1,8 +1,7 @@
 import simplejson as json
 from functools import wraps
 
-
-from auth import SimpleAuth
+from metadata.auth import is_dataset_owner
 from metadata.dataset.repository import DatasetRepository
 
 ID_COLUMN = "Id"
@@ -34,7 +33,13 @@ def check_auth(func):
             message = f"Dataset {dataset_id} does not exist"
             return error_response(404, message)
 
-        if not SimpleAuth().is_owner(event, dataset_id):
+        auth_header = event["headers"].get("Authorization")
+        if not auth_header:
+            message = "Authorization header missing"
+            return error_response(403, message)
+
+        bearer_token = auth_header.split(" ")[-1]
+        if not is_dataset_owner(bearer_token, dataset_id):
             message = f"You are not authorized to access dataset {dataset_id}"
             return error_response(403, message)
 

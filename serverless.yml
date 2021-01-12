@@ -13,8 +13,6 @@ provider:
   tracing:
     lambda: true
     apiGateway: true
-  layers:
-    - ${ssm:/dataplatform/shared/python-base-layer-arn}
   rolePermissionsBoundary: "arn:aws:iam::#{AWS::AccountId}:policy/oslokommune/oslokommune-boundary"
   iamManagedPolicies:
     - "arn:aws:iam::#{AWS::AccountId}:policy/metadata-api-policy"
@@ -37,7 +35,6 @@ plugins:
   - serverless-python-requirements
   - serverless-scriptable-plugin
   - serverless-plugin-git-variables
-  - serverless-plugin-common-layers
   - serverless-pseudo-parameters
   - serverless-es-logs
 

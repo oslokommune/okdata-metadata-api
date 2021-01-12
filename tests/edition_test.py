@@ -68,11 +68,11 @@ class TestCreateEdition:
         body = json.loads(response["body"])
         assert str.startswith(body[0]["message"], "Resource Conflict")
 
-    def test_forbidden(self, metadata_table, auth_event, put_version, auth_denied):
+    def test_forbidden(self, metadata_table, event, put_version):
         import metadata.edition.handler as edition_handler
 
         dataset_id, version = put_version
-        create_event = auth_event(
+        create_event = event(
             common_test_helper.raw_edition, dataset=dataset_id, version=version
         )
 
@@ -177,7 +177,7 @@ class TestUpdateEdition:
 
         assert edition_from_db["latest"] == f"{dataset_id}/{version}/{edition}"
 
-    def test_forbidden(self, metadata_table, auth_event, put_version, auth_denied):
+    def test_forbidden(self, metadata_table, auth_event, event, put_version):
         import metadata.edition.handler as edition_handler
 
         dataset_id, version = put_version
@@ -186,8 +186,8 @@ class TestUpdateEdition:
         )
         body = json.loads(edition_handler.create_edition(create_event, None)["body"])
 
-        edition_id = body[0]["message"].split("/")[-1]
-        update_event = auth_event(
+        edition_id = body["Id"].split("/")[-1]
+        update_event = event(
             common_test_helper.edition_updated,
             dataset=dataset_id,
             version=version,

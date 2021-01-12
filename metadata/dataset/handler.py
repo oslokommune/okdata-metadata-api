@@ -1,10 +1,11 @@
 import os
+import requests
 import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 
-from auth import SimpleAuth
-from dataplatform.awslambda.logging import logging_wrapper, log_add, log_exception
+from okdata.aws.logging import logging_wrapper, log_add, log_exception
 from metadata import common
+from metadata.auth import service_client_authorization_header
 from metadata.error import ResourceConflict, ValidationError
 from metadata.common import check_auth, validate_input
 from metadata.dataset.repository import DatasetRepository
@@ -30,8 +31,11 @@ def create_dataset(event, context):
 
         user_id = event["requestContext"]["authorizer"]["principalId"]
 
-        requests = SimpleAuth().request_from_client()
-        requests.post(f"{AUTHORIZER_API}/{dataset_id}", json={"principalId": user_id})
+        requests.post(
+            f"{AUTHORIZER_API}/{dataset_id}",
+            json={"principalId": user_id},
+            headers=service_client_authorization_header(),
+        )
 
         headers = {"Location": f"/datasets/{dataset_id}"}
         body = dataset_repository.get_dataset(dataset_id, consistent_read=True)

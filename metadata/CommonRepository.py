@@ -4,7 +4,7 @@ import logging
 
 from metadata import common
 from metadata.error import ResourceConflict, ValidationError
-from dataplatform.awslambda.logging import log_add, log_duration
+from okdata.aws.logging import log_add, log_duration
 
 from aws_xray_sdk.core import patch_all
 
