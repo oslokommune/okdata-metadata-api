@@ -53,7 +53,6 @@ raw_dataset = {
     "keywords": ["avfall", "besøkende", "gjenbruksstasjon"],
     "accrualPeriodicity": "hourly",
     "accessRights": "non-public",
-    "confidentiality": "green",
     "objective": "Formålsbeskrivelse",
     "contactPoint": {
         "name": "Tim",
@@ -69,7 +68,6 @@ dataset_updated = {
     "keywords": ["avfall", "besøkende", "gjenbruksstasjon"],
     "accrualPeriodicity": "daily",
     "accessRights": "non-public",
-    "confidentiality": "green",
     "objective": "Formålsbeskrivelse",
     "contactPoint": {
         "name": "Tim",
@@ -120,7 +118,6 @@ raw_geo_dataset = {
     "keywords": ["adspredelse", "bymiljø", "geodata"],
     "accrualPeriodicity": "irregular",
     "accessRights": "public",
-    "confidentiality": "green",
     "objective": "Formidle akebakker",
     "spatial": ["Bydel Østafor", "Bydel Vestafor"],
     "spatialResolutionInMeters": 720.31,
@@ -139,7 +136,6 @@ updated_geo_dataset = {
     "keywords": ["adspredelse", "bymiljø", "geodata"],
     "accrualPeriodicity": "irregular",
     "accessRights": "public",
-    "confidentiality": "green",
     "objective": "Formidle akebakker",
     "spatial": ["Oslo"],
     "spatialResolutionInMeters": 500,
