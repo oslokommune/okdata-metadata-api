@@ -96,7 +96,7 @@
       "maxLength": 255
     },
     "confidentiality": {
-      "description": "Classifier for how sensitive the dataset is.",
+      "description": "Classifier for how sensitive the dataset is. (Deprecated, use `accessRights` instead.)",
       "type": "string",
       "enum": [
         "green",
@@ -171,7 +171,6 @@
     "title",
     "accessRights",
     "contactPoint",
-    "publisher",
-    "confidentiality"
+    "publisher"
   ]
 }

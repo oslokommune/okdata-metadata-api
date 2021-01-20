@@ -14,7 +14,6 @@ valid_dataset = {
         "email": "dataplattform@oslo.kommune.no",
     },
     "publisher": "Origo",
-    "confidentiality": "green",
     "keywords": ["badetemperatur"],
     "objective": "Tilgjengeliggjøre badetemperaturer",
     "description": "Badetemperatur sensordata fra Vicotee",

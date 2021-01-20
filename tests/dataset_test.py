@@ -33,7 +33,6 @@ class TestCreateDataset:
         assert item[table.ID_COLUMN] == dataset_id
         assert item[table.TYPE_COLUMN] == "Dataset"
         assert item["title"] == "Antall besøkende på gjenbruksstasjoner"
-        assert item["confidentiality"] == "green"
 
         # Check that we create the initial version
 
@@ -62,7 +61,7 @@ class TestCreateDataset:
         import metadata.dataset.handler as dataset_handler
 
         invalid_dataset = common.raw_dataset.copy()
-        invalid_dataset["confidentiality"] = "blue"
+        invalid_dataset["accessRights"] = "foo"
         create_event = auth_event(invalid_dataset)
         response = dataset_handler.create_dataset(create_event, None)
         error_message = json.loads(response["body"])
@@ -70,7 +69,7 @@ class TestCreateDataset:
         assert error_message == {
             "message": "Validation error",
             "errors": [
-                "confidentiality: 'blue' is not one of ['green', 'yellow', 'red', 'purple']"
+                "accessRights: 'foo' is not one of ['non-public', 'public', 'restricted']"
             ],
         }
 
@@ -157,7 +156,7 @@ class TestUpdateDataset:
         dataset_handler.create_dataset(auth_event(dataset), None)
 
         invalid_dataset = dataset.copy()
-        invalid_dataset["confidentiality"] = "blue"
+        invalid_dataset["accessRights"] = "foo"
         update_event = auth_event(invalid_dataset)
 
         response = dataset_handler.update_dataset(update_event, None)
@@ -166,7 +165,7 @@ class TestUpdateDataset:
         assert error_message == {
             "message": "Validation error",
             "errors": [
-                "confidentiality: 'blue' is not one of ['green', 'yellow', 'red', 'purple']"
+                "accessRights: 'foo' is not one of ['non-public', 'public', 'restricted']"
             ],
         }
 
@@ -288,7 +287,7 @@ class TestPatchDataset:
         dataset_handler.create_dataset(auth_event(dataset), None)
 
         invalid_dataset = common.dataset_patched.copy()
-        invalid_dataset["confidentiality"] = "red"
+        invalid_dataset["foo"] = "bar"
         update_event = auth_event(invalid_dataset)
 
         response = dataset_handler.patch_dataset(update_event, None)
@@ -297,7 +296,7 @@ class TestPatchDataset:
         assert error_message == {
             "message": "Validation error",
             "errors": [
-                "Additional properties are not allowed ('confidentiality' was unexpected)",
+                "Additional properties are not allowed ('foo' was unexpected)",
             ],
         }
 
