@@ -49,13 +49,20 @@ class CommonRepository:
     def get_items(self, parent_id=None):
         log_add(dynamodb_item_type=self.type)
         cond = Key(common.TYPE_COLUMN).eq(self.type)
+        extra_query_args = {}
+
         if parent_id:
             log_add(dynamodb_parent_id=parent_id)
-            cond = cond & Key(common.ID_COLUMN).begins_with(f"{parent_id}/")
+            if self.type == "Dataset":
+                extra_query_args["FilterExpression"] = Key("parent_id").eq(parent_id)
+            else:
+                cond = cond & Key(common.ID_COLUMN).begins_with(f"{parent_id}/")
 
         db_response = log_duration(
             lambda: self.table.query(
-                IndexName="IdByTypeIndex", KeyConditionExpression=cond
+                IndexName="IdByTypeIndex",
+                KeyConditionExpression=cond,
+                **extra_query_args,
             ),
             "dynamodb_duration_ms",
         )

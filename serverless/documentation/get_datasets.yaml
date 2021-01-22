@@ -1,5 +1,9 @@
 summary: "Get all datasets"
 description: "Retrieves all datasets"
+queryParams:
+  - name: parent_id
+    description: Filter by parent dataset
+    type: string
 methodResponses:
   - statusCode: "200"
     responseBody:

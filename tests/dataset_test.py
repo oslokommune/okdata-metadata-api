@@ -314,6 +314,65 @@ class TestPatchDataset:
 
 
 class TestGetDataset:
+    def test_get_all_datasets(self, event, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        dataset = common.raw_dataset.copy()
+        response = dataset_handler.create_dataset(auth_event(dataset), None)
+        dataset_id = json.loads(response["body"])["Id"]
+
+        for i in range(0, 3):
+            child_dataset = common.raw_dataset.copy()
+            child_dataset["parent_id"] = dataset_id
+
+            response = dataset_handler.create_dataset(auth_event(child_dataset), None)
+
+        response = dataset_handler.get_datasets(event(), None)
+        datasets = json.loads(response["body"])
+
+        assert response["statusCode"] == 200
+        assert len(datasets) == 4  # Including parent dataset
+
+    def test_get_datasets_by_parent(self, event, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        dataset = common.raw_dataset.copy()
+        response = dataset_handler.create_dataset(auth_event(dataset), None)
+        dataset_id = json.loads(response["body"])["Id"]
+
+        for i in range(0, 3):
+            child_dataset = common.raw_dataset.copy()
+            child_dataset["parent_id"] = dataset_id
+
+            response = dataset_handler.create_dataset(auth_event(child_dataset), None)
+
+        event_for_get = event(query_params={"parent_id": dataset_id})
+        response = dataset_handler.get_datasets(event_for_get, None)
+        datasets = json.loads(response["body"])
+
+        assert response["statusCode"] == 200
+        assert len(datasets) == 3
+
+    def test_get_datasets_by_parent_none_found(self, event, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        dataset = common.raw_dataset.copy()
+        response = dataset_handler.create_dataset(auth_event(dataset), None)
+        dataset_id = json.loads(response["body"])["Id"]
+
+        for i in range(0, 3):
+            child_dataset = common.raw_dataset.copy()
+            child_dataset["parent_id"] = dataset_id
+
+            response = dataset_handler.create_dataset(auth_event(child_dataset), None)
+
+        event_for_get = event(query_params={"parent_id": "no-children"})
+        response = dataset_handler.get_datasets(event_for_get, None)
+        datasets = json.loads(response["body"])
+
+        assert response["statusCode"] == 200
+        assert len(datasets) == 0
+
     def test_get_dataset(self, event, auth_event, metadata_table):
         import metadata.dataset.handler as dataset_handler
 
@@ -322,7 +381,7 @@ class TestGetDataset:
         body = json.loads(response["body"])
         dataset_id = body["Id"]
 
-        event_for_get = event({}, dataset_id)
+        event_for_get = event(dataset=dataset_id)
         response = dataset_handler.get_dataset(event_for_get, None)
 
         assert response["statusCode"] == 200

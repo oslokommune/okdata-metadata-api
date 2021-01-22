@@ -74,7 +74,12 @@ def patch_dataset(event, context):
 def get_datasets(event, context):
     """GET /datasets"""
 
-    datasets = dataset_repository.get_datasets()
+    query_params = (
+        event["queryStringParameters"] if event["queryStringParameters"] else {}
+    )
+    parent_dataset_id = query_params.get("parent_id")
+
+    datasets = dataset_repository.get_datasets(parent_id=parent_dataset_id)
     log_add(num_datasets=len(datasets))
 
     for dataset in datasets:

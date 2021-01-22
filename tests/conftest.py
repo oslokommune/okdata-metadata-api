@@ -46,7 +46,12 @@ def auth_mock(requests_mock, mocker):
 
 def lambda_event_factory(token=None):
     def _lambda_event(
-        body={}, dataset=None, version=None, edition=None, distribution=None
+        body={},
+        dataset=None,
+        version=None,
+        edition=None,
+        distribution=None,
+        query_params=None,
     ):
         path = {}
         if dataset:
@@ -68,6 +73,8 @@ def lambda_event_factory(token=None):
 
         if path:
             event["pathParameters"] = path
+
+        event["queryStringParameters"] = query_params
 
         event["requestContext"] = {"authorizer": {"principalId": "mock-user"}}
         return event

@@ -3,4 +3,8 @@ events:
   - http:
       path: "datasets"
       method: "get"
+      request:
+        parameters:
+          querystrings:
+            parent_id: false
       documentation: ${file(serverless/documentation/get_datasets.yaml)}

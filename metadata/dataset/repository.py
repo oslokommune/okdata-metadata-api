@@ -28,8 +28,8 @@ class DatasetRepository(CommonRepository):
     def get_dataset(self, dataset_id, consistent_read=False):
         return self.get_item(dataset_id, consistent_read)
 
-    def get_datasets(self):
-        return self.get_items()
+    def get_datasets(self, parent_id=None):
+        return self.get_items(parent_id)
 
     def create_dataset(self, content):
         """Create a new dataset with `content` and return its ID."""

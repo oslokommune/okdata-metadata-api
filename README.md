@@ -66,12 +66,12 @@ The correct schema definition that is used for validation in the examples below:
 * Create or update version or edition: valid keycloack access token and owner-access to `:dataset-id`
 * List dataset/version/edition: Logged in user
 
-### List alle dataset
+### List all datasets
 
 ```
 GET /datasets
 ```
-All available datasets
+All available datasets. An optional query parameter `parent_id` is accepted for filtering by parent dataset.
 
 ### Create dataset
 
@@ -80,7 +80,7 @@ POST /datasets
 
 {
     "title": "Besøksdata gjenbruksstasjoner",
-    "description": "Sensordata fra tellere på gjenbruksstasjonene",
+    "description": "Sensordata fra tellere på gjenbruksstasjonene",
     "keywords": ["avfall", "besøkende", "gjenbruksstasjon"],
     "frequency": "hourly",
     "accessRights": "public",
@@ -105,7 +105,7 @@ PUT /datasets/:dataset-id
 
 {
     "title": "Besøksdata gjenbruksstasjoner oppdatert tittel",
-    "description": "Sensordata fra tellere på gjenbruksstasjonene",
+    "description": "Sensordata fra tellere på gjenbruksstasjonene",
     "keywords": ["avfall", "besøkende", "gjenbruksstasjon"],
     "frequency": "hourly",
     "accessRights": "public",
