@@ -116,6 +116,19 @@
       "type": "string",
       "maxLength": 255
     },
+    "source": {
+      "description": "Data source information",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "maxLength": 255
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
     "spatial": {
       "description": "The geographical area covered by the dataset.",
       "type": "array",

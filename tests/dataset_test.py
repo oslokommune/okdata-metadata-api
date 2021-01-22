@@ -90,6 +90,24 @@ class TestCreateDataset:
         assert item["spatialResolutionInMeters"] == Decimal("720.31")
         assert item["conformsTo"] == ["EUREF89 UTM sone 32, 2d"]
 
+    def test_create_geo_with_source_reference(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        dataset_source = {"type": "database", "database": "geodata", "table": "benches"}
+        dataset = common.raw_geo_dataset.copy()
+        dataset["source"] = dataset_source
+        create_event = auth_event(dataset)
+        response = dataset_handler.create_dataset(create_event, None)
+        body = json.loads(response["body"])
+        dataset_id = body["Id"]
+
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(table.ID_COLUMN).eq(dataset_id)
+        )
+        item = db_response["Items"][0]
+
+        assert item["source"] == dataset_source
+
     def test_create_geo_invalid(self, auth_event, metadata_table):
         import metadata.dataset.handler as dataset_handler
 
@@ -231,6 +249,32 @@ class TestUpdateDataset:
         assert item["spatialResolutionInMeters"] == Decimal("500")
         assert item["license"] == "https://data.norge.no/nlod/no/2.0"
         assert "conformsTo" not in item
+
+    def test_update_geo_dataset_with_invalid_source_reference(
+        self, auth_event, metadata_table
+    ):
+        import metadata.dataset.handler as dataset_handler
+
+        dataset = common.raw_geo_dataset.copy()
+        dataset["source"] = {
+            "type": "database",
+            "database": "geodata",
+            "table": "benches",
+        }
+        response = dataset_handler.create_dataset(auth_event(dataset), None)
+        body = json.loads(response["body"])
+        dataset_id = body["Id"]
+
+        updated_dataset = common.updated_geo_dataset.copy()
+        updated_dataset["source"] = {"foo": "bar"}
+        event_for_update = auth_event(updated_dataset, dataset_id)
+        response = dataset_handler.update_dataset(event_for_update, None)
+
+        assert response["statusCode"] == 400
+        assert json.loads(response["body"]) == {
+            "message": "Validation error",
+            "errors": ["source: 'type' is a required property"],
+        }
 
 
 class TestPatchDataset:
