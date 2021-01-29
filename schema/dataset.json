@@ -146,7 +146,12 @@
       "properties": {
         "type": {
           "type": "string",
-          "maxLength": 255
+          "maxLength": 255,
+          "enum": [
+            "database",
+            "event",
+            "file"
+          ]
         }
       },
       "required": [
