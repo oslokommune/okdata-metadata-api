@@ -25,6 +25,7 @@ class TestCreateDataset:
         assert response["statusCode"] == 201
         assert response["headers"]["Location"] == f"/datasets/{dataset_id}"
         assert dataset_id == "antall-besokende-pa-gjenbruksstasjoner"
+        assert body["source"] == {"type": "file"}
 
         db_response = metadata_table.query(
             KeyConditionExpression=Key(table.ID_COLUMN).eq(dataset_id)
