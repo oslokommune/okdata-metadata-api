@@ -40,7 +40,7 @@ class DatasetRepository(CommonRepository):
         content[common.TYPE_COLUMN] = self.type
         content["state"] = "active"
 
-        if not content.get("source", None):
+        if not content.get("source"):
             content["source"] = {"type": "file"}
 
         version = {
