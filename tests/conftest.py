@@ -6,7 +6,7 @@ import boto3
 import pytest
 from moto import mock_dynamodb2
 
-from metadata import auth
+from metadata.auth import Auth
 from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
 from tests import common_test_helper
 
@@ -40,7 +40,7 @@ def auth_mock(requests_mock, mocker):
         request_headers=client_credentials_header,
     )
     mocker.patch.object(
-        auth,
+        Auth,
         "service_client_authorization_header",
         return_value=client_credentials_header,
     )

@@ -1,9 +1,9 @@
+import simplejson as json
 from functools import wraps
 
-import simplejson as json
 from botocore.config import Config
 
-from metadata.auth import is_dataset_owner
+from metadata.auth import Auth
 from metadata.dataset.repository import DatasetRepository
 
 ID_COLUMN = "Id"
@@ -51,7 +51,7 @@ def check_auth(func):
             return error_response(403, message)
 
         bearer_token = auth_header.split(" ")[-1]
-        if not is_dataset_owner(bearer_token, dataset_id):
+        if not Auth().is_dataset_owner(bearer_token, dataset_id):
             message = f"You are not authorized to access dataset {dataset_id}"
             return error_response(403, message)
 

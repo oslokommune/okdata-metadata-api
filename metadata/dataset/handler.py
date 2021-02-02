@@ -5,7 +5,7 @@ from aws_xray_sdk.core import xray_recorder
 
 from okdata.aws.logging import logging_wrapper, log_add, log_exception
 from metadata import common
-from metadata.auth import service_client_authorization_header
+from metadata.auth import Auth
 from metadata.error import ResourceConflict, ValidationError
 from metadata.common import check_auth, validate_input
 from metadata.dataset.repository import DatasetRepository
@@ -34,7 +34,7 @@ def create_dataset(event, context):
         requests.post(
             f"{AUTHORIZER_API}/{dataset_id}",
             json={"principalId": user_id},
-            headers=service_client_authorization_header(),
+            headers=Auth().service_client_authorization_header(),
         )
 
         headers = {"Location": f"/datasets/{dataset_id}"}
