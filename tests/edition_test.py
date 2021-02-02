@@ -3,7 +3,7 @@ import json
 
 from boto3.dynamodb.conditions import Key
 
-import metadata.common as table
+from metadata.CommonRepository import ID_COLUMN
 from tests import common_test_helper
 
 
@@ -142,7 +142,7 @@ class TestUpdateEdition:
         assert edition_id == "antall-besokende-pa-gjenbruksstasjoner/6/20190528T133700"
 
         db_response = metadata_table.query(
-            KeyConditionExpression=Key(table.ID_COLUMN).eq(edition_id)
+            KeyConditionExpression=Key(ID_COLUMN).eq(edition_id)
         )
         edition_from_db = db_response["Items"][0]
 
@@ -171,7 +171,7 @@ class TestUpdateEdition:
 
         edition_id = f"{dataset_id}/{version}/latest"
         db_response = metadata_table.query(
-            KeyConditionExpression=Key(table.ID_COLUMN).eq(edition_id)
+            KeyConditionExpression=Key(ID_COLUMN).eq(edition_id)
         )
         edition_from_db = db_response["Items"][0]
 

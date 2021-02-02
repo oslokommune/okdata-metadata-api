@@ -4,7 +4,7 @@ import re
 
 from boto3.dynamodb.conditions import Key
 
-import metadata.common as table
+from metadata.CommonRepository import ID_COLUMN
 from tests import common_test_helper
 
 
@@ -110,7 +110,7 @@ class TestUpdateDistribution:
         assert body["Id"] == distribution_id
 
         db_response = metadata_table.query(
-            KeyConditionExpression=Key(table.ID_COLUMN).eq(distribution_id)
+            KeyConditionExpression=Key(ID_COLUMN).eq(distribution_id)
         )
         item = db_response["Items"][0]
 

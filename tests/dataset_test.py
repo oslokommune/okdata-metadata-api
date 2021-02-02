@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from boto3.dynamodb.conditions import Key
 
-import metadata.common as table
+from metadata.CommonRepository import ID_COLUMN, TYPE_COLUMN
 import metadata.dataset.repository as dataset_repository
 import tests.common_test_helper as common
 
@@ -28,11 +28,11 @@ class TestCreateDataset:
         assert body["source"] == {"type": "file"}
 
         db_response = metadata_table.query(
-            KeyConditionExpression=Key(table.ID_COLUMN).eq(dataset_id)
+            KeyConditionExpression=Key(ID_COLUMN).eq(dataset_id)
         )
         item = db_response["Items"][0]
-        assert item[table.ID_COLUMN] == dataset_id
-        assert item[table.TYPE_COLUMN] == "Dataset"
+        assert item[ID_COLUMN] == dataset_id
+        assert item[TYPE_COLUMN] == "Dataset"
         assert item["title"] == "Antall besøkende på gjenbruksstasjoner"
         assert item["state"] == "active"
 
@@ -40,22 +40,22 @@ class TestCreateDataset:
 
         version_id = f"{dataset_id}/1"
         db_response = metadata_table.query(
-            KeyConditionExpression=Key(table.ID_COLUMN).eq(version_id)
+            KeyConditionExpression=Key(ID_COLUMN).eq(version_id)
         )
         item = db_response["Items"][0]
-        assert item[table.ID_COLUMN] == version_id
-        assert item[table.TYPE_COLUMN] == "Version"
+        assert item[ID_COLUMN] == version_id
+        assert item[TYPE_COLUMN] == "Version"
         assert item["version"] == "1"
 
         # Check that we create the "latest" version alias
 
         latest_id = f"{dataset_id}/latest"
         db_response = metadata_table.query(
-            KeyConditionExpression=Key(table.ID_COLUMN).eq(latest_id)
+            KeyConditionExpression=Key(ID_COLUMN).eq(latest_id)
         )
         item = db_response["Items"][0]
-        assert item[table.ID_COLUMN] == latest_id
-        assert item[table.TYPE_COLUMN] == "Version"
+        assert item[ID_COLUMN] == latest_id
+        assert item[TYPE_COLUMN] == "Version"
         assert item["version"] == "1"
         assert item["latest"] == version_id
 
@@ -84,7 +84,7 @@ class TestCreateDataset:
         dataset_id = body["Id"]
 
         db_response = metadata_table.query(
-            KeyConditionExpression=Key(table.ID_COLUMN).eq(dataset_id)
+            KeyConditionExpression=Key(ID_COLUMN).eq(dataset_id)
         )
         item = db_response["Items"][0]
 
@@ -104,7 +104,7 @@ class TestCreateDataset:
         dataset_id = body["Id"]
 
         db_response = metadata_table.query(
-            KeyConditionExpression=Key(table.ID_COLUMN).eq(dataset_id)
+            KeyConditionExpression=Key(ID_COLUMN).eq(dataset_id)
         )
         item = db_response["Items"][0]
 
@@ -145,11 +145,11 @@ class TestUpdateDataset:
         assert response["statusCode"] == 200
 
         db_response = metadata_table.query(
-            KeyConditionExpression=Key(table.ID_COLUMN).eq(dataset_id)
+            KeyConditionExpression=Key(ID_COLUMN).eq(dataset_id)
         )
         item = db_response["Items"][0]
-        assert item[table.ID_COLUMN] == dataset_id
-        assert item[table.TYPE_COLUMN] == "Dataset"
+        assert item[ID_COLUMN] == dataset_id
+        assert item[TYPE_COLUMN] == "Dataset"
         assert item["title"] == "UPDATED TITLE"
         assert item["accrualPeriodicity"] == "daily"
 
@@ -241,11 +241,11 @@ class TestUpdateDataset:
         response = dataset_handler.update_dataset(event_for_update, None)
 
         db_response = metadata_table.query(
-            KeyConditionExpression=Key(table.ID_COLUMN).eq(dataset_id)
+            KeyConditionExpression=Key(ID_COLUMN).eq(dataset_id)
         )
         item = db_response["Items"][0]
 
-        assert item[table.ID_COLUMN] == dataset_id
+        assert item[ID_COLUMN] == dataset_id
         assert item["contactPoint"]["name"] == "Timian"
         assert item["spatial"] == ["Oslo"]
         assert item["spatialResolutionInMeters"] == Decimal("500")
@@ -297,11 +297,11 @@ class TestPatchDataset:
         assert response["statusCode"] == 200
 
         db_response = metadata_table.query(
-            KeyConditionExpression=Key(table.ID_COLUMN).eq(dataset_id)
+            KeyConditionExpression=Key(ID_COLUMN).eq(dataset_id)
         )
         item = db_response["Items"][0]
-        assert item[table.ID_COLUMN] == dataset_id
-        assert item[table.TYPE_COLUMN] == "Dataset"
+        assert item[ID_COLUMN] == dataset_id
+        assert item[TYPE_COLUMN] == "Dataset"
         # Changed:
         assert item["title"] == "PATCHED TITLE"
         assert item["keywords"][0] == "saksbehandling"
