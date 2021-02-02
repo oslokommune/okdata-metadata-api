@@ -6,10 +6,7 @@ from botocore.config import Config
 from metadata.auth import Auth
 from metadata.dataset.repository import DatasetRepository
 
-ID_COLUMN = "Id"
-TYPE_COLUMN = "Type"
 
-<<<<<<< HEAD
 BOTO_RESOURCE_COMMON_KWARGS = {
     "region_name": "eu-west-1",
     "config": Config(
@@ -20,10 +17,6 @@ BOTO_RESOURCE_COMMON_KWARGS = {
     ),
 }
 
-table_name_prefix = "metadata-api"
-
-=======
->>>>>>> DP-1963: Fix circular import dataset.repository -> common, common -> dataset.repository
 
 def validate_input(validator):
     def inner(func):

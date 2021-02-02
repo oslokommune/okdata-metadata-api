@@ -4,7 +4,6 @@ import json
 from boto3.dynamodb.conditions import Key
 
 from metadata.CommonRepository import ID_COLUMN, TYPE_COLUMN
-from metadata import common
 from tests import common_test_helper
 
 
@@ -180,8 +179,8 @@ class TestUpdateVersion:
         import metadata.version.handler as version_handler
 
         version = common_test_helper.raw_version.copy()
-        version[common.ID_COLUMN] = f"{put_dataset}/{version['version']}"
-        version[common.TYPE_COLUMN] = "version"
+        version[ID_COLUMN] = f"{put_dataset}/{version['version']}"
+        version[TYPE_COLUMN] = "version"
         metadata_table.put_item(Item=version)
 
         dataset_id = put_dataset
