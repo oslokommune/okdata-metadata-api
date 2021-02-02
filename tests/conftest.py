@@ -1,11 +1,13 @@
+import json
 import os
 import re
-import json
-import pytest
-import boto3
-from moto import mock_dynamodb2
-from metadata import auth
 
+import boto3
+import pytest
+from moto import mock_dynamodb2
+
+from metadata import auth
+from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
 from tests import common_test_helper
 
 AUTHORIZER_API = os.environ["AUTHORIZER_API"]
@@ -15,7 +17,7 @@ good_token = "Bjørnepollett"
 @pytest.fixture()
 def dynamodb():
     with mock_dynamodb2():
-        yield boto3.resource("dynamodb", "eu-west-1")
+        yield boto3.resource("dynamodb", **BOTO_RESOURCE_COMMON_KWARGS)
 
 
 @pytest.fixture(autouse=True)
