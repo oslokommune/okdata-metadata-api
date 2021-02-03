@@ -1,15 +1,17 @@
-import boto3
 import uuid
 
-from metadata.CommonRepository import CommonRepository
+import boto3
 from aws_xray_sdk.core import patch
+
+from metadata.CommonRepository import CommonRepository
+from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
 
 patch(["boto3"])
 
 
 class DistributionRepository(CommonRepository):
     def __init__(self):
-        dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        dynamodb = boto3.resource("dynamodb", **BOTO_RESOURCE_COMMON_KWARGS)
 
         self.metadata_table = dynamodb.Table("dataset-metadata")
 

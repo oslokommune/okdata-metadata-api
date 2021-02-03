@@ -1,9 +1,11 @@
-import boto3
-from botocore.exceptions import ClientError
 from datetime import datetime, timezone
 
-from metadata.CommonRepository import CommonRepository
+import boto3
 from aws_xray_sdk.core import patch
+from botocore.exceptions import ClientError
+
+from metadata.CommonRepository import CommonRepository
+from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
 
 patch(["boto3"])
 
@@ -12,7 +14,7 @@ edition_fmt = "%Y%m%dT%H%M%S"
 
 class EditionRepository(CommonRepository):
     def __init__(self):
-        dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        dynamodb = boto3.resource("dynamodb", **BOTO_RESOURCE_COMMON_KWARGS)
 
         self.metadata_table = dynamodb.Table("dataset-metadata")
 

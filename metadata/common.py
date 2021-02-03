@@ -1,11 +1,23 @@
-import simplejson as json
 from functools import wraps
+
+import simplejson as json
+from botocore.config import Config
 
 from metadata.auth import is_dataset_owner
 from metadata.dataset.repository import DatasetRepository
 
 ID_COLUMN = "Id"
 TYPE_COLUMN = "Type"
+
+BOTO_RESOURCE_COMMON_KWARGS = {
+    "region_name": "eu-west-1",
+    "config": Config(
+        # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/retries.html
+        retries={
+            "mode": "standard",
+        }
+    ),
+}
 
 table_name_prefix = "metadata-api"
 

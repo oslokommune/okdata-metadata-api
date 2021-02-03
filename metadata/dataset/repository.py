@@ -15,7 +15,7 @@ patch(["boto3"])
 
 class DatasetRepository(CommonRepository):
     def __init__(self):
-        dynamodb = boto3.resource("dynamodb", "eu-west-1")
+        dynamodb = boto3.resource("dynamodb", **common.BOTO_RESOURCE_COMMON_KWARGS)
 
         self.metadata_table = dynamodb.Table("dataset-metadata")
 
