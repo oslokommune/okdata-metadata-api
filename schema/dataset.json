@@ -177,6 +177,14 @@
     "license": {
       "description": "A legal document under which the resource is made available.",
       "type": "string"
+    },
+    "state": {
+      "description": "State of the dataset. Used to halt automatic processes when value is 'maintenance'.",
+      "type": "string",
+      "enum": [
+        "active",
+        "maintenance"
+      ]
     }
   },
   "additionalProperties": false,

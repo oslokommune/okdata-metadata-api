@@ -38,6 +38,7 @@ class DatasetRepository(CommonRepository):
 
         content[common.ID_COLUMN] = dataset_id
         content[common.TYPE_COLUMN] = self.type
+        content["state"] = "active"
 
         version = {
             "version": "1",

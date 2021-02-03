@@ -33,6 +33,7 @@ class TestCreateDataset:
         assert item[table.ID_COLUMN] == dataset_id
         assert item[table.TYPE_COLUMN] == "Dataset"
         assert item["title"] == "Antall besøkende på gjenbruksstasjoner"
+        assert item["state"] == "active"
 
         # Check that we create the initial version
 
