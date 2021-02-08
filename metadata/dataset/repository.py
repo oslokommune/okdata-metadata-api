@@ -7,6 +7,7 @@ from difflib import SequenceMatcher
 
 from okdata.aws.logging import log_dynamodb, log_exception
 from metadata.CommonRepository import CommonRepository, TYPE_COLUMN, ID_COLUMN
+from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
 from aws_xray_sdk.core import patch
 
 patch(["boto3"])
@@ -14,7 +15,7 @@ patch(["boto3"])
 
 class DatasetRepository(CommonRepository):
     def __init__(self):
-        dynamodb = boto3.resource("dynamodb", **common.BOTO_RESOURCE_COMMON_KWARGS)
+        dynamodb = boto3.resource("dynamodb", **BOTO_RESOURCE_COMMON_KWARGS)
 
         self.metadata_table = dynamodb.Table("dataset-metadata")
 
@@ -35,14 +36,10 @@ class DatasetRepository(CommonRepository):
         title = content["title"]
         dataset_id = self.generate_unique_id_based_on_title(title)
 
-<<<<<<< HEAD
-        content[common.ID_COLUMN] = dataset_id
-        content[common.TYPE_COLUMN] = self.type
         content["state"] = "active"
-=======
+
         content[ID_COLUMN] = dataset_id
         content[TYPE_COLUMN] = self.type
->>>>>>> DP-1963: Fix circular import dataset.repository -> common, common -> dataset.repository
 
         if not content.get("source"):
             content["source"] = {"type": "file"}

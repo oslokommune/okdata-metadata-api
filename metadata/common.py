@@ -3,9 +3,6 @@ from functools import wraps
 
 from botocore.config import Config
 
-from metadata.auth import Auth
-from metadata.dataset.repository import DatasetRepository
-
 
 BOTO_RESOURCE_COMMON_KWARGS = {
     "region_name": "eu-west-1",
