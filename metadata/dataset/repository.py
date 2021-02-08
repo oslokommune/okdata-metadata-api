@@ -41,7 +41,7 @@ class DatasetRepository(CommonRepository):
         content[ID_COLUMN] = dataset_id
         content[TYPE_COLUMN] = self.type
 
-        if not content.get("source"):
+        if "source" not in content:
             content["source"] = {"type": "file"}
 
         version = {
