@@ -6,8 +6,8 @@ from botocore.exceptions import ClientError
 from difflib import SequenceMatcher
 
 from okdata.aws.logging import log_dynamodb, log_exception
-from metadata import common
-from metadata.CommonRepository import CommonRepository
+from metadata.CommonRepository import CommonRepository, TYPE_COLUMN, ID_COLUMN
+from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
 from aws_xray_sdk.core import patch
 
 patch(["boto3"])
@@ -15,7 +15,7 @@ patch(["boto3"])
 
 class DatasetRepository(CommonRepository):
     def __init__(self):
-        dynamodb = boto3.resource("dynamodb", **common.BOTO_RESOURCE_COMMON_KWARGS)
+        dynamodb = boto3.resource("dynamodb", **BOTO_RESOURCE_COMMON_KWARGS)
 
         self.metadata_table = dynamodb.Table("dataset-metadata")
 
@@ -36,19 +36,23 @@ class DatasetRepository(CommonRepository):
         title = content["title"]
         dataset_id = self.generate_unique_id_based_on_title(title)
 
-        content[common.ID_COLUMN] = dataset_id
-        content[common.TYPE_COLUMN] = self.type
         content["state"] = "active"
+
+        content[ID_COLUMN] = dataset_id
+        content[TYPE_COLUMN] = self.type
+
+        if "source" not in content:
+            content["source"] = {"type": "file"}
 
         version = {
             "version": "1",
-            common.ID_COLUMN: f"{dataset_id}/1",
-            common.TYPE_COLUMN: "Version",
+            ID_COLUMN: f"{dataset_id}/1",
+            TYPE_COLUMN: "Version",
         }
 
         latest = version.copy()
-        latest["latest"] = version[common.ID_COLUMN]
-        latest[common.ID_COLUMN] = f"{dataset_id}/latest"
+        latest["latest"] = version[ID_COLUMN]
+        latest[ID_COLUMN] = f"{dataset_id}/latest"
 
         try:
             db_response = log_dynamodb(

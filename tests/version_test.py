@@ -3,8 +3,7 @@ import json
 
 from boto3.dynamodb.conditions import Key
 
-import metadata.common as table
-from metadata import common
+from metadata.CommonRepository import ID_COLUMN, TYPE_COLUMN
 from tests import common_test_helper
 
 
@@ -33,14 +32,14 @@ class TestCreateVersion:
         assert version_id == f'{dataset_id}/{version["version"]}'
 
         db_response = metadata_table.query(
-            KeyConditionExpression=Key(table.ID_COLUMN).eq(version_id)
+            KeyConditionExpression=Key(ID_COLUMN).eq(version_id)
         )
         items = db_response["Items"]
 
         assert len(items) == 1
         version_from_db = items[0]
-        assert version_from_db[table.ID_COLUMN] == version_id
-        assert version_from_db[table.TYPE_COLUMN] == "Version"
+        assert version_from_db[ID_COLUMN] == version_id
+        assert version_from_db[TYPE_COLUMN] == "Version"
 
     def test_create_version_invalid_version_latest(self, auth_event):
         import metadata.version.handler as version_handler
@@ -79,8 +78,8 @@ class TestCreateVersion:
         import metadata.version.handler as version_handler
 
         dataset = common_test_helper.raw_dataset.copy()
-        dataset[table.ID_COLUMN] = "dataset-id"
-        dataset[table.TYPE_COLUMN] = "Dataset"
+        dataset[ID_COLUMN] = "dataset-id"
+        dataset[TYPE_COLUMN] = "Dataset"
         metadata_table.put_item(Item=dataset)
 
         version = common_test_helper.raw_version
@@ -90,7 +89,7 @@ class TestCreateVersion:
         assert response["statusCode"] == 403
         assert json.loads(response["body"]) == [
             {
-                "message": f"You are not authorized to access dataset {dataset[table.ID_COLUMN]}"
+                "message": f"You are not authorized to access dataset {dataset[ID_COLUMN]}"
             }
         ]
 
@@ -129,7 +128,7 @@ class TestUpdateVersion:
         assert version_id == f"{dataset_id}/{version_name}"
 
         db_response = metadata_table.query(
-            KeyConditionExpression=Key(table.ID_COLUMN).eq(version_id)
+            KeyConditionExpression=Key(ID_COLUMN).eq(version_id)
         )
         version_from_db = db_response["Items"][0]
         assert version_from_db["version"] == "6"
@@ -170,7 +169,7 @@ class TestUpdateVersion:
         version_id = "antall-besokende-pa-gjenbruksstasjoner/latest"
 
         db_response = metadata_table.query(
-            KeyConditionExpression=Key(table.ID_COLUMN).eq(version_id)
+            KeyConditionExpression=Key(ID_COLUMN).eq(version_id)
         )
         version_from_db = db_response["Items"][0]
         assert version_from_db["Id"] == "antall-besokende-pa-gjenbruksstasjoner/latest"
@@ -180,8 +179,8 @@ class TestUpdateVersion:
         import metadata.version.handler as version_handler
 
         version = common_test_helper.raw_version.copy()
-        version[common.ID_COLUMN] = f"{put_dataset}/{version['version']}"
-        version[common.TYPE_COLUMN] = "version"
+        version[ID_COLUMN] = f"{put_dataset}/{version['version']}"
+        version[TYPE_COLUMN] = "version"
         metadata_table.put_item(Item=version)
 
         dataset_id = put_dataset

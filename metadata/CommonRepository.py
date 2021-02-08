@@ -2,7 +2,6 @@ from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 import logging
 
-from metadata import common
 from metadata.error import ResourceConflict, ValidationError
 from okdata.aws.logging import log_add, log_duration
 
@@ -13,6 +12,10 @@ patch_all()
 log = logging.getLogger()
 
 
+ID_COLUMN = "Id"
+TYPE_COLUMN = "Type"
+
+
 class CommonRepository:
     def __init__(self, table, type):
         self.table = table
@@ -20,7 +23,7 @@ class CommonRepository:
 
     def get_item(self, item_id, consistent_read=False):
         log_add(dynamodb_item_id=item_id, dynamodb_item_type=self.type)
-        key = {common.ID_COLUMN: item_id, common.TYPE_COLUMN: self.type}
+        key = {ID_COLUMN: item_id, TYPE_COLUMN: self.type}
 
         db_response = log_duration(
             lambda: self.table.get_item(Key=key, ConsistentRead=consistent_read),
@@ -48,7 +51,7 @@ class CommonRepository:
 
     def get_items(self, parent_id=None):
         log_add(dynamodb_item_type=self.type)
-        cond = Key(common.TYPE_COLUMN).eq(self.type)
+        cond = Key(TYPE_COLUMN).eq(self.type)
         extra_query_args = {}
 
         if parent_id:
@@ -56,7 +59,7 @@ class CommonRepository:
             if self.type == "Dataset":
                 extra_query_args["FilterExpression"] = Key("parent_id").eq(parent_id)
             else:
-                cond = cond & Key(common.ID_COLUMN).begins_with(f"{parent_id}/")
+                cond = cond & Key(ID_COLUMN).begins_with(f"{parent_id}/")
 
         db_response = log_duration(
             lambda: self.table.query(
@@ -95,7 +98,7 @@ class CommonRepository:
         log_add(dynamodb_item_id=item_id, dynamodb_item_type=self.type)
         if parent_id:
             log_add(dynamodb_parent_id=parent_id)
-            parent_key = {common.ID_COLUMN: parent_id, common.TYPE_COLUMN: parent_type}
+            parent_key = {ID_COLUMN: parent_id, TYPE_COLUMN: parent_type}
             db_response = self.table.get_item(Key=parent_key)
             parent_exists = "Item" in db_response
             log_add(dynamodb_parent_exists=parent_exists)
@@ -104,8 +107,8 @@ class CommonRepository:
                 log.error(msg)
                 raise KeyError(msg)
 
-        content[common.ID_COLUMN] = item_id
-        content[common.TYPE_COLUMN] = self.type
+        content[ID_COLUMN] = item_id
+        content[TYPE_COLUMN] = self.type
 
         db_response = log_duration(
             lambda: self._create_item(content, update_on_exists), "dynamodb_duration_ms"
@@ -138,13 +141,13 @@ class CommonRepository:
                 cond = "attribute_not_exists(Id) AND attribute_not_exists(#Type)"
                 return self.table.put_item(
                     Item=content,
-                    ExpressionAttributeNames={"#Type": common.TYPE_COLUMN},
+                    ExpressionAttributeNames={"#Type": TYPE_COLUMN},
                     ConditionExpression=cond,
                 )
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code == "ConditionalCheckFailedException":
-                item_id = content[common.ID_COLUMN]
+                item_id = content[ID_COLUMN]
                 msg = f"Item with id {item_id} already exists"
                 log.error(msg)
                 raise ResourceConflict(msg, e)
@@ -170,8 +173,8 @@ class CommonRepository:
 
         new_content = {**old_item, **content} if patch else content
 
-        new_content[common.ID_COLUMN] = old_item[common.ID_COLUMN]
-        new_content[common.TYPE_COLUMN] = self.type
+        new_content[ID_COLUMN] = old_item[ID_COLUMN]
+        new_content[TYPE_COLUMN] = self.type
 
         for key in ["accessRights", "confidentiality", "parent_id"]:
             if old_item.get(key) != new_content.get(key):

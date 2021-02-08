@@ -5,7 +5,8 @@ from aws_xray_sdk.core import xray_recorder
 from okdata.aws.logging import logging_wrapper, log_add, log_exception
 from metadata import common
 from metadata.error import ResourceConflict
-from metadata.common import check_auth, validate_input
+from metadata.common import validate_input
+from metadata.auth import check_auth
 from metadata.distribution.repository import DistributionRepository
 from metadata.validator import Validator
 

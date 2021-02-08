@@ -1,4 +1,4 @@
-import metadata.common as table
+from metadata.CommonRepository import ID_COLUMN, TYPE_COLUMN
 
 metadata_table_name = "dataset-metadata"
 
@@ -7,8 +7,8 @@ def create_metadata_table(dynamodb):
     return create_table(
         dynamodb,
         metadata_table_name,
-        table.ID_COLUMN,
-        table.TYPE_COLUMN,
+        ID_COLUMN,
+        TYPE_COLUMN,
         gsi="IdByTypeIndex",
     )
 
