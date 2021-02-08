@@ -1,1285 +1,1370 @@
-swagger: '2.0'
+---
+swagger: "2.0"
 info:
-  version: '2021-01-22T14:21:51Z'
-  title: prod-metadata-api
-  description: "Api for å registrere og redigere metadata for datasett i dataplattformen.\n\
-    \    Create og Update endepunktene krever autorisasjon, mens resten er åpent."
-  contact:
-    name: Origo dataplattform
-    email: dataplattform@oslo.kommune.no
-host: api.data.oslo.systems
-basePath: /metadata
+  version: "2021-02-08T12:23:01Z"
+  title: "prod-metadata-api"
+host: "api.data.oslo.systems"
+basePath: "/metadata"
 schemes:
-- https
+- "https"
 paths:
   /datasets:
     get:
-      summary: Get all datasets
-      description: Retrieves all datasets
+      summary: "Get all datasets"
+      description: "Retrieves all datasets"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - name: parent_id
-        in: query
-        description: Filter by parent dataset
+      - name: "parent_id"
+        in: "query"
+        description: "Filter by parent dataset"
         required: false
-        type: string
+        type: "string"
       responses:
-        200:
-          description: 200 response
+        "200":
+          description: "200 response"
           schema:
-            $ref: '#/definitions/Datasets'
-        500:
-          description: 500 response
+            $ref: "#/definitions/Datasets"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        403:
-          description: 403 response
+            $ref: "#/definitions/StandardResponse"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
     post:
-      description: Create a new dataset
+      description: "Create a new dataset"
       consumes:
-      - application/json
+      - "application/json"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - in: body
-        name: Dataset
-        description: A dataset object
+      - in: "body"
+        name: "Dataset"
+        description: "A dataset object"
         required: true
         schema:
-          $ref: '#/definitions/Dataset'
+          $ref: "#/definitions/Dataset"
       responses:
-        201:
-          description: 201 response
+        "201":
+          description: "201 response"
           schema:
-            $ref: '#/definitions/Dataset'
-        400:
-          description: 400 response
+            $ref: "#/definitions/Dataset"
+        "400":
+          description: "400 response"
           schema:
-            $ref: '#/definitions/UserErrorResponse'
-        500:
-          description: 500 response
+            $ref: "#/definitions/UserErrorResponse"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
+    options:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Headers:
+              type: "string"
   /datasets/{dataset-id}:
     get:
-      summary: Get a dataset
-      description: Retrieves a dataset
+      summary: "Get a dataset"
+      description: "Retrieves a dataset"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - name: dataset-id
-        in: path
-        description: The dataset you want to retrieve
+      - name: "dataset-id"
+        in: "path"
+        description: "The dataset you want to retrieve"
         required: true
-        type: string
+        type: "string"
       responses:
-        200:
-          description: 200 response
+        "200":
+          description: "200 response"
           schema:
-            $ref: '#/definitions/Dataset'
-        500:
-          description: 500 response
+            $ref: "#/definitions/Dataset"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        403:
-          description: 403 response
+            $ref: "#/definitions/StandardResponse"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        404:
-          description: 404 response
+            $ref: "#/definitions/StandardResponse"
+        "404":
+          description: "404 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
     put:
-      summary: Update a dataset
-      description: Updates an existing dataset
+      summary: "Update a dataset"
+      description: "Updates an existing dataset"
       consumes:
-      - application/json
+      - "application/json"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - name: dataset-id
-        in: path
-        description: The dataset you want to update
+      - name: "dataset-id"
+        in: "path"
+        description: "The dataset you want to update"
         required: true
-        type: string
-      - in: body
-        name: Dataset
-        description: The new object
+        type: "string"
+      - in: "body"
+        name: "Dataset"
+        description: "The new object"
         required: true
         schema:
-          $ref: '#/definitions/Dataset'
+          $ref: "#/definitions/Dataset"
       responses:
-        200:
-          description: 200 response
+        "200":
+          description: "200 response"
           schema:
-            $ref: '#/definitions/Dataset'
-        500:
-          description: 500 response
+            $ref: "#/definitions/Dataset"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        403:
-          description: 403 response
+            $ref: "#/definitions/StandardResponse"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        404:
-          description: 404 response
+            $ref: "#/definitions/StandardResponse"
+        "404":
+          description: "404 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
     patch:
-      summary: Partially update a dataset
-      description: Partially updates an existing dataset
+      summary: "Partially update a dataset"
+      description: "Partially updates an existing dataset"
       consumes:
-      - application/json
+      - "application/json"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - name: dataset-id
-        in: path
-        description: The dataset you want to update
+      - name: "dataset-id"
+        in: "path"
+        description: "The dataset you want to update"
         required: true
-        type: string
-      - in: body
-        name: DatasetPatch
-        description: The new values
+        type: "string"
+      - in: "body"
+        name: "DatasetPatch"
+        description: "The new values"
         required: true
         schema:
-          $ref: '#/definitions/DatasetPatch'
+          $ref: "#/definitions/DatasetPatch"
       responses:
-        200:
-          description: 200 response
+        "200":
+          description: "200 response"
           schema:
-            $ref: '#/definitions/Dataset'
-        500:
-          description: 500 response
+            $ref: "#/definitions/Dataset"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        403:
-          description: 403 response
+            $ref: "#/definitions/StandardResponse"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        404:
-          description: 404 response
+            $ref: "#/definitions/StandardResponse"
+        "404":
+          description: "404 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
   /datasets/{dataset-id}/versions:
     get:
-      summary: Get all versions
-      description: Retrieves all versions
+      summary: "Get all versions"
+      description: "Retrieves all versions"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - name: dataset-id
-        in: path
-        description: The dataset which contains the versions you want to retrieve
+      - name: "dataset-id"
+        in: "path"
+        description: "The dataset which contains the versions you want to retrieve"
         required: true
-        type: string
+        type: "string"
       responses:
-        200:
-          description: 200 response
+        "200":
+          description: "200 response"
           schema:
-            $ref: '#/definitions/Versions'
-        500:
-          description: 500 response
+            $ref: "#/definitions/Versions"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        403:
-          description: 403 response
+            $ref: "#/definitions/StandardResponse"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
     post:
-      summary: Create new version
-      description: Creates a version
+      summary: "Create new version"
+      description: "Creates a version"
       consumes:
-      - application/json
+      - "application/json"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - name: dataset-id
-        in: path
-        description: The dataset for which to create a new version
+      - name: "dataset-id"
+        in: "path"
+        description: "The dataset for which to create a new version"
         required: true
-        type: string
-      - in: body
-        name: Version
-        description: A user information object
+        type: "string"
+      - in: "body"
+        name: "Version"
+        description: "A user information object"
         required: true
         schema:
-          $ref: '#/definitions/Version'
+          $ref: "#/definitions/Version"
       responses:
-        201:
-          description: 201 response
+        "201":
+          description: "201 response"
           schema:
-            $ref: '#/definitions/Version'
-        400:
-          description: 400 response
+            $ref: "#/definitions/Version"
+        "400":
+          description: "400 response"
           schema:
-            $ref: '#/definitions/UserErrorResponse'
-        500:
-          description: 500 response
+            $ref: "#/definitions/UserErrorResponse"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        403:
-          description: 403 response
+            $ref: "#/definitions/StandardResponse"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
+    options:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Headers:
+              type: "string"
   /datasets/{dataset-id}/versions/{version}:
     get:
-      summary: Get a version
-      description: Retrieves a specific version
+      summary: "Get a version"
+      description: "Retrieves a specific version"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - name: version
-        in: path
-        description: The version you wish to retrieve
+      - name: "version"
+        in: "path"
+        description: "The version you wish to retrieve"
         required: true
-        type: string
-      - name: dataset-id
-        in: path
-        description: The dataset containing the version you want to retrieve
+        type: "string"
+      - name: "dataset-id"
+        in: "path"
+        description: "The dataset containing the version you want to retrieve"
         required: true
-        type: string
+        type: "string"
       responses:
-        200:
-          description: 200 response
+        "200":
+          description: "200 response"
           schema:
-            $ref: '#/definitions/Version'
-        500:
-          description: 500 response
+            $ref: "#/definitions/Version"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        403:
-          description: 403 response
+            $ref: "#/definitions/StandardResponse"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        404:
-          description: 404 response
+            $ref: "#/definitions/StandardResponse"
+        "404":
+          description: "404 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
     put:
-      summary: Update a version
-      description: Updates an existing version
+      summary: "Update a version"
+      description: "Updates an existing version"
       consumes:
-      - application/json
+      - "application/json"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - name: version
-        in: path
-        description: The version you wish to update
+      - name: "version"
+        in: "path"
+        description: "The version you wish to update"
         required: true
-        type: string
-      - name: dataset-id
-        in: path
-        description: The dataset which contains the version you want to update
+        type: "string"
+      - name: "dataset-id"
+        in: "path"
+        description: "The dataset which contains the version you want to update"
         required: true
-        type: string
-      - in: body
-        name: Version
-        description: The new object
+        type: "string"
+      - in: "body"
+        name: "Version"
+        description: "The new object"
         required: true
         schema:
-          $ref: '#/definitions/Version'
+          $ref: "#/definitions/Version"
       responses:
-        200:
-          description: 200 response
+        "200":
+          description: "200 response"
           schema:
-            $ref: '#/definitions/Version'
-        500:
-          description: 500 response
+            $ref: "#/definitions/Version"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        403:
-          description: 403 response
+            $ref: "#/definitions/StandardResponse"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        404:
-          description: 404 response
+            $ref: "#/definitions/StandardResponse"
+        "404":
+          description: "404 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
   /datasets/{dataset-id}/versions/{version}/editions:
     get:
-      summary: Get all editions
-      description: Retrieves all editions
+      summary: "Get all editions"
+      description: "Retrieves all editions"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - name: version
-        in: path
-        description: The version of the editions you want to retrieve
+      - name: "version"
+        in: "path"
+        description: "The version of the editions you want to retrieve"
         required: true
-        type: string
-      - name: dataset-id
-        in: path
-        description: The dataset which contains the editions you want to retrieve
+        type: "string"
+      - name: "dataset-id"
+        in: "path"
+        description: "The dataset which contains the editions you want to retrieve"
         required: true
-        type: string
+        type: "string"
       responses:
-        200:
-          description: 200 response
+        "200":
+          description: "200 response"
           schema:
-            $ref: '#/definitions/Editions'
-        500:
-          description: 500 response
+            $ref: "#/definitions/Editions"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        403:
-          description: 403 response
+            $ref: "#/definitions/StandardResponse"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
     post:
-      summary: Post an edition
-      description: Posts a new edition
+      summary: "Post an edition"
+      description: "Posts a new edition"
       consumes:
-      - application/json
+      - "application/json"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - name: version
-        in: path
-        description: The version of the given dataset for which to create a new edition
+      - name: "version"
+        in: "path"
+        description: "The version of the given dataset for which to create a new edition"
         required: true
-        type: string
-      - name: dataset-id
-        in: path
-        description: The dataset for which to create a new edition
+        type: "string"
+      - name: "dataset-id"
+        in: "path"
+        description: "The dataset for which to create a new edition"
         required: true
-        type: string
-      - in: body
-        name: Edition
-        description: A dataset object
+        type: "string"
+      - in: "body"
+        name: "Edition"
+        description: "A dataset object"
         required: true
         schema:
-          $ref: '#/definitions/Edition'
+          $ref: "#/definitions/Edition"
       responses:
-        201:
-          description: 201 response
+        "201":
+          description: "201 response"
           schema:
-            $ref: '#/definitions/Edition'
-        400:
-          description: 400 response
+            $ref: "#/definitions/Edition"
+        "400":
+          description: "400 response"
           schema:
-            $ref: '#/definitions/UserErrorResponse'
-        500:
-          description: 500 response
+            $ref: "#/definitions/UserErrorResponse"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        403:
-          description: 403 response
+            $ref: "#/definitions/StandardResponse"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
+    options:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Headers:
+              type: "string"
   /datasets/{dataset-id}/versions/{version}/editions/{edition}:
     get:
-      summary: Get an edition
-      description: Retrieves a specific edition
+      summary: "Get an edition"
+      description: "Retrieves a specific edition"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - name: version
-        in: path
-        description: The version containing the edition you want to retrieve
+      - name: "version"
+        in: "path"
+        description: "The version containing the edition you want to retrieve"
         required: true
-        type: string
-      - name: dataset-id
-        in: path
-        description: The dataset containing the edition you want to retrieve
+        type: "string"
+      - name: "dataset-id"
+        in: "path"
+        description: "The dataset containing the edition you want to retrieve"
         required: true
-        type: string
-      - name: edition
-        in: path
-        description: The edition you want to retrieve.
+        type: "string"
+      - name: "edition"
+        in: "path"
+        description: "The edition you want to retrieve."
         required: true
-        type: string
+        type: "string"
       responses:
-        200:
-          description: 200 response
+        "200":
+          description: "200 response"
           schema:
-            $ref: '#/definitions/Edition'
-        500:
-          description: 500 response
+            $ref: "#/definitions/Edition"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        403:
-          description: 403 response
+            $ref: "#/definitions/StandardResponse"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        404:
-          description: 404 response
+            $ref: "#/definitions/StandardResponse"
+        "404":
+          description: "404 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
     put:
-      summary: Update an edition
-      description: Updates an existing edition
+      summary: "Update an edition"
+      description: "Updates an existing edition"
       consumes:
-      - application/json
+      - "application/json"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - name: version
-        in: path
-        description: The version which contains the edition you want to update
+      - name: "version"
+        in: "path"
+        description: "The version which contains the edition you want to update"
         required: true
-        type: string
-      - name: dataset-id
-        in: path
-        description: The dataset which contains the edition you want to update
+        type: "string"
+      - name: "dataset-id"
+        in: "path"
+        description: "The dataset which contains the edition you want to update"
         required: true
-        type: string
-      - name: edition
-        in: path
-        description: The edition you want to update
+        type: "string"
+      - name: "edition"
+        in: "path"
+        description: "The edition you want to update"
         required: true
-        type: string
-      - in: body
-        name: Edition
-        description: The new object
+        type: "string"
+      - in: "body"
+        name: "Edition"
+        description: "The new object"
         required: true
         schema:
-          $ref: '#/definitions/Edition'
+          $ref: "#/definitions/Edition"
       responses:
-        200:
-          description: 200 response
+        "200":
+          description: "200 response"
           schema:
-            $ref: '#/definitions/Edition'
-        500:
-          description: 500 response
+            $ref: "#/definitions/Edition"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        403:
-          description: 403 response
+            $ref: "#/definitions/StandardResponse"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        404:
-          description: 404 response
+            $ref: "#/definitions/StandardResponse"
+        "404":
+          description: "404 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
   /datasets/{dataset-id}/versions/{version}/editions/{edition}/distributions:
     get:
-      summary: Get all distributions
-      description: Retrieves all distributions
+      summary: "Get all distributions"
+      description: "Retrieves all distributions"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - name: version
-        in: path
-        description: The version of the distributions you want to retrieve
+      - name: "version"
+        in: "path"
+        description: "The version of the distributions you want to retrieve"
         required: true
-        type: string
-      - name: dataset-id
-        in: path
-        description: The dataset which contains the distributions you want to retrieve
+        type: "string"
+      - name: "dataset-id"
+        in: "path"
+        description: "The dataset which contains the distributions you want to retrieve"
         required: true
-        type: string
-      - name: edition
-        in: path
-        description: The edition which contains the distributions you want to retrieve
+        type: "string"
+      - name: "edition"
+        in: "path"
+        description: "The edition which contains the distributions you want to retrieve"
         required: true
-        type: string
+        type: "string"
       responses:
-        200:
-          description: 200 response
+        "200":
+          description: "200 response"
           schema:
-            $ref: '#/definitions/Distributions'
-        500:
-          description: 500 response
+            $ref: "#/definitions/Distributions"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        403:
-          description: 403 response
+            $ref: "#/definitions/StandardResponse"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
     post:
-      summary: Post a dataset
-      description: Posts a new dataset
+      summary: "Post a dataset"
+      description: "Posts a new dataset"
       consumes:
-      - application/json
+      - "application/json"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - name: version
-        in: path
-        description: The version of the given dataset for which to create a new distribution
+      - name: "version"
+        in: "path"
+        description: "The version of the given dataset for which to create a new distribution"
         required: true
-        type: string
-      - name: dataset-id
-        in: path
-        description: The dataset for which to create a new distribution
+        type: "string"
+      - name: "dataset-id"
+        in: "path"
+        description: "The dataset for which to create a new distribution"
         required: true
-        type: string
-      - name: edition
-        in: path
-        description: The edition of the given dataset for which to create a new distribution
+        type: "string"
+      - name: "edition"
+        in: "path"
+        description: "The edition of the given dataset for which to create a new distribution"
         required: true
-        type: string
-      - in: body
-        name: Distribution
-        description: A dataset object
+        type: "string"
+      - in: "body"
+        name: "Distribution"
+        description: "A dataset object"
         required: true
         schema:
-          $ref: '#/definitions/Distribution'
+          $ref: "#/definitions/Distribution"
       responses:
-        201:
-          description: 201 response
+        "201":
+          description: "201 response"
           schema:
-            $ref: '#/definitions/Version'
-        400:
-          description: 400 response
+            $ref: "#/definitions/Version"
+        "400":
+          description: "400 response"
           schema:
-            $ref: '#/definitions/UserErrorResponse'
-        500:
-          description: 500 response
+            $ref: "#/definitions/UserErrorResponse"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        403:
-          description: 403 response
+            $ref: "#/definitions/StandardResponse"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
+    options:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "200 response"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Headers:
+              type: "string"
   /datasets/{dataset-id}/versions/{version}/editions/{edition}/distributions/{distribution}:
     get:
-      summary: Get a distribution
-      description: Retrieves a specific distribution
+      summary: "Get a distribution"
+      description: "Retrieves a specific distribution"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - name: version
-        in: path
-        description: The version containing the distribution you want to retrieve
+      - name: "version"
+        in: "path"
+        description: "The version containing the distribution you want to retrieve"
         required: true
-        type: string
-      - name: dataset-id
-        in: path
-        description: The dataset containing the distribution you want to retrieve
+        type: "string"
+      - name: "dataset-id"
+        in: "path"
+        description: "The dataset containing the distribution you want to retrieve"
         required: true
-        type: string
-      - name: edition
-        in: path
-        description: The edition containing the distribution you want to retrieve
+        type: "string"
+      - name: "edition"
+        in: "path"
+        description: "The edition containing the distribution you want to retrieve"
         required: true
-        type: string
-      - name: distribution
-        in: path
-        description: The distribution you want to retrieve
+        type: "string"
+      - name: "distribution"
+        in: "path"
+        description: "The distribution you want to retrieve"
         required: true
-        type: string
+        type: "string"
       responses:
-        200:
-          description: 200 response
+        "200":
+          description: "200 response"
           schema:
-            $ref: '#/definitions/Distribution'
-        500:
-          description: 500 response
+            $ref: "#/definitions/Distribution"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        403:
-          description: 403 response
+            $ref: "#/definitions/StandardResponse"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        404:
-          description: 404 response
+            $ref: "#/definitions/StandardResponse"
+        "404":
+          description: "404 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
     put:
-      summary: Update a distribution
-      description: Updates an existing distribution
+      summary: "Update a distribution"
+      description: "Updates an existing distribution"
       consumes:
-      - application/json
+      - "application/json"
       produces:
-      - application/json
+      - "application/json"
       parameters:
-      - name: version
-        in: path
-        description: The version which contains the distribution you want to update
+      - name: "version"
+        in: "path"
+        description: "The version which contains the distribution you want to update"
         required: true
-        type: string
-      - name: dataset-id
-        in: path
-        description: The dataset which contains the distribution you want to update
+        type: "string"
+      - name: "dataset-id"
+        in: "path"
+        description: "The dataset which contains the distribution you want to update"
         required: true
-        type: string
-      - name: edition
-        in: path
-        description: The edition which contains the distribution you want to update
+        type: "string"
+      - name: "edition"
+        in: "path"
+        description: "The edition which contains the distribution you want to update"
         required: true
-        type: string
-      - name: distribution
-        in: path
-        description: The distribution you want to update
+        type: "string"
+      - name: "distribution"
+        in: "path"
+        description: "The distribution you want to update"
         required: true
-        type: string
-      - in: body
-        name: Distribution
-        description: The new object
+        type: "string"
+      - in: "body"
+        name: "Distribution"
+        description: "The new object"
         required: true
         schema:
-          $ref: '#/definitions/Distribution'
+          $ref: "#/definitions/Distribution"
       responses:
-        200:
-          description: 200 response
+        "200":
+          description: "200 response"
           schema:
-            $ref: '#/definitions/Distribution'
-        500:
-          description: 500 response
+            $ref: "#/definitions/Distribution"
+        "500":
+          description: "500 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        401:
-          description: 401 response
+            $ref: "#/definitions/StandardResponse"
+        "401":
+          description: "401 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        403:
-          description: 403 response
+            $ref: "#/definitions/StandardResponse"
+        "403":
+          description: "403 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
-        404:
-          description: 404 response
+            $ref: "#/definitions/StandardResponse"
+        "404":
+          description: "404 response"
           schema:
-            $ref: '#/definitions/StandardResponse'
+            $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
 securityDefinitions:
   authenticate:
-    type: apiKey
-    name: Authorization
-    in: header
-    x-amazon-apigateway-authtype: custom
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+    x-amazon-apigateway-authtype: "custom"
 definitions:
   DatasetPatch:
-    type: object
+    type: "object"
     properties:
       keywords:
-        type: array
-        description: Extra keywords describing the dataset
+        type: "array"
+        description: "Extra keywords describing the dataset"
         items:
-          type: string
+          type: "string"
           maxLength: 255
       contactPoint:
-        type: object
-        description: Contact info
+        type: "object"
+        description: "Contact info"
         properties:
           name:
-            type: string
+            type: "string"
             maxLength: 255
           email:
-            type: string
-            format: idn-email
+            type: "string"
+            format: "idn-email"
             maxLength: 255
         required:
-        - email
+        - "email"
       description:
-        type: string
-        description: A description of what this dataset contains.
+        type: "string"
+        description: "A description of what this dataset contains."
         maxLength: 2048
       timestamp_field:
-        type: string
-        description: A timestamp field for eventstreams
+        type: "string"
+        description: "A timestamp field for eventstreams"
         maxLength: 255
       source:
-        type: object
-        description: Data source information
+        type: "object"
+        description: "Data source information"
         properties:
           type:
-            type: string
+            type: "string"
             maxLength: 255
         required:
-        - type
+        - "type"
       title:
-        type: string
-        description: The dataset title
+        type: "string"
+        description: "The dataset title"
         maxLength: 128
-        pattern: ^[- a-zA-Z0-9åÅæÆøØ]+$
+        pattern: "^[- a-zA-Z0-9åÅæÆøØ]+$"
       objective:
-        type: string
-        description: A description on why this dataset was created.
+        type: "string"
+        description: "A description on why this dataset was created."
         maxLength: 2048
       license:
-        type: string
-        description: A legal document under which the resource is made available.
+        type: "string"
+        description: "A legal document under which the resource is made available."
       spatialResolutionInMeters:
-        type: number
-        description: Minimum spatial separation resolvable in the dataset, measured
-          in meters.
+        type: "number"
+        description: "Minimum spatial separation resolvable in the dataset, measured\
+          \ in meters."
         minimum: 0.0
       publisher:
-        type: string
-        description: Refrence to a unit responsible for making the dataset available.
+        type: "string"
+        description: "Refrence to a unit responsible for making the dataset available."
         maxLength: 255
       theme:
-        type: array
-        description: Reference to a main theme for this dataset.
+        type: "array"
+        description: "Reference to a main theme for this dataset."
         items:
-          type: string
+          type: "string"
           enum:
-          - agriculture, fisheries, forestry and food
-          - economy and finance
-          - education, culture and sport
-          - energy
-          - environment
-          - government and public sector
-          - health
-          - international issues
-          - justice, legal system and public safety
-          - regions and cities
-          - population and society
-          - science and technology
-          - transport
+          - "agriculture, fisheries, forestry and food"
+          - "economy and finance"
+          - "education, culture and sport"
+          - "energy"
+          - "environment"
+          - "government and public sector"
+          - "health"
+          - "international issues"
+          - "justice, legal system and public safety"
+          - "regions and cities"
+          - "population and society"
+          - "science and technology"
+          - "transport"
       accrualPeriodicity:
-        type: string
-        description: Indicates how often a dataset is updated
+        type: "string"
+        description: "Indicates how often a dataset is updated"
         enum:
-        - annual
-        - semiannual
-        - three times a year
-        - bidecennial
-        - biennial
-        - bihourly
-        - bimonthly
-        - biweekly
-        - continuous
-        - daily
-        - twice a day
-        - decennial
-        - hourly
-        - irregular
-        - monthly
-        - semimonthly
-        - three times a month
-        - never
-        - other
-        - quadrennial
-        - quarterly
-        - quinquennial
-        - tridecennial
-        - triennial
-        - trihourly
-        - unknown
-        - continuously updated
-        - weekly
-        - semiweekly
-        - three times a week
+        - "annual"
+        - "semiannual"
+        - "three times a year"
+        - "bidecennial"
+        - "biennial"
+        - "bihourly"
+        - "bimonthly"
+        - "biweekly"
+        - "continuous"
+        - "daily"
+        - "twice a day"
+        - "decennial"
+        - "hourly"
+        - "irregular"
+        - "monthly"
+        - "semimonthly"
+        - "three times a month"
+        - "never"
+        - "other"
+        - "quadrennial"
+        - "quarterly"
+        - "quinquennial"
+        - "tridecennial"
+        - "triennial"
+        - "trihourly"
+        - "unknown"
+        - "continuously updated"
+        - "weekly"
+        - "semiweekly"
+        - "three times a week"
       conformsTo:
-        type: array
-        description: An established standard to which the described resource conforms.
+        type: "array"
+        description: "An established standard to which the described resource conforms."
         items:
-          type: string
+          type: "string"
+      state:
+        type: "string"
+        description: "State of the dataset. Used to halt automatic processes when\
+          \ value is 'maintenance'."
+        enum:
+        - "active"
+        - "maintenance"
       spatial:
-        type: array
-        description: The geographical area covered by the dataset.
+        type: "array"
+        description: "The geographical area covered by the dataset."
         items:
-          type: string
-    title: DatasetPatch
-    description: This is a dataset patch
+          type: "string"
+    title: "DatasetPatch"
+    description: "This is a dataset patch"
   Datasets:
-    type: array
-    description: This is multiple datasets
+    type: "array"
+    description: "This is multiple datasets"
     items:
-      type: object
-      description: Metadata about a dataset
-      title: Dataset
+      type: "object"
+      description: "Metadata about a dataset"
+      title: "Dataset"
       properties:
         keywords:
-          type: array
-          description: Extra keywords describing the dataset
+          type: "array"
+          description: "Extra keywords describing the dataset"
           items:
-            type: string
+            type: "string"
             maxLength: 255
         contactPoint:
-          type: object
-          description: Contact info
+          type: "object"
+          description: "Contact info"
           properties:
             name:
-              type: string
+              type: "string"
               maxLength: 255
             email:
-              type: string
-              format: idn-email
+              type: "string"
+              format: "idn-email"
               maxLength: 255
           required:
-          - email
+          - "email"
         confidentiality:
-          type: string
-          description: Classifier for how sensitive the dataset is. (Deprecated, use
-            `accessRights` instead.)
+          type: "string"
+          description: "Classifier for how sensitive the dataset is. (Deprecated,\
+            \ use `accessRights` instead.)"
           enum:
-          - green
-          - yellow
-          - red
-          - purple
+          - "green"
+          - "yellow"
+          - "red"
+          - "purple"
         description:
-          type: string
-          description: A description of what this dataset contains.
+          type: "string"
+          description: "A description of what this dataset contains."
           maxLength: 2048
         timestamp_field:
-          type: string
-          description: A timestamp field for eventstreams
+          type: "string"
+          description: "A timestamp field for eventstreams"
           maxLength: 255
         source:
-          type: object
-          description: Data source information
+          type: "object"
+          description: "Data source information"
           properties:
             type:
-              type: string
+              type: "string"
               maxLength: 255
+              enum:
+              - "database"
+              - "event"
+              - "file"
           required:
-          - type
+          - "type"
         title:
-          type: string
-          description: The dataset title
+          type: "string"
+          description: "The dataset title"
           maxLength: 128
-          pattern: ^[- a-zA-Z0-9åÅæÆøØ]+$
+          pattern: "^[- a-zA-Z0-9åÅæÆøØ]+$"
         objective:
-          type: string
-          description: A description on why this dataset was created.
+          type: "string"
+          description: "A description on why this dataset was created."
           maxLength: 2048
         license:
-          type: string
-          description: A legal document under which the resource is made available.
+          type: "string"
+          description: "A legal document under which the resource is made available."
         spatialResolutionInMeters:
-          type: number
-          description: Minimum spatial separation resolvable in the dataset, measured
-            in meters.
+          type: "number"
+          description: "Minimum spatial separation resolvable in the dataset, measured\
+            \ in meters."
           minimum: 0.0
         parent_id:
-          type: string
-          description: Id of the parent dataset
+          type: "string"
+          description: "Id of the parent dataset"
           maxLength: 128
         publisher:
-          type: string
-          description: Refrence to a unit responsible for making the dataset available.
+          type: "string"
+          description: "Refrence to a unit responsible for making the dataset available."
           maxLength: 255
         theme:
-          type: array
-          description: Reference to a main theme for this dataset.
+          type: "array"
+          description: "Reference to a main theme for this dataset."
           items:
-            type: string
+            type: "string"
             enum:
-            - agriculture, fisheries, forestry and food
-            - economy and finance
-            - education, culture and sport
-            - energy
-            - environment
-            - government and public sector
-            - health
-            - international issues
-            - justice, legal system and public safety
-            - regions and cities
-            - population and society
-            - science and technology
-            - transport
+            - "agriculture, fisheries, forestry and food"
+            - "economy and finance"
+            - "education, culture and sport"
+            - "energy"
+            - "environment"
+            - "government and public sector"
+            - "health"
+            - "international issues"
+            - "justice, legal system and public safety"
+            - "regions and cities"
+            - "population and society"
+            - "science and technology"
+            - "transport"
         accrualPeriodicity:
-          type: string
-          description: Indicates how often a dataset is updated
+          type: "string"
+          description: "Indicates how often a dataset is updated"
           enum:
-          - annual
-          - semiannual
-          - three times a year
-          - bidecennial
-          - biennial
-          - bihourly
-          - bimonthly
-          - biweekly
-          - continuous
-          - daily
-          - twice a day
-          - decennial
-          - hourly
-          - irregular
-          - monthly
-          - semimonthly
-          - three times a month
-          - never
-          - other
-          - quadrennial
-          - quarterly
-          - quinquennial
-          - tridecennial
-          - triennial
-          - trihourly
-          - unknown
-          - continuously updated
-          - weekly
-          - semiweekly
-          - three times a week
+          - "annual"
+          - "semiannual"
+          - "three times a year"
+          - "bidecennial"
+          - "biennial"
+          - "bihourly"
+          - "bimonthly"
+          - "biweekly"
+          - "continuous"
+          - "daily"
+          - "twice a day"
+          - "decennial"
+          - "hourly"
+          - "irregular"
+          - "monthly"
+          - "semimonthly"
+          - "three times a month"
+          - "never"
+          - "other"
+          - "quadrennial"
+          - "quarterly"
+          - "quinquennial"
+          - "tridecennial"
+          - "triennial"
+          - "trihourly"
+          - "unknown"
+          - "continuously updated"
+          - "weekly"
+          - "semiweekly"
+          - "three times a week"
         accessRights:
-          type: string
-          description: The level of access of this dataset. Should be used to indicate
-            if the dataset should have restricted public access.
+          type: "string"
+          description: "The level of access of this dataset. Should be used to indicate\
+            \ if the dataset should have restricted public access."
           enum:
-          - non-public
-          - public
-          - restricted
+          - "non-public"
+          - "public"
+          - "restricted"
         conformsTo:
-          type: array
-          description: An established standard to which the described resource conforms.
+          type: "array"
+          description: "An established standard to which the described resource conforms."
           items:
-            type: string
+            type: "string"
+        state:
+          type: "string"
+          description: "State of the dataset. Used to halt automatic processes when\
+            \ value is 'maintenance'."
+          enum:
+          - "active"
+          - "maintenance"
         spatial:
-          type: array
-          description: The geographical area covered by the dataset.
+          type: "array"
+          description: "The geographical area covered by the dataset."
           items:
-            type: string
+            type: "string"
       required:
-      - accessRights
-      - contactPoint
-      - publisher
-      - title
+      - "accessRights"
+      - "contactPoint"
+      - "publisher"
+      - "title"
   Versions:
-    type: array
-    description: This is multiple versions
+    type: "array"
+    description: "This is multiple versions"
     items:
-      type: object
-      description: Metadata about a version
-      title: Version
+      type: "object"
+      description: "Metadata about a version"
+      title: "Version"
       properties:
         version:
-          type: string
+          type: "string"
           minLength: 1
           maxLength: 128
       required:
-      - version
+      - "version"
   Editions:
-    type: array
-    description: This is multiple editions
+    type: "array"
+    description: "This is multiple editions"
     items:
-      type: object
-      description: Metadata about an edition
-      title: Edition
+      type: "object"
+      description: "Metadata about an edition"
+      title: "Edition"
       properties:
         edition:
-          type: string
-          format: date-time
+          type: "string"
+          format: "date-time"
         description:
-          type: string
+          type: "string"
           maxLength: 2048
         startTime:
-          type: string
-          format: date
+          type: "string"
+          format: "date"
         endTime:
-          type: string
-          format: date
+          type: "string"
+          format: "date"
       required:
-      - edition
+      - "edition"
   StandardResponse:
-    type: object
+    type: "object"
     required:
-    - message
+    - "message"
     properties:
       message:
-        type: string
-    description: Standard response structure
+        type: "string"
+    description: "Standard response structure"
   Version:
-    type: object
+    type: "object"
     required:
-    - version
+    - "version"
     properties:
       version:
-        type: string
+        type: "string"
         minLength: 1
         maxLength: 128
-    title: Version
-    description: Create a version
+    title: "Version"
+    description: "Create a version"
   Dataset:
-    type: object
+    type: "object"
     required:
-    - accessRights
-    - contactPoint
-    - publisher
-    - title
+    - "accessRights"
+    - "contactPoint"
+    - "publisher"
+    - "title"
     properties:
       keywords:
-        type: array
-        description: Extra keywords describing the dataset
+        type: "array"
+        description: "Extra keywords describing the dataset"
         items:
-          type: string
+          type: "string"
           maxLength: 255
       contactPoint:
-        type: object
-        description: Contact info
+        type: "object"
+        description: "Contact info"
         properties:
           name:
-            type: string
+            type: "string"
             maxLength: 255
           email:
-            type: string
-            format: idn-email
+            type: "string"
+            format: "idn-email"
             maxLength: 255
         required:
-        - email
+        - "email"
       confidentiality:
-        type: string
-        description: Classifier for how sensitive the dataset is. (Deprecated, use
-          `accessRights` instead.)
+        type: "string"
+        description: "Classifier for how sensitive the dataset is. (Deprecated, use\
+          \ `accessRights` instead.)"
         enum:
-        - green
-        - yellow
-        - red
-        - purple
+        - "green"
+        - "yellow"
+        - "red"
+        - "purple"
       description:
-        type: string
-        description: A description of what this dataset contains.
+        type: "string"
+        description: "A description of what this dataset contains."
         maxLength: 2048
       timestamp_field:
-        type: string
-        description: A timestamp field for eventstreams
+        type: "string"
+        description: "A timestamp field for eventstreams"
         maxLength: 255
       source:
-        type: object
-        description: Data source information
+        type: "object"
+        description: "Data source information"
         properties:
           type:
-            type: string
+            type: "string"
             maxLength: 255
+            enum:
+            - "database"
+            - "event"
+            - "file"
         required:
-        - type
+        - "type"
       title:
-        type: string
-        description: The dataset title
+        type: "string"
+        description: "The dataset title"
         maxLength: 128
-        pattern: ^[- a-zA-Z0-9åÅæÆøØ]+$
+        pattern: "^[- a-zA-Z0-9åÅæÆøØ]+$"
       objective:
-        type: string
-        description: A description on why this dataset was created.
+        type: "string"
+        description: "A description on why this dataset was created."
         maxLength: 2048
       license:
-        type: string
-        description: A legal document under which the resource is made available.
+        type: "string"
+        description: "A legal document under which the resource is made available."
       spatialResolutionInMeters:
-        type: number
-        description: Minimum spatial separation resolvable in the dataset, measured
-          in meters.
+        type: "number"
+        description: "Minimum spatial separation resolvable in the dataset, measured\
+          \ in meters."
         minimum: 0.0
       parent_id:
-        type: string
-        description: Id of the parent dataset
+        type: "string"
+        description: "Id of the parent dataset"
         maxLength: 128
       publisher:
-        type: string
-        description: Refrence to a unit responsible for making the dataset available.
+        type: "string"
+        description: "Refrence to a unit responsible for making the dataset available."
         maxLength: 255
       theme:
-        type: array
-        description: Reference to a main theme for this dataset.
+        type: "array"
+        description: "Reference to a main theme for this dataset."
         items:
-          type: string
+          type: "string"
           enum:
-          - agriculture, fisheries, forestry and food
-          - economy and finance
-          - education, culture and sport
-          - energy
-          - environment
-          - government and public sector
-          - health
-          - international issues
-          - justice, legal system and public safety
-          - regions and cities
-          - population and society
-          - science and technology
-          - transport
+          - "agriculture, fisheries, forestry and food"
+          - "economy and finance"
+          - "education, culture and sport"
+          - "energy"
+          - "environment"
+          - "government and public sector"
+          - "health"
+          - "international issues"
+          - "justice, legal system and public safety"
+          - "regions and cities"
+          - "population and society"
+          - "science and technology"
+          - "transport"
       accrualPeriodicity:
-        type: string
-        description: Indicates how often a dataset is updated
+        type: "string"
+        description: "Indicates how often a dataset is updated"
         enum:
-        - annual
-        - semiannual
-        - three times a year
-        - bidecennial
-        - biennial
-        - bihourly
-        - bimonthly
-        - biweekly
-        - continuous
-        - daily
-        - twice a day
-        - decennial
-        - hourly
-        - irregular
-        - monthly
-        - semimonthly
-        - three times a month
-        - never
-        - other
-        - quadrennial
-        - quarterly
-        - quinquennial
-        - tridecennial
-        - triennial
-        - trihourly
-        - unknown
-        - continuously updated
-        - weekly
-        - semiweekly
-        - three times a week
+        - "annual"
+        - "semiannual"
+        - "three times a year"
+        - "bidecennial"
+        - "biennial"
+        - "bihourly"
+        - "bimonthly"
+        - "biweekly"
+        - "continuous"
+        - "daily"
+        - "twice a day"
+        - "decennial"
+        - "hourly"
+        - "irregular"
+        - "monthly"
+        - "semimonthly"
+        - "three times a month"
+        - "never"
+        - "other"
+        - "quadrennial"
+        - "quarterly"
+        - "quinquennial"
+        - "tridecennial"
+        - "triennial"
+        - "trihourly"
+        - "unknown"
+        - "continuously updated"
+        - "weekly"
+        - "semiweekly"
+        - "three times a week"
       accessRights:
-        type: string
-        description: The level of access of this dataset. Should be used to indicate
-          if the dataset should have restricted public access.
+        type: "string"
+        description: "The level of access of this dataset. Should be used to indicate\
+          \ if the dataset should have restricted public access."
         enum:
-        - non-public
-        - public
-        - restricted
+        - "non-public"
+        - "public"
+        - "restricted"
       conformsTo:
-        type: array
-        description: An established standard to which the described resource conforms.
+        type: "array"
+        description: "An established standard to which the described resource conforms."
         items:
-          type: string
+          type: "string"
+      state:
+        type: "string"
+        description: "State of the dataset. Used to halt automatic processes when\
+          \ value is 'maintenance'."
+        enum:
+        - "active"
+        - "maintenance"
       spatial:
-        type: array
-        description: The geographical area covered by the dataset.
+        type: "array"
+        description: "The geographical area covered by the dataset."
         items:
-          type: string
-    title: Dataset
-    description: This is a dataset
+          type: "string"
+    title: "Dataset"
+    description: "This is a dataset"
   Distribution:
-    type: object
+    type: "object"
     properties:
       license:
-        type: string
-        description: A legal document under which the resource is made available.
+        type: "string"
+        description: "A legal document under which the resource is made available."
       filename:
-        type: string
+        type: "string"
         minLength: 1
         maxLength: 255
       filenames:
-        type: array
+        type: "array"
         items:
-          type: string
+          type: "string"
           minLength: 1
           maxLength: 255
-    title: Distribution
-    description: This is a distribution
+    title: "Distribution"
+    description: "This is a distribution"
   UserErrorResponse:
-    type: object
+    type: "object"
     required:
-    - errors
-    - message
+    - "errors"
+    - "message"
     properties:
       message:
-        type: string
-        description: A message of what went wrong
+        type: "string"
+        description: "A message of what went wrong"
       errors:
-        type: array
-        description: List of information on why the request failed
+        type: "array"
+        description: "List of information on why the request failed"
         items:
-          type: string
-    description: Response on user errors
+          type: "string"
+    description: "Response on user errors"
   Edition:
-    type: object
+    type: "object"
     required:
-    - edition
+    - "edition"
     properties:
       edition:
-        type: string
-        format: date-time
+        type: "string"
+        format: "date-time"
       description:
-        type: string
+        type: "string"
         maxLength: 2048
       startTime:
-        type: string
-        format: date
+        type: "string"
+        format: "date"
       endTime:
-        type: string
-        format: date
-    title: Edition
-    description: Create a edition
+        type: "string"
+        format: "date"
+    title: "Edition"
+    description: "Create a edition"
   Distributions:
-    type: array
-    description: This is multiple datasets
+    type: "array"
+    description: "This is multiple datasets"
     items:
-      type: object
-      description: Metadata about a distribution
-      title: Distribution
+      type: "object"
+      description: "Metadata about a distribution"
+      title: "Distribution"
       properties:
         license:
-          type: string
-          description: A legal document under which the resource is made available.
+          type: "string"
+          description: "A legal document under which the resource is made available."
         filename:
-          type: string
+          type: "string"
           minLength: 1
           maxLength: 255
         filenames:
-          type: array
+          type: "array"
           items:
-            type: string
+            type: "string"
             minLength: 1
             maxLength: 255
