@@ -2,7 +2,7 @@ import os
 from metadata.dataset.repository import DatasetRepository
 from aws_xray_sdk.core import xray_recorder
 
-xray_recorder.begin_segment("Set-event-source-script")
+xray_recorder.begin_segment("Set-file-source-script")
 
 env = "dev"
 
