@@ -26,4 +26,4 @@ if __name__ == "__main__":
             parent_dataset_ids.append(dataset["parent_id"])
 
     for dataset_id in set(parent_dataset_ids):
-        dataset_repository.patch_item(dataset_id, {"source": None})
+        dataset_repository.patch_item(dataset_id, {"source": {"type": "none"}})
