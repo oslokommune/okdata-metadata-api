@@ -1,7 +1,7 @@
 ---
 swagger: "2.0"
 info:
-  version: "2021-02-08T12:23:01Z"
+  version: "2021-02-11T12:52:12Z"
   title: "prod-metadata-api"
 host: "api.data.oslo.systems"
 basePath: "/metadata"
@@ -968,6 +968,7 @@ definitions:
               - "database"
               - "event"
               - "file"
+              - "none"
           required:
           - "type"
         title:
@@ -1188,6 +1189,7 @@ definitions:
             - "database"
             - "event"
             - "file"
+            - "none"
         required:
         - "type"
       title:
