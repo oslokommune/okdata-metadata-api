@@ -150,7 +150,8 @@
           "enum": [
             "database",
             "event",
-            "file"
+            "file",
+            "none"
           ]
         }
       },
