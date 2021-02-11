@@ -26,4 +26,9 @@ if __name__ == "__main__":
             parent_dataset_ids.append(dataset["parent_id"])
 
     for dataset_id in set(parent_dataset_ids):
-        dataset_repository.patch_item(dataset_id, {"source": {"type": "none"}})
+        try:
+            dataset_repository.patch_item(dataset_id, {"source": {"type": "none"}})
+        except KeyError as e:
+            print(f"Failed for {dataset_id}. Reason:")
+            print(str(e))
+        print(f"Updated {dataset_id}")
