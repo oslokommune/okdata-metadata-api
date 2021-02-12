@@ -75,6 +75,60 @@ class TestCreateDataset:
             ],
         }
 
+    def test_create_with_parent(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        parent = common.raw_dataset.copy()
+        parent["source"] = {"type": "none"}
+        res = dataset_handler.create_dataset(auth_event(parent), None)
+        parent_id = json.loads(res["body"])["Id"]
+
+        child = common.raw_dataset.copy()
+        child["parent_id"] = parent_id
+        res = dataset_handler.create_dataset(auth_event(child), None)
+
+        assert res["statusCode"] == 201
+
+        child_id = json.loads(res["body"])["Id"]
+
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(ID_COLUMN).eq(child_id)
+        )
+        item = db_response["Items"][0]
+
+        assert item["title"] == "Antall besøkende på gjenbruksstasjoner"
+        assert item["parent_id"] == parent_id
+
+    def test_create_with_missing_parent(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        child = common.raw_dataset.copy()
+        child["parent_id"] = "non-existing"
+
+        res = dataset_handler.create_dataset(auth_event(child), None)
+        assert res["statusCode"] == 400
+        assert (
+            json.loads(res["body"])[0]["message"]
+            == "Parent dataset 'non-existing' doesn't exist."
+        )
+
+    def test_create_with_wrong_parent_source_type(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        parent = common.raw_dataset.copy()
+        parent["source"] = {"type": "file"}
+        res = dataset_handler.create_dataset(auth_event(parent), None)
+        parent_id = json.loads(res["body"])["Id"]
+
+        child = common.raw_dataset.copy()
+        child["parent_id"] = parent_id
+
+        res = dataset_handler.create_dataset(auth_event(child), None)
+        assert res["statusCode"] == 400
+        assert (
+            "wrong parent source type" in json.loads(res["body"])[0]["message"].lower()
+        )
+
     def test_create_geo(self, auth_event, metadata_table):
         import metadata.dataset.handler as dataset_handler
 
@@ -364,6 +418,7 @@ class TestGetDataset:
         import metadata.dataset.handler as dataset_handler
 
         dataset = common.raw_dataset.copy()
+        dataset["source"] = {"type": "none"}
         response = dataset_handler.create_dataset(auth_event(dataset), None)
         dataset_id = json.loads(response["body"])["Id"]
 
@@ -383,6 +438,7 @@ class TestGetDataset:
         import metadata.dataset.handler as dataset_handler
 
         dataset = common.raw_dataset.copy()
+        dataset["source"] = {"type": "none"}
         response = dataset_handler.create_dataset(auth_event(dataset), None)
         dataset_id = json.loads(response["body"])["Id"]
 

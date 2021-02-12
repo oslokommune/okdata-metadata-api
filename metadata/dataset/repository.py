@@ -1,14 +1,15 @@
-import boto3
 import re
-import shortuuid
 
+import boto3
+import shortuuid
+from aws_xray_sdk.core import patch
 from botocore.exceptions import ClientError
 from difflib import SequenceMatcher
-
 from okdata.aws.logging import log_dynamodb, log_exception
+
 from metadata.CommonRepository import CommonRepository, TYPE_COLUMN, ID_COLUMN
 from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
-from aws_xray_sdk.core import patch
+from metadata.error import ValidationError
 
 patch(["boto3"])
 
@@ -32,7 +33,25 @@ class DatasetRepository(CommonRepository):
         return self.get_items(parent_id)
 
     def create_dataset(self, content):
-        """Create a new dataset with `content` and return its ID."""
+        """Create a new dataset with `content` and return its ID.
+
+        Verify that a parent dataset exists with source type `none` when a
+        `parent_id` is given, otherwise raise a `ValidationError`.
+        """
+
+        parent_id = content.get("parent_id")
+        if parent_id:
+            parent = self.get_dataset(parent_id)
+
+            if not parent:
+                raise ValidationError(f"Parent dataset '{parent_id}' doesn't exist.")
+
+            source_type = parent.get("source").get("type")
+            if source_type != "none":
+                raise ValidationError(
+                    f"Wrong parent source type. Got '{source_type}', expected 'none'."
+                )
+
         title = content["title"]
         dataset_id = self.generate_unique_id_based_on_title(title)
 
