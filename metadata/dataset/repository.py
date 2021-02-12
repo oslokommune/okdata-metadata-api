@@ -22,6 +22,22 @@ class DatasetRepository(CommonRepository):
 
         super().__init__(self.metadata_table, "Dataset")
 
+    def _validate_parent(self, parent_id):
+        """Validate that a parent dataset exists and has source type `none`.
+
+        If not, raise a `ValidationError`.
+        """
+        parent = self.get_dataset(parent_id)
+
+        if not parent:
+            raise ValidationError(f"Parent dataset '{parent_id}' doesn't exist.")
+
+        source_type = parent.get("source").get("type")
+        if source_type != "none":
+            raise ValidationError(
+                f"Wrong parent source type. Got '{source_type}', expected 'none'."
+            )
+
     def dataset_exists(self, dataset_id):
         dataset = self.get_dataset(dataset_id)
         return dataset is not None
@@ -41,16 +57,7 @@ class DatasetRepository(CommonRepository):
 
         parent_id = content.get("parent_id")
         if parent_id:
-            parent = self.get_dataset(parent_id)
-
-            if not parent:
-                raise ValidationError(f"Parent dataset '{parent_id}' doesn't exist.")
-
-            source_type = parent.get("source").get("type")
-            if source_type != "none":
-                raise ValidationError(
-                    f"Wrong parent source type. Got '{source_type}', expected 'none'."
-                )
+            self._validate_parent(parent_id)
 
         title = content["title"]
         dataset_id = self.generate_unique_id_based_on_title(title)
