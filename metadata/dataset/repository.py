@@ -1,14 +1,15 @@
-import boto3
 import re
-import shortuuid
 
+import boto3
+import shortuuid
+from aws_xray_sdk.core import patch
 from botocore.exceptions import ClientError
 from difflib import SequenceMatcher
-
 from okdata.aws.logging import log_dynamodb, log_exception
+
 from metadata.CommonRepository import CommonRepository, TYPE_COLUMN, ID_COLUMN
 from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
-from aws_xray_sdk.core import patch
+from metadata.error import ValidationError
 
 patch(["boto3"])
 
@@ -21,6 +22,26 @@ class DatasetRepository(CommonRepository):
 
         super().__init__(self.metadata_table, "Dataset")
 
+    def _validate_parent(self, parent_id):
+        """Validate that a parent dataset exists and has source type `none`.
+
+        If not, raise a `ValidationError`.
+        """
+        parent = self.get_dataset(parent_id)
+
+        if not parent:
+            raise ValidationError(f"Parent dataset '{parent_id}' doesn't exist.")
+
+        source_type = parent.get("source").get("type")
+        if not source_type:
+            raise ValidationError(
+                f"Specified parent dataset '{parent_id}' missing source type, expected 'none'."
+            )
+        if source_type != "none":
+            raise ValidationError(
+                f"Wrong parent source type. Got '{source_type}', expected 'none'."
+            )
+
     def dataset_exists(self, dataset_id):
         dataset = self.get_dataset(dataset_id)
         return dataset is not None
@@ -32,7 +53,16 @@ class DatasetRepository(CommonRepository):
         return self.get_items(parent_id)
 
     def create_dataset(self, content):
-        """Create a new dataset with `content` and return its ID."""
+        """Create a new dataset with `content` and return its ID.
+
+        Verify that a parent dataset exists with source type `none` when a
+        `parent_id` is given, otherwise raise a `ValidationError`.
+        """
+
+        parent_id = content.get("parent_id")
+        if parent_id:
+            self._validate_parent(parent_id)
+
         title = content["title"]
         dataset_id = self.generate_unique_id_based_on_title(title)
 

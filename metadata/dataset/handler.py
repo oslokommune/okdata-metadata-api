@@ -41,6 +41,9 @@ def create_dataset(event, context):
         body = dataset_repository.get_dataset(dataset_id, consistent_read=True)
         add_self_url(body)
         return common.response(201, body, headers)
+    except ValidationError as e:
+        log_exception(e)
+        return common.error_response(400, str(e))
     except ResourceConflict as d:
         return common.error_response(409, f"Resource Conflict: {d}")
     except Exception as e:
