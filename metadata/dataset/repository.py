@@ -33,6 +33,10 @@ class DatasetRepository(CommonRepository):
             raise ValidationError(f"Parent dataset '{parent_id}' doesn't exist.")
 
         source_type = parent.get("source").get("type")
+        if not source_type:
+            raise ValidationError(
+                f"Specified parent dataset '{parent_id}' missing source type, expected 'none'."
+            )
         if source_type != "none":
             raise ValidationError(
                 f"Wrong parent source type. Got '{source_type}', expected 'none'."
