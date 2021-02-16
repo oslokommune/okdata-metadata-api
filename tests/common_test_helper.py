@@ -107,11 +107,14 @@ edition_updated = {
 
 raw_distribution = {
     "distribution_type": "file",
+    "content_type": "text/csv",
     "filename": "BOOOM.csv",
     "filenames": ["BOOOM.csv"],
 }
 
 distribution_updated = {
+    "distribution_type": "file",
+    "content_type": "text/csv",
     "filename": "UPDATED.csv",
     "filenames": ["BOOOM.csv"],
     "license": "Norsk lisens for offentlige data (NLOD) 2.0",

@@ -8,6 +8,11 @@
       "type": "string",
       "enum": ["file", "api"]
     },
+    "content_type": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255
+    },
     "filename": {
       "type": "string",
       "minLength": 1,
