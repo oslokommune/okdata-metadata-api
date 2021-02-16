@@ -30,6 +30,10 @@ def create_distribution(event, context):
     log_add(dataset_id=dataset_id, version=version, edition=edition)
 
     try:
+        # FIXME Remove once 'distribution_type' is required
+        if "distribution_type" not in content:
+            content["distribution_type"] = "file"
+
         distribution_id = distribution_repository.create_distribution(
             dataset_id, version, edition, content
         )

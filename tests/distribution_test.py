@@ -24,27 +24,85 @@ class TestCreateDistribution:
             version=version,
             edition=edition,
         )
+
         response = distribution_handler.create_distribution(create_event, None)
         body = json.loads(response["body"])
+
         distribution_id = body["Id"]
         id_regex = f"{dataset_id}/{version}/{edition}/[0-9a-f-]+"
         location_regex = f"/datasets/{dataset_id}/versions/{version}/editions/{edition}/distributions/[0-9a-f-]+"
 
         assert response["statusCode"] == 201
+        assert body["distribution_type"] == "file"
+        assert body["filenames"] == ["BOOOM.csv"]
         assert re.fullmatch(id_regex, distribution_id)
         assert re.fullmatch(location_regex, response["headers"]["Location"])
 
-        # Creating distribution for non-existing edition should fail
-        bad_create_event = create_event
-        bad_create_event["pathParameters"]["edition"] = "LOLOLFEIL"
+    def test_create_distribution_set_default_type(
+        self, metadata_table, auth_event, put_edition
+    ):
+        import metadata.distribution.handler as distribution_handler
 
-        response = distribution_handler.create_distribution(
-            bad_create_event, common_test_helper.Context("1234")
+        content = common_test_helper.raw_distribution.copy()
+        content.pop("distribution_type")
+        dataset_id, version, edition = put_edition
+        create_event = auth_event(
+            content,
+            dataset=dataset_id,
+            version=version,
+            edition=edition,
         )
+
+        response = distribution_handler.create_distribution(create_event, None)
+        body = json.loads(response["body"])
+
+        assert response["statusCode"] == 201
+        assert body["distribution_type"] == "file"
+
+    def test_create_distribution_non_existing_edition(
+        self, metadata_table, auth_event, put_edition
+    ):
+        import metadata.distribution.handler as distribution_handler
+
+        dataset_id, version, edition = put_edition
+        bad_create_event = auth_event(
+            common_test_helper.raw_distribution,
+            dataset=dataset_id,
+            version=version,
+            edition="LOLOLFEIL",
+        )
+
+        context = common_test_helper.Context("1234")
+        response = distribution_handler.create_distribution(bad_create_event, context)
+
         assert response["statusCode"] == 500
         assert json.loads(response["body"]) == {
             "message": "Error creating distribution. RequestId: 1234"
         }
+
+    def test_create_distribution_wrong_type(
+        self, metadata_table, auth_event, put_edition
+    ):
+        import metadata.distribution.handler as distribution_handler
+
+        bad_content = common_test_helper.raw_distribution.copy()
+        bad_content["distribution_type"] = "foo"
+        dataset_id, version, edition = put_edition
+        bad_create_event = auth_event(
+            bad_content,
+            dataset=dataset_id,
+            version=version,
+            edition=edition,
+        )
+
+        response = distribution_handler.create_distribution(bad_create_event, None)
+        body = json.loads(response["body"])
+
+        assert response["statusCode"] == 400
+        assert body["message"] == "Validation error"
+        assert body["errors"] == [
+            "distribution_type: 'foo' is not one of ['file', 'api']"
+        ]
 
     def test_forbidden(self, metadata_table, event, put_edition):
         import metadata.distribution.handler as distribution_handler
@@ -158,7 +216,7 @@ class TestUpdateDistribution:
         ]
 
 
-class TestDistribution:
+class TestGetDistribution:
     def test_distribution_not_found(self, event):
         import metadata.distribution.handler as distribution_handler
 
@@ -168,3 +226,67 @@ class TestDistribution:
         response = distribution_handler.get_distribution(event_for_get, None)
         assert response["statusCode"] == 404
         assert json.loads(response["body"]) == {"message": "Distribution not found."}
+
+    def test_get_distribution(self, event, metadata_table):
+        import metadata.distribution.handler as distribution_handler
+
+        distribution_id = "1234/1/20190401T133700/6f563c62-8fe4-4591-a999-5fbf0798e268"
+        metadata_table.put_item(
+            Item={
+                "Id": distribution_id,
+                "Type": "Distribution",
+                "distribution_type": "file",
+                "filenames": ["file.csv"],
+            }
+        )
+
+        event_for_get = event(
+            {}, "1234", "1", "20190401T133700", "6f563c62-8fe4-4591-a999-5fbf0798e268"
+        )
+        response = distribution_handler.get_distribution(event_for_get, None)
+
+        assert response["statusCode"] == 200
+
+        body = json.loads(response["body"])
+        assert body["Id"] == distribution_id
+        assert body["Type"] == "Distribution"
+        assert body["distribution_type"] == "file"
+        assert body["filenames"] == ["file.csv"]
+
+
+class TestGetDistributions:
+    def test_no_distributions(self, event):
+        import metadata.distribution.handler as distribution_handler
+
+        event_for_get = event({}, "1234", "1", "20190401T133700")
+        response = distribution_handler.get_distributions(event_for_get, None)
+
+        assert response["statusCode"] == 200
+        assert json.loads(response["body"]) == []
+
+    def test_get_distributions(self, event, metadata_table):
+        import metadata.distribution.handler as distribution_handler
+
+        distribution_id = "1234/1/20190401T133700/6f563c62-8fe4-4591-a999-5fbf0798e268"
+        metadata_table.put_item(
+            Item={
+                "Id": distribution_id,
+                "Type": "Distribution",
+                "distribution_type": "file",
+                "filenames": ["file.csv"],
+            }
+        )
+
+        event_for_get = event({}, "1234", "1", "20190401T133700")
+        response = distribution_handler.get_distributions(event_for_get, None)
+
+        assert response["statusCode"] == 200
+
+        body = json.loads(response["body"])
+        assert len(body) == 1
+
+        distribution = body[0]
+        assert distribution["Id"] == distribution_id
+        assert distribution["Type"] == "Distribution"
+        assert distribution["distribution_type"] == "file"
+        assert distribution["filenames"] == ["file.csv"]

@@ -4,6 +4,10 @@
   "description": "Metadata about a distribution",
   "type": "object",
   "properties": {
+    "distribution_type": {
+      "type": "string",
+      "enum": ["file", "api"]
+    },
     "filename": {
       "type": "string",
       "minLength": 1,
