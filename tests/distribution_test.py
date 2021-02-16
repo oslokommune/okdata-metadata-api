@@ -216,7 +216,7 @@ class TestUpdateDistribution:
         ]
 
 
-class TestDistribution:
+class TestGetDistribution:
     def test_distribution_not_found(self, event):
         import metadata.distribution.handler as distribution_handler
 
@@ -226,3 +226,67 @@ class TestDistribution:
         response = distribution_handler.get_distribution(event_for_get, None)
         assert response["statusCode"] == 404
         assert json.loads(response["body"]) == {"message": "Distribution not found."}
+
+    def test_get_distribution(self, event, metadata_table):
+        import metadata.distribution.handler as distribution_handler
+
+        distribution_id = "1234/1/20190401T133700/6f563c62-8fe4-4591-a999-5fbf0798e268"
+        metadata_table.put_item(
+            Item={
+                "Id": distribution_id,
+                "Type": "Distribution",
+                "distribution_type": "file",
+                "filenames": ["file.csv"],
+            }
+        )
+
+        event_for_get = event(
+            {}, "1234", "1", "20190401T133700", "6f563c62-8fe4-4591-a999-5fbf0798e268"
+        )
+        response = distribution_handler.get_distribution(event_for_get, None)
+
+        assert response["statusCode"] == 200
+
+        body = json.loads(response["body"])
+        assert body["Id"] == distribution_id
+        assert body["Type"] == "Distribution"
+        assert body["distribution_type"] == "file"
+        assert body["filenames"] == ["file.csv"]
+
+
+class TestGetDistributions:
+    def test_no_distributions(self, event):
+        import metadata.distribution.handler as distribution_handler
+
+        event_for_get = event({}, "1234", "1", "20190401T133700")
+        response = distribution_handler.get_distributions(event_for_get, None)
+
+        assert response["statusCode"] == 200
+        assert json.loads(response["body"]) == []
+
+    def test_get_distributions(self, event, metadata_table):
+        import metadata.distribution.handler as distribution_handler
+
+        distribution_id = "1234/1/20190401T133700/6f563c62-8fe4-4591-a999-5fbf0798e268"
+        metadata_table.put_item(
+            Item={
+                "Id": distribution_id,
+                "Type": "Distribution",
+                "distribution_type": "file",
+                "filenames": ["file.csv"],
+            }
+        )
+
+        event_for_get = event({}, "1234", "1", "20190401T133700")
+        response = distribution_handler.get_distributions(event_for_get, None)
+
+        assert response["statusCode"] == 200
+
+        body = json.loads(response["body"])
+        assert len(body) == 1
+
+        distribution = body[0]
+        assert distribution["Id"] == distribution_id
+        assert distribution["Type"] == "Distribution"
+        assert distribution["distribution_type"] == "file"
+        assert distribution["filenames"] == ["file.csv"]
