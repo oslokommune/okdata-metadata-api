@@ -24,8 +24,10 @@ class TestCreateDistribution:
             version=version,
             edition=edition,
         )
+
         response = distribution_handler.create_distribution(create_event, None)
         body = json.loads(response["body"])
+
         distribution_id = body["Id"]
         id_regex = f"{dataset_id}/{version}/{edition}/[0-9a-f-]+"
         location_regex = f"/datasets/{dataset_id}/versions/{version}/editions/{edition}/distributions/[0-9a-f-]+"
@@ -35,6 +37,27 @@ class TestCreateDistribution:
         assert body["filenames"] == ["BOOOM.csv"]
         assert re.fullmatch(id_regex, distribution_id)
         assert re.fullmatch(location_regex, response["headers"]["Location"])
+
+    def test_create_distribution_set_default_type(
+        self, metadata_table, auth_event, put_edition
+    ):
+        import metadata.distribution.handler as distribution_handler
+
+        content = common_test_helper.raw_distribution.copy()
+        content.pop("distribution_type")
+        dataset_id, version, edition = put_edition
+        create_event = auth_event(
+            content,
+            dataset=dataset_id,
+            version=version,
+            edition=edition,
+        )
+
+        response = distribution_handler.create_distribution(create_event, None)
+        body = json.loads(response["body"])
+
+        assert response["statusCode"] == 201
+        assert body["distribution_type"] == "file"
 
     def test_create_distribution_non_existing_edition(
         self, metadata_table, auth_event, put_edition
@@ -49,9 +72,9 @@ class TestCreateDistribution:
             edition="LOLOLFEIL",
         )
 
-        response = distribution_handler.create_distribution(
-            bad_create_event, common_test_helper.Context("1234")
-        )
+        context = common_test_helper.Context("1234")
+        response = distribution_handler.create_distribution(bad_create_event, context)
+
         assert response["statusCode"] == 500
         assert json.loads(response["body"]) == {
             "message": "Error creating distribution. RequestId: 1234"
@@ -71,10 +94,10 @@ class TestCreateDistribution:
             version=version,
             edition=edition,
         )
-        response = distribution_handler.create_distribution(
-            bad_create_event, common_test_helper.Context("1234")
-        )
+
+        response = distribution_handler.create_distribution(bad_create_event, None)
         body = json.loads(response["body"])
+
         assert response["statusCode"] == 400
         assert body["message"] == "Validation error"
         assert body["errors"] == [
