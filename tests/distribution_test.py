@@ -31,12 +31,23 @@ class TestCreateDistribution:
         location_regex = f"/datasets/{dataset_id}/versions/{version}/editions/{edition}/distributions/[0-9a-f-]+"
 
         assert response["statusCode"] == 201
+        assert body["distribution_type"] == "file"
+        assert body["filenames"] == ["BOOOM.csv"]
         assert re.fullmatch(id_regex, distribution_id)
         assert re.fullmatch(location_regex, response["headers"]["Location"])
 
-        # Creating distribution for non-existing edition should fail
-        bad_create_event = create_event
-        bad_create_event["pathParameters"]["edition"] = "LOLOLFEIL"
+    def test_create_distribution_non_existing_edition(
+        self, metadata_table, auth_event, put_edition
+    ):
+        import metadata.distribution.handler as distribution_handler
+
+        dataset_id, version, edition = put_edition
+        bad_create_event = auth_event(
+            common_test_helper.raw_distribution,
+            dataset=dataset_id,
+            version=version,
+            edition="LOLOLFEIL",
+        )
 
         response = distribution_handler.create_distribution(
             bad_create_event, common_test_helper.Context("1234")
@@ -45,6 +56,30 @@ class TestCreateDistribution:
         assert json.loads(response["body"]) == {
             "message": "Error creating distribution. RequestId: 1234"
         }
+
+    def test_create_distribution_wrong_type(
+        self, metadata_table, auth_event, put_edition
+    ):
+        import metadata.distribution.handler as distribution_handler
+
+        bad_content = common_test_helper.raw_distribution.copy()
+        bad_content["distribution_type"] = "foo"
+        dataset_id, version, edition = put_edition
+        bad_create_event = auth_event(
+            bad_content,
+            dataset=dataset_id,
+            version=version,
+            edition=edition,
+        )
+        response = distribution_handler.create_distribution(
+            bad_create_event, common_test_helper.Context("1234")
+        )
+        body = json.loads(response["body"])
+        assert response["statusCode"] == 400
+        assert body["message"] == "Validation error"
+        assert body["errors"] == [
+            "distribution_type: 'foo' is not one of ['file', 'api']"
+        ]
 
     def test_forbidden(self, metadata_table, event, put_edition):
         import metadata.distribution.handler as distribution_handler

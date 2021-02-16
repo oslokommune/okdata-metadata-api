@@ -105,7 +105,12 @@ edition_updated = {
     "endTime": "2018-12-21",
 }
 
-raw_distribution = {"filename": "BOOOM.csv", "filenames": ["BOOOM.csv"]}
+raw_distribution = {
+    "distribution_type": "file",
+    "filename": "BOOOM.csv",
+    "filenames": ["BOOOM.csv"],
+}
+
 distribution_updated = {
     "filename": "UPDATED.csv",
     "filenames": ["BOOOM.csv"],
