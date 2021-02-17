@@ -60,6 +60,26 @@ class TestCreateDistribution:
         assert response["statusCode"] == 201
         assert body["distribution_type"] == "file"
 
+    def test_create_api_distribution(self, metadata_table, auth_event, put_edition):
+        import metadata.distribution.handler as distribution_handler
+
+        content = common_test_helper.raw_distribution.copy()
+        content["distribution_type"] = "api"
+        content["api_url"] = "https://example.org"
+        dataset_id, version, edition = put_edition
+        create_event = auth_event(
+            content,
+            dataset=dataset_id,
+            version=version,
+            edition=edition,
+        )
+
+        response = distribution_handler.create_distribution(create_event, None)
+        body = json.loads(response["body"])
+
+        assert response["statusCode"] == 201
+        assert body["distribution_type"] == "api"
+
     def test_create_distribution_non_existing_edition(
         self, metadata_table, auth_event, put_edition
     ):
@@ -104,6 +124,54 @@ class TestCreateDistribution:
         assert body["errors"] == [
             "distribution_type: 'foo' is not one of ['file', 'api']"
         ]
+
+    def test_create_distribution_missing_api_url(
+        self, metadata_table, auth_event, put_edition
+    ):
+        import metadata.distribution.handler as distribution_handler
+
+        bad_content = common_test_helper.raw_distribution.copy()
+        bad_content["distribution_type"] = "api"
+        dataset_id, version, edition = put_edition
+        bad_create_event = auth_event(
+            bad_content,
+            dataset=dataset_id,
+            version=version,
+            edition=edition,
+        )
+
+        response = distribution_handler.create_distribution(bad_create_event, None)
+        body = json.loads(response["body"])
+
+        assert response["statusCode"] == 400
+        assert (
+            body[0]["message"]
+            == "Missing 'api_url', required when 'distribution_type' is 'api'."
+        )
+
+    def test_create_distribution_wrong_type_for_api_url(
+        self, metadata_table, auth_event, put_edition
+    ):
+        import metadata.distribution.handler as distribution_handler
+
+        bad_content = common_test_helper.raw_distribution.copy()
+        bad_content["api_url"] = "https://example.org"
+        dataset_id, version, edition = put_edition
+        bad_create_event = auth_event(
+            bad_content,
+            dataset=dataset_id,
+            version=version,
+            edition=edition,
+        )
+
+        response = distribution_handler.create_distribution(bad_create_event, None)
+        body = json.loads(response["body"])
+
+        assert response["statusCode"] == 400
+        assert (
+            body[0]["message"]
+            == "'api_url' is only supported when 'distribution_type' is 'api', got 'file'."
+        )
 
     def test_forbidden(self, metadata_table, event, put_edition):
         import metadata.distribution.handler as distribution_handler
