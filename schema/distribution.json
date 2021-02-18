@@ -26,6 +26,10 @@
         "maxLength": 255
       }
     },
+    "api_url": {
+      "type": "string",
+      "maxLength": 2048
+    },
     "license": {
       "description": "A legal document under which the resource is made available.",
       "type": "string"

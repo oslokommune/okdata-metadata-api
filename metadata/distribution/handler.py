@@ -4,7 +4,7 @@ from aws_xray_sdk.core import xray_recorder
 
 from okdata.aws.logging import logging_wrapper, log_add, log_exception
 from metadata import common
-from metadata.error import ResourceConflict
+from metadata.error import ResourceConflict, ValidationError
 from metadata.common import validate_input
 from metadata.auth import check_auth
 from metadata.distribution.repository import DistributionRepository
@@ -48,6 +48,9 @@ def create_distribution(event, context):
         )
         add_self_url(body)
         return common.response(201, body, headers)
+    except ValidationError as e:
+        log_exception(e)
+        return common.error_response(400, str(e))
     except ResourceConflict as d:
         return common.error_response(409, f"Resource Conflict: {d}")
     except Exception as e:
@@ -85,6 +88,9 @@ def update_distribution(event, context):
         )
         add_self_url(body)
         return common.response(200, body)
+    except ValidationError as e:
+        log_exception(e)
+        return common.error_response(400, str(e))
     except KeyError:
         message = "Distribution not found."
         return common.response(404, {"message": message})
