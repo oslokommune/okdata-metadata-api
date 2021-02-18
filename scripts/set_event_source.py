@@ -1,11 +1,10 @@
+import argparse
 import os
 import boto3
 from metadata.dataset.repository import DatasetRepository
 from aws_xray_sdk.core import xray_recorder
 
 xray_recorder.begin_segment("Set-event-source-script")
-
-env = "dev"
 
 
 class EventStreamsTable:
@@ -20,12 +19,12 @@ class EventStreamsTable:
 
 
 if __name__ == "__main__":
-    if env == "dev":
-        os.environ["AWS_PROFILE"] = "okdata-dev"
-    elif env == "prod":
-        os.environ["AWS_PROFILE"] = "okdata-prod"
-    else:
-        raise Exception(f"Invalid env {env}")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--env", required=True, choices=["dev", "prod"])
+    args = parser.parse_args()
+
+    os.environ["AWS_PROFILE"] = f"okdata-{args.env}"
+
     dataset_ids = EventStreamsTable().get_dataset_ids()
     [print(dataset_id) for dataset_id in dataset_ids]
 
