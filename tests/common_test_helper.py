@@ -105,11 +105,17 @@ edition_updated = {
     "endTime": "2018-12-21",
 }
 
-raw_distribution = {
+raw_file_distribution = {
     "distribution_type": "file",
     "content_type": "text/csv",
     "filename": "BOOOM.csv",
     "filenames": ["BOOOM.csv"],
+}
+
+raw_api_distribution = {
+    "distribution_type": "api",
+    "content_type": "text/csv",
+    "api_url": "https://example.org",
 }
 
 distribution_updated = {

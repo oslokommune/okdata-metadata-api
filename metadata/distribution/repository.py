@@ -20,7 +20,24 @@ class DistributionRepository(CommonRepository):
 
     def _validate_content(self, content):
         distribution_type = content.get("distribution_type")
+        filename = content.get("filename")
+        filenames = content.get("filenames")
         api_url = content.get("api_url")
+
+        if distribution_type == "file":
+            if not (filename or filenames):
+                raise ValidationError(
+                    # Not exactly true – we still accept the deprecated
+                    # 'filename' – but let's recommend the undeprecated one.
+                    "Missing 'filenames', required when 'distribution_type' is 'file'."
+                )
+        elif filename or filenames:
+            raise ValidationError(
+                "'filename{}' is only supported when 'distribution_type' is 'file', got '{}'.".format(
+                    "s" if filenames else "",
+                    distribution_type,
+                )
+            )
 
         if distribution_type == "api":
             if not api_url:
