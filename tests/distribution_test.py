@@ -34,6 +34,7 @@ class TestCreateDistribution:
 
         assert response["statusCode"] == 201
         assert body["distribution_type"] == "file"
+        assert body["content_type"] == "text/csv"
         assert body["filenames"] == ["BOOOM.csv"]
         assert re.fullmatch(id_regex, distribution_id)
         assert re.fullmatch(location_regex, response["headers"]["Location"])
@@ -236,6 +237,7 @@ class TestGetDistribution:
                 "Id": distribution_id,
                 "Type": "Distribution",
                 "distribution_type": "file",
+                "content_type": "text/csv",
                 "filenames": ["file.csv"],
             }
         )
@@ -251,6 +253,7 @@ class TestGetDistribution:
         assert body["Id"] == distribution_id
         assert body["Type"] == "Distribution"
         assert body["distribution_type"] == "file"
+        assert body["content_type"] == "text/csv"
         assert body["filenames"] == ["file.csv"]
 
 
@@ -273,6 +276,7 @@ class TestGetDistributions:
                 "Id": distribution_id,
                 "Type": "Distribution",
                 "distribution_type": "file",
+                "content_type": "text/csv",
                 "filenames": ["file.csv"],
             }
         )
@@ -289,4 +293,5 @@ class TestGetDistributions:
         assert distribution["Id"] == distribution_id
         assert distribution["Type"] == "Distribution"
         assert distribution["distribution_type"] == "file"
+        assert distribution["content_type"] == "text/csv"
         assert distribution["filenames"] == ["file.csv"]
