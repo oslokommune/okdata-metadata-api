@@ -1,7 +1,7 @@
 ---
 swagger: "2.0"
 info:
-  version: "2021-02-11T12:52:12Z"
+  version: "2021-02-19T08:35:54Z"
   title: "prod-metadata-api"
 host: "api.data.oslo.systems"
 basePath: "/metadata"
@@ -1307,12 +1307,24 @@ definitions:
         type: "string"
         minLength: 1
         maxLength: 255
+      content_type:
+        type: "string"
+        minLength: 1
+        maxLength: 255
+      api_url:
+        type: "string"
+        maxLength: 2048
       filenames:
         type: "array"
         items:
           type: "string"
           minLength: 1
           maxLength: 255
+      distribution_type:
+        type: "string"
+        enum:
+        - "file"
+        - "api"
     title: "Distribution"
     description: "This is a distribution"
   UserErrorResponse:
@@ -1364,9 +1376,21 @@ definitions:
           type: "string"
           minLength: 1
           maxLength: 255
+        content_type:
+          type: "string"
+          minLength: 1
+          maxLength: 255
+        api_url:
+          type: "string"
+          maxLength: 2048
         filenames:
           type: "array"
           items:
             type: "string"
             minLength: 1
             maxLength: 255
+        distribution_type:
+          type: "string"
+          enum:
+          - "file"
+          - "api"
