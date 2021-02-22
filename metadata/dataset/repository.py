@@ -121,7 +121,7 @@ class DatasetRepository(CommonRepository):
         uid = base
 
         while self.dataset_exists(uid):
-            uid = f"{base}-{slugify(shortuuid.ShortUUID().random(length=5))}"
+            uid = f"{base}-{shortuuid.ShortUUID().random(length=5)}"
 
         return uid
 

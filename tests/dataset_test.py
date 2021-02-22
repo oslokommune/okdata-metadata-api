@@ -287,8 +287,6 @@ class TestUpdateDataset:
         )
 
         assert old_dataset_id != new_dataset_id
-        assert old_dataset_id == old_dataset_id.lower()
-        assert new_dataset_id == new_dataset_id.lower()
 
     def test_slugify(self):
         title = (
