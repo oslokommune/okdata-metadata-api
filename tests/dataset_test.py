@@ -275,6 +275,19 @@ class TestUpdateDataset:
             {"message": f"Dataset {dataset_id} does not exist"}
         ]
 
+    def test_generate_unique_id_based_on_title(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        response = dataset_handler.create_dataset(auth_event(common.raw_dataset), None)
+        old_dataset_id = json.loads(response["body"])["Id"]
+
+        dataset_repo = dataset_repository.DatasetRepository()
+        new_dataset_id = dataset_repo.generate_unique_id_based_on_title(
+            common.raw_dataset["title"]
+        )
+
+        assert old_dataset_id != new_dataset_id
+
     def test_slugify(self):
         title = (
             "  Tittel på datasett 42 med spesialtegn :+*/\\_[](){} og norske tegn ÆØÅ  "

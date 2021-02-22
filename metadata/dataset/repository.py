@@ -113,12 +113,17 @@ class DatasetRepository(CommonRepository):
     def patch_dataset(self, dataset_id, content):
         return self.patch_item(dataset_id, content)
 
+    # TODO: Consider not using this function in the dataset creation API, but
+    # rather make clients smarter in guiding their users toward choosing unique
+    # titles (resulting in unique IDs) for their datasets.
     def generate_unique_id_based_on_title(self, title):
-        id = slugify(title)[:64]
-        if self.dataset_exists(id):
-            return id + "-" + shortuuid.ShortUUID().random(length=5)
-        else:
-            return id
+        base = slugify(title)[:64]
+        uid = base
+
+        while self.dataset_exists(uid):
+            uid = f"{base}-{shortuuid.ShortUUID().random(length=5)}"
+
+        return uid
 
 
 def slugify(title):
