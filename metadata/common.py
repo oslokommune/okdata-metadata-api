@@ -10,6 +10,7 @@ BOTO_RESOURCE_COMMON_KWARGS = {
         # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/retries.html
         retries={
             "mode": "standard",
+            "max_attempts": 5,
         }
     ),
 }
