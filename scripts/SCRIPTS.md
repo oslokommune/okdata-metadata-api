@@ -17,3 +17,5 @@ is for traceability.
   * This script was used to set `state = active` for all datasets.
 * `add_bym_geodata_editions_and_distributions`
   * Adds editions and API distributions for BYM's geo datasets.
+* `set_distribution_type`
+  * Initializes distribitions' `distribution_type` to either `file` or `api`.
