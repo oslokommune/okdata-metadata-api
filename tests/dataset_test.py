@@ -35,6 +35,7 @@ class TestCreateDataset:
         assert item[TYPE_COLUMN] == "Dataset"
         assert item["title"] == "Antall besøkende på gjenbruksstasjoner"
         assert item["state"] == "active"
+        assert item["license"] == "https://data.norge.no/nlod/no/1.0"
 
         # Check that we create the initial version
 
@@ -180,6 +181,20 @@ class TestCreateDataset:
             ],
         }
 
+    def test_create_invalid_license(self, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        invalid_dataset = common.raw_geo_dataset.copy()
+        invalid_dataset["license"] = "nlod"
+        create_event = auth_event(invalid_dataset)
+        response = dataset_handler.create_dataset(create_event, None)
+        error_message = json.loads(response["body"])
+        assert response["statusCode"] == 400
+        assert error_message == {
+            "message": "Validation error",
+            "errors": ["license: 'nlod' is not a 'uri'"],
+        }
+
 
 class TestUpdateDataset:
     def test_update_dataset(self, auth_event, metadata_table):
@@ -206,6 +221,7 @@ class TestUpdateDataset:
         assert item[TYPE_COLUMN] == "Dataset"
         assert item["title"] == "UPDATED TITLE"
         assert item["accrualPeriodicity"] == "daily"
+        assert item["license"] == "https://data.norge.no/nlod/no/2.0"
 
     def test_forbidden(self, event, metadata_table, auth_event):
         import metadata.dataset.handler as dataset_handler

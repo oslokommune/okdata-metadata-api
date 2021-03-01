@@ -182,7 +182,8 @@
     },
     "license": {
       "description": "A legal document under which the resource is made available.",
-      "type": "string"
+      "type": "string",
+      "format": "uri"
     },
     "state": {
       "description": "State of the dataset. Used to halt automatic processes when value is 'maintenance'.",
