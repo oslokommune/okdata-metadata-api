@@ -123,7 +123,6 @@ distribution_updated = {
     "content_type": "text/csv",
     "filename": "UPDATED.csv",
     "filenames": ["BOOOM.csv"],
-    "license": "Norsk lisens for offentlige data (NLOD) 2.0",
 }
 
 raw_geo_dataset = {
