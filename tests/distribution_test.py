@@ -289,7 +289,6 @@ class TestUpdateDistribution:
         item = db_response["Items"][0]
 
         assert item["filename"] == "UPDATED.csv"
-        assert item["license"] == "Norsk lisens for offentlige data (NLOD) 2.0"
 
     def test_forbidden(self, metadata_table, event, put_edition):
         import metadata.distribution.handler as distribution_handler
