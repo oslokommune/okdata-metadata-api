@@ -117,6 +117,7 @@ raw_api_distribution = {
     "distribution_type": "api",
     "content_type": "text/csv",
     "api_url": "https://example.org",
+    "api_id": "okdata-api-catalog:123",
 }
 
 distribution_updated = {
