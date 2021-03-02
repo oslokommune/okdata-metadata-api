@@ -54,7 +54,7 @@ raw_dataset = {
     "accrualPeriodicity": "hourly",
     "accessRights": "non-public",
     "objective": "Formålsbeskrivelse",
-    "license": "https://data.norge.no/nlod/no/1.0",
+    "license": "http://data.norge.no/nlod/no/1.0/",
     "contactPoint": {
         "name": "Tim",
         "email": "tim@oslo.kommune.no",
@@ -70,7 +70,7 @@ dataset_updated = {
     "accrualPeriodicity": "daily",
     "accessRights": "non-public",
     "objective": "Formålsbeskrivelse",
-    "license": "https://data.norge.no/nlod/no/2.0",
+    "license": "http://data.norge.no/nlod/no/2.0/",
     "contactPoint": {
         "name": "Tim",
         "email": "tim@oslo.kommune.no",
@@ -154,7 +154,7 @@ updated_geo_dataset = {
     "objective": "Formidle akebakker",
     "spatial": ["Oslo"],
     "spatialResolutionInMeters": 500,
-    "license": "https://data.norge.no/nlod/no/2.0",
+    "license": "http://data.norge.no/nlod/no/2.0/",
     "contactPoint": {
         "name": "Timian",
         "email": "tim@oslo.kommune.no",
