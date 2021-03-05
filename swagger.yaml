@@ -1,7 +1,7 @@
 ---
 swagger: "2.0"
 info:
-  version: "2021-02-19T08:35:54Z"
+  version: "2021-03-05T11:10:28Z"
   title: "prod-metadata-api"
 host: "api.data.oslo.systems"
 basePath: "/metadata"
@@ -831,7 +831,14 @@ definitions:
         maxLength: 2048
       license:
         type: "string"
+        format: "uri"
         description: "A legal document under which the resource is made available."
+        enum:
+        - "http://creativecommons.org/licenses/by/4.0/"
+        - "http://creativecommons.org/publicdomain/zero/1.0/"
+        - "http://data.norge.no/nlod/"
+        - "http://data.norge.no/nlod/no/1.0/"
+        - "http://data.norge.no/nlod/no/2.0/"
       spatialResolutionInMeters:
         type: "number"
         description: "Minimum spatial separation resolvable in the dataset, measured\
@@ -982,7 +989,14 @@ definitions:
           maxLength: 2048
         license:
           type: "string"
+          format: "uri"
           description: "A legal document under which the resource is made available."
+          enum:
+          - "http://creativecommons.org/licenses/by/4.0/"
+          - "http://creativecommons.org/publicdomain/zero/1.0/"
+          - "http://data.norge.no/nlod/"
+          - "http://data.norge.no/nlod/no/1.0/"
+          - "http://data.norge.no/nlod/no/2.0/"
         spatialResolutionInMeters:
           type: "number"
           description: "Minimum spatial separation resolvable in the dataset, measured\
@@ -1203,7 +1217,14 @@ definitions:
         maxLength: 2048
       license:
         type: "string"
+        format: "uri"
         description: "A legal document under which the resource is made available."
+        enum:
+        - "http://creativecommons.org/licenses/by/4.0/"
+        - "http://creativecommons.org/publicdomain/zero/1.0/"
+        - "http://data.norge.no/nlod/"
+        - "http://data.norge.no/nlod/no/1.0/"
+        - "http://data.norge.no/nlod/no/2.0/"
       spatialResolutionInMeters:
         type: "number"
         description: "Minimum spatial separation resolvable in the dataset, measured\
@@ -1300,9 +1321,6 @@ definitions:
   Distribution:
     type: "object"
     properties:
-      license:
-        type: "string"
-        description: "A legal document under which the resource is made available."
       filename:
         type: "string"
         minLength: 1
@@ -1369,9 +1387,6 @@ definitions:
       description: "Metadata about a distribution"
       title: "Distribution"
       properties:
-        license:
-          type: "string"
-          description: "A legal document under which the resource is made available."
         filename:
           type: "string"
           minLength: 1
