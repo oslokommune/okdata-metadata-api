@@ -10,6 +10,8 @@ from metadata.error import ValidationError
 
 patch(["boto3"])
 
+API_NAMESPACES = ["okdata-api-catalog"]
+
 # Parquet doesn't have an IANA-registered MIME type
 # (yet? https://issues.apache.org/jira/browse/PARQUET-1889).
 mimetypes.add_type("application/parquet", ".parq")
@@ -51,6 +53,12 @@ class DistributionRepository(CommonRepository):
                 raise ValidationError(
                     "Missing 'api_url', required when 'distribution_type' is 'api'."
                 )
+            if api_id:
+                namespace, ref = api_id.split(":")
+                if namespace not in API_NAMESPACES:
+                    raise ValidationError(
+                        f"API namespace must be one of {API_NAMESPACES}, was '{namespace}'."
+                    )
         elif api_url or api_id:
             raise ValidationError(
                 "'{}' is only supported when 'distribution_type' is 'api', got '{}'.".format(

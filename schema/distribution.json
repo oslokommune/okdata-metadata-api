@@ -32,7 +32,8 @@
     },
     "api_id": {
       "type": "string",
-      "maxLength": 2048
+      "maxLength": 2048,
+      "pattern": "^[-a-z0-9_]+:[-a-z0-9_]+$"
     }
   },
   "additionalProperties": false
