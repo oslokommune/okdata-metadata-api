@@ -421,7 +421,7 @@ class TestDeriveContentType:
         DistributionRepository._derive_content_type(item)
         assert "content_type" not in item
 
-    def test_wrong_override_content_type(self):
+    def test_override_content_type(self):
         item = {
             "filenames": ["foo.csv"],
             "distribution_type": "file",
