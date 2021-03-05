@@ -58,7 +58,7 @@ class DistributionRepository(CommonRepository):
     def _derive_content_type(item):
         """Make an attempt at deriving a content type for `item`."""
 
-        if item.get("distribution_type") != "file" or "content_type" in item:
+        if "content_type" in item or item.get("distribution_type") != "file":
             return
 
         filename = (
