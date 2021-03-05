@@ -152,7 +152,15 @@
     },
     "license": {
       "description": "A legal document under which the resource is made available.",
-      "type": "string"
+      "type": "string",
+      "format": "uri",
+      "enum": [
+        "http://creativecommons.org/licenses/by/4.0/",
+        "http://creativecommons.org/publicdomain/zero/1.0/",
+        "http://data.norge.no/nlod/",
+        "http://data.norge.no/nlod/no/1.0/",
+        "http://data.norge.no/nlod/no/2.0/"
+      ]
     },
     "state": {
       "description": "State of the dataset. Used to halt automatic processes when value is 'maintenance'.",
