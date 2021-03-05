@@ -458,8 +458,10 @@ class TestDeriveContentType:
         "ext,mime_type",
         [
             ("csv", "text/csv"),
+            ("CSV", "text/csv"),
             ("json", "application/json"),
             ("parq", "application/parquet"),
+            ("PARQ", "application/parquet"),
             ("parq.gz", "application/parquet"),
             ("parquet", "application/parquet"),
             ("parquet.gz", "application/parquet"),
