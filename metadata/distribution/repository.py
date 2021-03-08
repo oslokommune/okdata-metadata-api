@@ -1,3 +1,4 @@
+import mimetypes
 import uuid
 
 import boto3
@@ -8,6 +9,11 @@ from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
 from metadata.error import ValidationError
 
 patch(["boto3"])
+
+# Parquet doesn't have an IANA-registered MIME type
+# (yet? https://issues.apache.org/jira/browse/PARQUET-1889).
+mimetypes.add_type("application/parquet", ".parq")
+mimetypes.add_type("application/parquet", ".parquet")
 
 
 class DistributionRepository(CommonRepository):
@@ -53,15 +59,44 @@ class DistributionRepository(CommonRepository):
         result = self.get_distribution(dataset_id, version, edition, distribution)
         return result is not None
 
+    @staticmethod
+    def _derive_content_type(item):
+        """Make an attempt at deriving a content type for `item`."""
+
+        if "content_type" in item or item.get("distribution_type") != "file":
+            return
+
+        filename = (
+            item["filenames"][0] if item.get("filenames") else item.get("filename")
+        )
+
+        if not filename:
+            return
+
+        mime_type, encoding = mimetypes.guess_type(filename)
+
+        if mime_type:
+            item["content_type"] = mime_type
+
     def get_distribution(
         self, dataset_id, version, edition, distribution, consistent_read=False
     ):
         distribution_id = f"{dataset_id}/{version}/{edition}/{distribution}"
-        return self.get_item(distribution_id, consistent_read)
+        item = self.get_item(distribution_id, consistent_read)
+
+        if item:
+            self._derive_content_type(item)
+
+        return item
 
     def get_distributions(self, dataset_id, version, edition):
         edition_id = f"{dataset_id}/{version}/{edition}"
-        return self.get_items(edition_id)
+        items = self.get_items(edition_id)
+
+        for item in items:
+            self._derive_content_type(item)
+
+        return items
 
     def create_distribution(self, dataset_id, version, edition, content):
         self._validate_content(content)

@@ -109,7 +109,6 @@ edition_updated = {
 
 raw_file_distribution = {
     "distribution_type": "file",
-    "content_type": "text/csv",
     "filename": "BOOOM.csv",
     "filenames": ["BOOOM.csv"],
 }
@@ -122,7 +121,6 @@ raw_api_distribution = {
 
 distribution_updated = {
     "distribution_type": "file",
-    "content_type": "text/csv",
     "filename": "UPDATED.csv",
     "filenames": ["BOOOM.csv"],
 }

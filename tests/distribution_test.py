@@ -5,6 +5,7 @@ import re
 from boto3.dynamodb.conditions import Key
 
 from metadata.CommonRepository import ID_COLUMN
+from metadata.distribution.repository import DistributionRepository
 from tests import common_test_helper
 
 
@@ -351,7 +352,6 @@ class TestGetDistribution:
                 "Id": distribution_id,
                 "Type": "Distribution",
                 "distribution_type": "file",
-                "content_type": "text/csv",
                 "filenames": ["file.csv"],
             }
         )
@@ -390,7 +390,6 @@ class TestGetDistributions:
                 "Id": distribution_id,
                 "Type": "Distribution",
                 "distribution_type": "file",
-                "content_type": "text/csv",
                 "filenames": ["file.csv"],
             }
         )
@@ -409,3 +408,71 @@ class TestGetDistributions:
         assert distribution["distribution_type"] == "file"
         assert distribution["content_type"] == "text/csv"
         assert distribution["filenames"] == ["file.csv"]
+
+
+class TestDeriveContentType:
+    def test_empty_item(self):
+        item = {}
+        DistributionRepository._derive_content_type(item)
+        assert "content_type" not in item
+
+    def test_wrong_distribution_type(self):
+        item = {"filenames": ["foo.csv"], "distribution_type": "api"}
+        DistributionRepository._derive_content_type(item)
+        assert "content_type" not in item
+
+    def test_override_content_type(self):
+        item = {
+            "filenames": ["foo.csv"],
+            "distribution_type": "file",
+            "content_type": "definitely_not_csv",
+        }
+        DistributionRepository._derive_content_type(item)
+        assert item["content_type"] == "definitely_not_csv"
+
+    def test_based_on_filename(self):
+        item = {"filename": "foo.csv", "distribution_type": "file"}
+        DistributionRepository._derive_content_type(item)
+        assert item["content_type"] == "text/csv"
+
+    def test_based_on_filenames(self):
+        item = {"filenames": ["foo.csv"], "distribution_type": "file"}
+        DistributionRepository._derive_content_type(item)
+        assert item["content_type"] == "text/csv"
+
+    def test_filenames_preferred(self):
+        item = {
+            "filename": "foo.parquet",
+            "filenames": ["foo.csv"],
+            "distribution_type": "file",
+        }
+        DistributionRepository._derive_content_type(item)
+        assert item["content_type"] == "text/csv"
+
+    def test_missing_filename(self):
+        item = {"distribution_type": "file"}
+        DistributionRepository._derive_content_type(item)
+        assert "content_type" not in item
+
+    @pytest.mark.parametrize(
+        "ext,mime_type",
+        [
+            ("csv", "text/csv"),
+            ("CSV", "text/csv"),
+            ("json", "application/json"),
+            ("parq", "application/parquet"),
+            ("PARQ", "application/parquet"),
+            ("parq.gz", "application/parquet"),
+            ("parquet", "application/parquet"),
+            ("parquet.gz", "application/parquet"),
+            ("xls", "application/vnd.ms-excel"),
+            (
+                "xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            ),
+        ],
+    )
+    def test_important_types(self, ext, mime_type):
+        item = {"filenames": [f"foo.{ext}"], "distribution_type": "file"}
+        DistributionRepository._derive_content_type(item)
+        assert item["content_type"] == mime_type
