@@ -10,14 +10,10 @@ from metadata.error import ValidationError
 
 patch(["boto3"])
 
-
-def _ensure_extra_mime_types():
-    # Parquet doesn't have an IANA-registered MIME type
-    # (yet? https://issues.apache.org/jira/browse/PARQUET-1889).
-    if ".parq" not in mimetypes.types_map:
-        mimetypes.add_type("application/parquet", ".parq")
-    if ".parquet" not in mimetypes.types_map:
-        mimetypes.add_type("application/parquet", ".parquet")
+# Parquet doesn't have an IANA-registered MIME type
+# (yet? https://issues.apache.org/jira/browse/PARQUET-1889).
+mimetypes.add_type("application/parquet", ".parq")
+mimetypes.add_type("application/parquet", ".parquet")
 
 
 class DistributionRepository(CommonRepository):
@@ -77,7 +73,6 @@ class DistributionRepository(CommonRepository):
         if not filename:
             return
 
-        _ensure_extra_mime_types()
         mime_type, encoding = mimetypes.guess_type(filename)
 
         if mime_type:
