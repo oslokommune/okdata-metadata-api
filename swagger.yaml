@@ -1,7 +1,7 @@
 ---
 swagger: "2.0"
 info:
-  version: "2021-03-05T11:10:28Z"
+  version: "2021-03-09T08:42:54Z"
   title: "prod-metadata-api"
 host: "api.data.oslo.systems"
 basePath: "/metadata"
@@ -1321,6 +1321,10 @@ definitions:
   Distribution:
     type: "object"
     properties:
+      api_id:
+        type: "string"
+        maxLength: 2048
+        pattern: "^[-a-z0-9_]+:[-a-z0-9_]+$"
       filename:
         type: "string"
         minLength: 1
@@ -1387,6 +1391,10 @@ definitions:
       description: "Metadata about a distribution"
       title: "Distribution"
       properties:
+        api_id:
+          type: "string"
+          maxLength: 2048
+          pattern: "^[-a-z0-9_]+:[-a-z0-9_]+$"
         filename:
           type: "string"
           minLength: 1
