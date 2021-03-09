@@ -519,3 +519,32 @@ class TestGetDataset:
         assert dataset["spatial"] == ["Bydel Østafor", "Bydel Vestafor"]
         assert dataset["spatialResolutionInMeters"] == 720.31
         assert dataset["conformsTo"] == ["EUREF89 UTM sone 32, 2d"]
+
+    def test_get_datasets_by_api(self, event, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        for distribution_id, api_id in [
+            ("foo/1/bar/123", "okdata-api-catalog:123"),
+            ("foo/1/bar/1234", "okdata-api-catalog:123"),
+            ("bar/1/baz/123", "okdata-api-catalog:123"),
+            ("baz/1/foo/123", "okdata-api-catalog:1234"),
+        ]:
+            metadata_table.put_item(
+                Item={
+                    "Id": distribution_id,
+                    "Type": "Distribution",
+                    "api_id": api_id,
+                }
+            )
+
+        for dataset_id in ["foo", "bar", "baz"]:
+            metadata_table.put_item(Item={"Id": dataset_id, "Type": "Dataset"})
+
+        res = dataset_handler.get_datasets(
+            event(query_params={"api_id": "okdata-api-catalog:123"}), None
+        )
+
+        assert res["statusCode"] == 200
+        datasets = json.loads(res["body"])
+        assert len(datasets) == 2
+        assert set(ds["Id"] for ds in datasets) == {"foo", "bar"}

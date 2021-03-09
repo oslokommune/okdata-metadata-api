@@ -9,26 +9,52 @@ def create_metadata_table(dynamodb):
         metadata_table_name,
         ID_COLUMN,
         TYPE_COLUMN,
-        gsi="IdByTypeIndex",
+        gsis=[
+            {
+                "index_name": "IdByTypeIndex",
+                "hash_key": TYPE_COLUMN,
+                "range_key": ID_COLUMN,
+            },
+            {
+                "index_name": "IdByApiIdSparseIndex",
+                "hash_key": "api_id",
+            },
+        ],
     )
 
 
-def create_table(dynamodb, table_name, hashkey, rangekey=None, gsi=None):
+def create_table(dynamodb, table_name, hashkey, rangekey=None, gsis=[]):
     keyschema = [{"AttributeName": hashkey, "KeyType": "HASH"}]
     attributes = [{"AttributeName": hashkey, "AttributeType": "S"}]
-    gsis = []
 
     if rangekey:
         keyschema.append({"AttributeName": rangekey, "KeyType": "RANGE"})
         attributes.append({"AttributeName": rangekey, "AttributeType": "S"})
 
-    if gsi:
-        gsis = [
+    for gsi in gsis:
+        attribute_names = [attr["AttributeName"] for attr in attributes]
+
+        if gsi["hash_key"] not in attribute_names:
+            attributes.append({"AttributeName": gsi["hash_key"], "AttributeType": "S"})
+
+        if "range_key" in gsi and gsi["range_key"] not in attribute_names:
+            attributes.append({"AttributeName": gsi["range_key"], "AttributeType": "S"})
+
+    return dynamodb.create_table(
+        TableName=table_name,
+        KeySchema=keyschema,
+        AttributeDefinitions=attributes,
+        ProvisionedThroughput={"ReadCapacityUnits": 5, "WriteCapacityUnits": 5},
+        GlobalSecondaryIndexes=[
             {
-                "IndexName": gsi,
+                "IndexName": gsi["index_name"],
                 "KeySchema": [
-                    {"AttributeName": rangekey, "KeyType": "HASH"},
-                    {"AttributeName": hashkey, "KeyType": "RANGE"},
+                    {"AttributeName": gsi["hash_key"], "KeyType": "HASH"},
+                    *(
+                        [{"AttributeName": gsi["range_key"], "KeyType": "RANGE"}]
+                        if "range_key" in gsi
+                        else []
+                    ),
                 ],
                 "Projection": {"ProjectionType": "INCLUDE"},
                 "ProvisionedThroughput": {
@@ -36,14 +62,8 @@ def create_table(dynamodb, table_name, hashkey, rangekey=None, gsi=None):
                     "WriteCapacityUnits": 5,
                 },
             }
-        ]
-
-    return dynamodb.create_table(
-        TableName=table_name,
-        KeySchema=keyschema,
-        AttributeDefinitions=attributes,
-        ProvisionedThroughput={"ReadCapacityUnits": 5, "WriteCapacityUnits": 5},
-        GlobalSecondaryIndexes=gsis,
+            for gsi in gsis
+        ],
     )
 
 

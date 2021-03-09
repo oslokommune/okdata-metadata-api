@@ -4,6 +4,9 @@ queryParams:
   - name: parent_id
     description: Filter by parent dataset
     type: string
+  - name: api_id
+    description: Filter by API ID
+    type: string
 methodResponses:
   - statusCode: "200"
     responseBody:
