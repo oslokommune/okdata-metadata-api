@@ -35,6 +35,7 @@ plugins:
   - serverless-python-requirements
   - serverless-scriptable-plugin
   - serverless-plugin-git-variables
+  - serverless-prune-plugin
   - serverless-pseudo-parameters
   - serverless-es-logs
 
@@ -63,6 +64,9 @@ custom:
     endpoint: ${ssm:/dataplatform/shared/logs-elasticsearch-endpoint}
     index: dataplatform-services
     filterPattern: '{ $.function_name = "*" }'
+  prune:
+    automatic: true
+    number: 3
   documentation:
     info:
       version: ${git:sha1}
