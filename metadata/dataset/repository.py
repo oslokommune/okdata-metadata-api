@@ -3,6 +3,7 @@ import re
 import boto3
 import shortuuid
 from aws_xray_sdk.core import patch
+from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 from difflib import SequenceMatcher
 from okdata.aws.logging import log_dynamodb, log_exception
@@ -49,8 +50,21 @@ class DatasetRepository(CommonRepository):
     def get_dataset(self, dataset_id, consistent_read=False):
         return self.get_item(dataset_id, consistent_read)
 
-    def get_datasets(self, parent_id=None):
-        return self.get_items(parent_id)
+    def get_datasets(self, parent_id=None, api_id=None):
+        datasets = self.get_items(parent_id)
+
+        if api_id:
+            db_response = log_dynamodb(
+                lambda: self.metadata_table.query(
+                    IndexName="IdByApiIdSparseIndex",
+                    KeyConditionExpression=Key("api_id").eq(api_id),
+                )
+            )
+            distributions = db_response["Items"]
+            dataset_ids = {dist["Id"].split("/")[0] for dist in distributions}
+            datasets = [ds for ds in datasets if ds["Id"] in dataset_ids]
+
+        return datasets
 
     def create_dataset(self, content):
         """Create a new dataset with `content` and return its ID.
