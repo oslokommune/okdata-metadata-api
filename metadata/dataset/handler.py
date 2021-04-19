@@ -13,6 +13,7 @@ from metadata.validator import Validator
 
 dataset_repository = DatasetRepository()
 AUTHORIZER_API = os.environ["AUTHORIZER_API"]
+OKDATA_PERMISSION_API_URL = os.environ["OKDATA_PERMISSION_API_URL"]
 validator = Validator("dataset")
 patch_validator = Validator("dataset_patch")
 BASE_URL = os.environ.get("BASE_URL", "")
@@ -29,13 +30,22 @@ def create_dataset(event, context):
         dataset_id = dataset_repository.create_dataset(content)
         log_add(dataset_id=dataset_id)
 
-        user_id = event["requestContext"]["authorizer"]["principalId"]
+        principal_id = event["requestContext"]["authorizer"]["principalId"]
 
-        requests.post(
-            f"{AUTHORIZER_API}/{dataset_id}",
-            json={"principalId": user_id},
-            headers=Auth().service_client_authorization_header(),
+        auth_header = Auth().service_client_authorization_header()
+
+        create_okdata_permissions(
+            dataset_id=dataset_id,
+            owner_principal_id=principal_id,
+            auth_header=auth_header,
         )
+
+        create_simple_auth_response = requests.post(
+            f"{AUTHORIZER_API}/{dataset_id}",
+            json={"principalId": principal_id},
+            headers=auth_header,
+        )
+        create_simple_auth_response.raise_for_status()
 
         headers = {"Location": f"/datasets/{dataset_id}"}
         body = dataset_repository.get_dataset(dataset_id, consistent_read=True)
@@ -139,3 +149,26 @@ def _update_dataset(event, context, patch):
         log_exception(e)
         message = f"Error updating dataset. RequestId: {context.aws_request_id}"
         return common.response(500, {"message": message})
+
+
+def create_okdata_permissions(
+    dataset_id: str, owner_principal_id: str, auth_header: dict
+):
+    resource_name = f"okdata:dataset:{dataset_id}"
+    service_account_prefix = "service-account-"
+    if owner_principal_id.startswith(service_account_prefix):
+        user_id = owner_principal_id[len(service_account_prefix) :]
+        user_type = "client"
+    else:
+        user_type = "user"
+        user_id = owner_principal_id
+    create_permissions_body = {
+        "owner": {"user_id": user_id, "user_type": user_type},
+        "resource_name": resource_name,
+    }
+    create_permissions_response = requests.post(
+        f"{OKDATA_PERMISSION_API_URL}/permissions",
+        json=create_permissions_body,
+        headers=auth_header,
+    )
+    create_permissions_response.raise_for_status()

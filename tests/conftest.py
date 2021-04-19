@@ -3,6 +3,7 @@ import os
 import re
 
 import boto3
+import jsonschema
 import pytest
 from moto import mock_dynamodb2
 
@@ -11,6 +12,7 @@ from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
 from tests import common_test_helper
 
 AUTHORIZER_API = os.environ["AUTHORIZER_API"]
+OKDATA_PERMISSION_API_URL = os.environ["OKDATA_PERMISSION_API_URL"]
 good_token = "Bjørnepollett"
 
 
@@ -43,6 +45,48 @@ def auth_mock(requests_mock, mocker):
         Auth,
         "service_client_authorization_header",
         return_value=client_credentials_header,
+    )
+
+
+@pytest.fixture(autouse=True)
+def okdata_permission_api_mock(requests_mock, mocker):
+    url_matcher = re.compile(f"{OKDATA_PERMISSION_API_URL}/permissions")
+
+    def body_matcher(request):
+        body = request.json()
+        schema = {
+            "title": "CreateResourceBody",
+            "type": "object",
+            "properties": {
+                "owner": {"$ref": "#/definitions/User"},
+                "resource_name": {"title": "Resource Name", "type": "string"},
+            },
+            "required": ["owner", "resource_name"],
+            "definitions": {
+                "User": {
+                    "title": "User",
+                    "type": "object",
+                    "properties": {
+                        "user_id": {"title": "User Id", "type": "string"},
+                        "user_type": {"title": "User Type", "type": "string"},
+                    },
+                    "required": ["user_id", "user_type"],
+                }
+            },
+        }
+        jsonschema.validate(body, schema)
+        return True
+
+    client_credentials_header = {
+        "Authorization": "Bearer Magic-keycloak-stuff",
+    }
+
+    requests_mock.register_uri(
+        "POST",
+        url_matcher,
+        request_headers=client_credentials_header,
+        status_code=201,
+        additional_matcher=body_matcher,
     )
 
 

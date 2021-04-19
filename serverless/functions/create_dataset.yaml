@@ -1,4 +1,5 @@
 handler: metadata.dataset.handler.create_dataset
+timeout: 15
 events:
   - http:
       path: "datasets"
