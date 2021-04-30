@@ -1,4 +1,5 @@
 import os
+
 import requests
 import simplejson as json
 from aws_xray_sdk.core import xray_recorder
@@ -64,7 +65,7 @@ def create_dataset(event, context):
 
 @logging_wrapper
 @validate_input(validator)
-@check_auth
+@check_auth("okdata:dataset:update")
 @xray_recorder.capture("update_dataset")
 def update_dataset(event, context):
     """PUT /datasets/:dataset-id"""
@@ -74,7 +75,7 @@ def update_dataset(event, context):
 
 @logging_wrapper
 @validate_input(patch_validator)
-@check_auth
+@check_auth("okdata:dataset:update")
 @xray_recorder.capture("patch_dataset")
 def patch_dataset(event, context):
     """PATCH /datasets/:dataset-id"""

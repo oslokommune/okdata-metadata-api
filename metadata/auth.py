@@ -1,6 +1,7 @@
 import os
-import requests
+
 from keycloak import KeycloakOpenID
+from okdata.resource_auth import ResourceAuthorizer
 
 from metadata.dataset.repository import DatasetRepository
 from metadata.common import error_response
@@ -8,7 +9,6 @@ from metadata.common import error_response
 
 class Auth:
     def __init__(self):
-        self.AUTHORIZER_API = os.environ["AUTHORIZER_API"]
         self.KEYCLOAK_SERVER = "{}/auth/".format(os.environ["KEYCLOAK_SERVER"])
         self.KEYCLOAK_REALM = os.environ.get("KEYCLOAK_REALM", "api-catalog")
         self.CLIENT_ID = os.environ["CLIENT_ID"]
@@ -25,35 +25,34 @@ class Auth:
         access_token = f"{response['token_type']} {response['access_token']}"
         return {"Authorization": access_token}
 
-    def is_dataset_owner(self, token, dataset_id):
-        result = requests.get(
-            f"{self.AUTHORIZER_API}/{dataset_id}",
-            headers={"Authorization": f"Bearer {token}"},
-        )
-        result.raise_for_status()
-        data = result.json()
-        return data.get("access", False)
 
+def check_auth(scope: str, use_whitelist=False):
+    def middle(func):
 
-def check_auth(func):
-    def wrapper(event, *args, **kwargs):
-        path_parameters = event["pathParameters"]
-        dataset_id = path_parameters["dataset-id"]
+        resource_authorizer = ResourceAuthorizer()
 
-        if DatasetRepository().get_dataset(dataset_id) is None:
-            message = f"Dataset {dataset_id} does not exist"
-            return error_response(404, message)
+        def wrapper(event, *args, **kwargs):
+            path_parameters = event["pathParameters"]
+            dataset_id = path_parameters["dataset-id"]
 
-        auth_header = event["headers"].get("Authorization")
-        if not auth_header:
-            message = "Authorization header missing"
-            return error_response(403, message)
+            if DatasetRepository().get_dataset(dataset_id) is None:
+                message = f"Dataset {dataset_id} does not exist"
+                return error_response(404, message)
 
-        bearer_token = auth_header.split(" ")[-1]
-        if not Auth().is_dataset_owner(bearer_token, dataset_id):
-            message = f"You are not authorized to access dataset {dataset_id}"
-            return error_response(403, message)
+            auth_header = event["headers"].get("Authorization")
+            if not auth_header:
+                message = "Authorization header missing"
+                return error_response(403, message)
 
-        return func(event, *args, **kwargs)
+            bearer_token = auth_header.split(" ")[-1]
+            if not resource_authorizer.has_access(
+                bearer_token, scope, f"okdata:dataset:{dataset_id}", use_whitelist
+            ):
+                message = f"You are not authorized to access dataset {dataset_id}"
+                return error_response(403, message)
 
-    return wrapper
+            return func(event, *args, **kwargs)
+
+        return wrapper
+
+    return middle

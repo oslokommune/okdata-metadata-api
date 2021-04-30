@@ -35,5 +35,6 @@ setuptools.setup(
         "strict-rfc3339",
         "okdata-aws",
         "python-keycloak",
+        "okdata-resource-auth",
     ],
 )

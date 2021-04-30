@@ -27,6 +27,7 @@ provider:
     ENABLE_AUTH: true
     KEYCLOAK_SERVER: ${ssm:/dataplatform/shared/keycloak-server-url}
     KEYCLOAK_REALM: api-catalog
+    RESOURCE_SERVER_CLIENT_ID: okdata-resource-server
     CLIENT_ID: metadata-api
     CLIENT_SECRET: ${ssm:/dataplatform/${self:service.name}/keycloak-client-secret~true}
     BASE_URL: ${self:custom.baseUrl.${self:provider.stage}, self:custom.baseUrl.dev}

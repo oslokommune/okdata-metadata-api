@@ -1,8 +1,9 @@
 import os
+
 import simplejson as json
 from aws_xray_sdk.core import xray_recorder
-
 from okdata.aws.logging import logging_wrapper, log_add, log_exception
+
 from metadata import common
 from metadata.error import ResourceConflict
 from metadata.auth import check_auth
@@ -18,7 +19,7 @@ BASE_URL = os.environ.get("BASE_URL", "")
 
 @logging_wrapper
 @validate_input(validator)
-@check_auth
+@check_auth("okdata:dataset:write")
 @xray_recorder.capture("create_edition")
 def create_edition(event, context):
     """POST /datasets/:dataset-id/versions/:version/editions"""
@@ -54,7 +55,7 @@ def create_edition(event, context):
 
 @logging_wrapper
 @validate_input(validator)
-@check_auth
+@check_auth("okdata:dataset:write")
 @xray_recorder.capture("update_edition")
 def update_edition(event, context):
     """PUT /datasets/:dataset-id/versions/:version/editions/:edition"""

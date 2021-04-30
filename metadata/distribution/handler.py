@@ -1,8 +1,9 @@
 import os
+
 import simplejson as json
 from aws_xray_sdk.core import xray_recorder
-
 from okdata.aws.logging import logging_wrapper, log_add, log_exception
+
 from metadata import common
 from metadata.error import ResourceConflict, ValidationError
 from metadata.common import validate_input
@@ -17,7 +18,7 @@ BASE_URL = os.environ.get("BASE_URL", "")
 
 @logging_wrapper
 @validate_input(validator)
-@check_auth
+@check_auth("okdata:dataset:write", use_whitelist=True)
 @xray_recorder.capture("create_distribution")
 def create_distribution(event, context):
     """POST /datasets/:dataset-id/versions/:version/editions/:edition/distributions"""
@@ -61,7 +62,7 @@ def create_distribution(event, context):
 
 @logging_wrapper
 @validate_input(validator)
-@check_auth
+@check_auth("okdata:dataset:write", use_whitelist=True)
 @xray_recorder.capture("update_distribution")
 def update_distribution(event, context):
     """PUT /datasets/:dataset-id/versions/:version/editions/:edition/distributions/:distribution"""

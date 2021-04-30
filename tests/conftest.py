@@ -6,6 +6,7 @@ import boto3
 import jsonschema
 import pytest
 from moto import mock_dynamodb2
+from okdata.resource_auth import ResourceAuthorizer
 
 from metadata.auth import Auth
 from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
@@ -23,19 +24,22 @@ def dynamodb():
 
 
 @pytest.fixture(autouse=True)
-def auth_mock(requests_mock, mocker):
+def auth_mock(requests_mock, mocker, monkeypatch):
     matcher = re.compile(f"{AUTHORIZER_API}/.*")
     client_credentials_header = {
         "Authorization": "Bearer Magic-keycloak-stuff",
     }
 
-    requests_mock.register_uri("GET", matcher, json={"access": False})
-    requests_mock.register_uri(
-        "GET",
-        matcher,
-        request_headers={"Authorization": f"Bearer {good_token}"},
-        json={"access": True},
-    )
+    def has_access_mock(
+        self, bearer_token, scope, resource_name=None, use_whitelist=False
+    ):
+        return (
+            bearer_token == good_token
+            and resource_name.startswith("okdata:dataset:")
+            and (scope == "okdata:dataset:update" or scope == "okdata:dataset:write")
+        )
+
+    monkeypatch.setattr(ResourceAuthorizer, "has_access", has_access_mock)
     requests_mock.register_uri(
         "POST",
         matcher,
