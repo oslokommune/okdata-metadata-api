@@ -19,7 +19,7 @@ BASE_URL = os.environ.get("BASE_URL", "")
 
 @logging_wrapper
 @validate_input(validator)
-@check_auth("okdata:dataset:write")
+@check_auth("okdata:dataset:write", use_whitelist=True)
 @xray_recorder.capture("create_edition")
 def create_edition(event, context):
     """POST /datasets/:dataset-id/versions/:version/editions"""
