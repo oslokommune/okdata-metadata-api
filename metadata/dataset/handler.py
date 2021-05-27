@@ -13,7 +13,6 @@ from metadata.dataset.repository import DatasetRepository
 from metadata.validator import Validator
 
 dataset_repository = DatasetRepository()
-AUTHORIZER_API = os.environ["AUTHORIZER_API"]
 OKDATA_PERMISSION_API_URL = os.environ["OKDATA_PERMISSION_API_URL"]
 validator = Validator("dataset")
 patch_validator = Validator("dataset_patch")
@@ -40,13 +39,6 @@ def create_dataset(event, context):
             owner_principal_id=principal_id,
             auth_header=auth_header,
         )
-
-        create_simple_auth_response = requests.post(
-            f"{AUTHORIZER_API}/{dataset_id}",
-            json={"principalId": principal_id},
-            headers=auth_header,
-        )
-        create_simple_auth_response.raise_for_status()
 
         headers = {"Location": f"/datasets/{dataset_id}"}
         body = dataset_repository.get_dataset(dataset_id, consistent_read=True)

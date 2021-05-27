@@ -12,7 +12,7 @@ from metadata.auth import Auth
 from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
 from tests import common_test_helper
 
-AUTHORIZER_API = os.environ["AUTHORIZER_API"]
+
 OKDATA_PERMISSION_API_URL = os.environ["OKDATA_PERMISSION_API_URL"]
 good_token = "Bjørnepollett"
 
@@ -25,7 +25,6 @@ def dynamodb():
 
 @pytest.fixture(autouse=True)
 def auth_mock(requests_mock, mocker, monkeypatch):
-    matcher = re.compile(f"{AUTHORIZER_API}/.*")
     client_credentials_header = {
         "Authorization": "Bearer Magic-keycloak-stuff",
     }
@@ -40,11 +39,6 @@ def auth_mock(requests_mock, mocker, monkeypatch):
         )
 
     monkeypatch.setattr(ResourceAuthorizer, "has_access", has_access_mock)
-    requests_mock.register_uri(
-        "POST",
-        matcher,
-        request_headers=client_credentials_header,
-    )
     mocker.patch.object(
         Auth,
         "service_client_authorization_header",

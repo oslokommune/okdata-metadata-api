@@ -22,7 +22,6 @@ provider:
   environment:
     SERVICE_NAME: ${self:service}
     GIT_REV: ${git:branch}:${git:sha1}
-    AUTHORIZER_API: ${ssm:/dataplatform/shared/api-gateway-url}/simple-dataset-authorizer
     OKDATA_PERMISSION_API_URL: ${ssm:/dataplatform/shared/api-gateway-url}/okdata-permission-api
     ENABLE_AUTH: true
     KEYCLOAK_SERVER: ${ssm:/dataplatform/shared/keycloak-server-url}
