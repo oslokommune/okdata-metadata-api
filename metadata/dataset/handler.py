@@ -11,8 +11,12 @@ from metadata.error import ResourceConflict, ValidationError
 from metadata.common import validate_input
 from metadata.dataset.repository import DatasetRepository
 from metadata.validator import Validator
+from metadata.version.repository import VersionRepository
+from metadata.version.handler import add_self_url as add_version_url
 
 dataset_repository = DatasetRepository()
+version_repository = VersionRepository()
+
 OKDATA_PERMISSION_API_URL = os.environ["OKDATA_PERMISSION_API_URL"]
 validator = Validator("dataset")
 patch_validator = Validator("dataset_patch")
@@ -80,9 +84,7 @@ def patch_dataset(event, context):
 def get_datasets(event, context):
     """GET /datasets"""
 
-    query_params = (
-        event["queryStringParameters"] if event["queryStringParameters"] else {}
-    )
+    query_params = event.get("queryStringParameters") or {}
 
     datasets = dataset_repository.get_datasets(
         parent_id=query_params.get("parent_id"),
@@ -105,12 +107,21 @@ def get_dataset(event, context):
     log_add(dataset_id=dataset_id)
     dataset = dataset_repository.get_dataset(dataset_id)
 
-    if dataset:
-        add_self_url(dataset)
-        return common.response(200, dataset)
-    else:
+    if not dataset:
         message = "Dataset not found."
         return common.response(404, {"message": message})
+
+    add_self_url(dataset)
+
+    query_params = event.get("queryStringParameters") or {}
+    embed_versions = "versions" in query_params.get("embed", "").split(",")
+    if embed_versions:
+        versions = version_repository.get_versions(dataset_id=dataset["Id"])
+        dataset["_embedded"] = {"versions": versions}
+        for version in versions:
+            add_version_url(version)
+
+    return common.response(200, dataset)
 
 
 def add_self_url(dataset):

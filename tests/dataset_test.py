@@ -519,6 +519,8 @@ class TestGetDataset:
         assert dataset["spatial"] == ["Bydel Østafor", "Bydel Vestafor"]
         assert dataset["spatialResolutionInMeters"] == 720.31
         assert dataset["conformsTo"] == ["EUREF89 UTM sone 32, 2d"]
+        expected_href = "/datasets/akebakker-under-kommunal-forvaltning-i-oslo"
+        assert dataset["_links"]["self"]["href"] == expected_href
 
     def test_get_datasets_by_api(self, event, auth_event, metadata_table):
         import metadata.dataset.handler as dataset_handler
@@ -548,3 +550,25 @@ class TestGetDataset:
         datasets = json.loads(res["body"])
         assert len(datasets) == 2
         assert set(ds["Id"] for ds in datasets) == {"foo", "bar"}
+
+    def test_get_dataset_with_versions(self, event, auth_event, metadata_table):
+        import metadata.dataset.handler as dataset_handler
+
+        dataset = common.raw_geo_dataset.copy()
+        response = dataset_handler.create_dataset(auth_event(dataset), None)
+        body = json.loads(response["body"])
+        dataset_id = body["Id"]
+
+        event_for_get = event(dataset=dataset_id, query_params={"embed": "versions"})
+        response = dataset_handler.get_dataset(event_for_get, None)
+
+        assert response["statusCode"] == 200
+        dataset = json.loads(response["body"])
+        versions = dataset["_embedded"]["versions"]
+        assert len(versions) == 1
+        assert versions[0]["Id"] == "akebakker-under-kommunal-forvaltning-i-oslo/1"
+        assert versions[0]["version"] == "1"
+        expected_href = (
+            "/datasets/akebakker-under-kommunal-forvaltning-i-oslo/versions/1"
+        )
+        assert versions[0]["_links"]["self"]["href"] == expected_href
