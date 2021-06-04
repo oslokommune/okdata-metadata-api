@@ -1,0 +1,14 @@
+{% do requirements.append("openpyxl") %}
+{% do requirements.append("tabulate") %}
+{% do imports.append(("io", "BytesIO")) %}
+{% do imports.append(("openpyxl", "load_workbook")) %}
+{% do imports.append(("tabulate", "tabulate")) %}
+
+{% macro code() %}
+# Open workbook.
+workbook = load_workbook(filename=BytesIO(data))
+worksheet = workbook.active
+
+# Print a nice table.
+print(tabulate(list(ws.values)))
+{% endmacro %}

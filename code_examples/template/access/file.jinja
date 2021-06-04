@@ -1,0 +1,22 @@
+{% do requirements.append("okdata-sdk") %}
+{% do imports.append(("okdata.sdk.data.download", "Download")) %}
+
+{% macro code() %}
+# Instantiate the download client.
+client = Download()
+
+# Download the files from the dataset's latest distribution.
+res = client.download(
+    dataset_id="{{ dataset_id }}",
+    version="{{ version }}",
+    edition="latest",
+    output_path="/tmp/examples",
+)
+
+# Select the first file (this is usually also the only file).
+filename = res["files"][0]
+
+# Read file contents.
+with open(filename{% if content_type in ["excel", "parquet"] %}, "rb"{% endif %}) as f:
+    data = f.read()
+{% endmacro %}

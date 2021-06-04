@@ -1,0 +1,8 @@
+{% do requirements.append("tabulate") %}
+{% do imports.append("csv") %}
+{% do imports.append(("tabulate", "tabulate")) %}
+
+{% macro code() %}
+# Print a nice table.
+print(tabulate(csv.reader(data.splitlines(), delimiter="{{delimiter}}")))
+{% endmacro %}

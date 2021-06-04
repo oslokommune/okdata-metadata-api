@@ -1,0 +1,19 @@
+# Prerequisites:
+{% if access_rights != "public" %}
+#   export OKDATA_USERNAME=my-user
+#   export OKDATA_PASSWORD=my-password
+#
+{% endif %}
+{% for requirement in requirements|sort -%}
+#   pip install --user {{requirement}}
+{% endfor %}
+
+{% for import in imports -%}
+{% if import is not string -%}
+from {{ import[0] }} import {{ import[1] }}
+{% else -%}
+import {{ import }}
+{% endif -%}
+{% endfor -%}
+
+{% block body %}{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.jinja" %}
+
+{% import "access/"+dataset_type+".jinja" as access with context %}
+{% if content_type %}
+{% import "process/"+content_type+".jinja" as process with context %}
+{% endif %}
+
+{%- block body -%}
+{{- access.code() }}
+{% if process and process.code %}
+{{ process.code() -}}
+{% endif %}
+{%- endblock -%}

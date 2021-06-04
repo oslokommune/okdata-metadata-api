@@ -1,0 +1,14 @@
+{% do requirements.append("okdata-sdk") %}
+{% do requirements.append("requests") %}
+{% do imports.append("requests") %}
+{% do imports.append(("okdata.sdk.data.download", "Download")) %}
+
+{% macro code() %}
+# Request data from API endpoint.
+api_url = "{{ api_url }}"
+{% if content_type in ["json"] %}
+data = requests.get(api_url).json()
+{% else %}
+data = requests.get(api_url)
+{% endif %}
+{% endmacro %}

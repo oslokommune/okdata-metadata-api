@@ -1,0 +1,11 @@
+{% do requirements.append("parquet") %}
+{% do requirements.append("tabulate") %}
+{% do imports.append(("io", "BytesIO")) %}
+{% do imports.append("parquet") %}
+{% do imports.append(("tabulate", "tabulate")) %}
+
+{% macro code() %}
+# Print a nice table.
+data = list(parquet.reader(BytesIO(data)))
+print(tabulate(data))
+{% endmacro %}

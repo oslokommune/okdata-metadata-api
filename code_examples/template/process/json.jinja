@@ -1,0 +1,10 @@
+{% do imports.append("json") %}
+
+{% macro code() %}
+# Print indented JSON.
+{% if dataset_type == "api" %}
+print(json.dumps(data, indent=4))
+{% else %}
+print(json.dumps(json.loads(data), indent=4))
+{% endif %}
+{% endmacro %}

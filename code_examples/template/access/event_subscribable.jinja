@@ -1,0 +1,20 @@
+{% do requirements.append("okdata-sdk") %}
+{% do requirements.append("websocket-client") %}
+{% do imports.append("websocket") %}
+{% do imports.append(("okdata.sdk.auth.auth", "Authenticate")) %}
+{% do imports.append(("okdata.sdk.config", "Config")) %}
+
+{% macro code() %}
+# Instantiate the authentication client.
+auth = Authenticate(config=Config())
+
+# Connect to socket and print incoming events.
+ws = websocket.WebSocketApp(
+    "wss://ws.data-dev.oslo.systems/event-data-subscription?dataset_id={{ dataset_id }}",
+    header={"Authorization": f"Bearer {auth.access_token}"},
+    on_open=lambda ws: print("Connected! Listening..."),
+    on_message=lambda ws, event: print(event),
+    on_error=lambda ws, error: print(error),
+)
+ws.run_forever()
+{% endmacro %}
