@@ -1,12 +1,12 @@
-import pytest
 import json
 from decimal import Decimal
 
+import pytest
 from boto3.dynamodb.conditions import Key
 
-from metadata.CommonRepository import ID_COLUMN, TYPE_COLUMN
 import metadata.dataset.repository as dataset_repository
 import tests.common_test_helper as common
+from metadata.CommonRepository import ID_COLUMN, TYPE_COLUMN
 
 
 @pytest.fixture(autouse=True)
@@ -572,3 +572,27 @@ class TestGetDataset:
             "/datasets/akebakker-under-kommunal-forvaltning-i-oslo/versions/1"
         )
         assert versions[0]["_links"]["self"]["href"] == expected_href
+
+
+class TestGetCodeExamples:
+    def test_get_code_examples(self, event, auth_event, metadata_table, put_edition):
+        import metadata.dataset.handler as dataset_handler
+        import metadata.distribution.handler as distribution_handler
+
+        dataset_id, version, edition = put_edition
+        distribution_handler.create_distribution(
+            auth_event(
+                common.raw_file_distribution,
+                dataset=dataset_id,
+                version=version,
+                edition=edition,
+            ),
+            None,
+        )
+
+        res = dataset_handler.get_code_examples(event(dataset=dataset_id), None)
+        assert res["statusCode"] == 200
+
+        examples = json.loads(res["body"])
+        assert len(examples) == 1
+        assert examples[0]["content_type"] == "text/csv"

@@ -3,16 +3,17 @@ import os
 import requests
 import simplejson as json
 from aws_xray_sdk.core import xray_recorder
-
 from okdata.aws.logging import logging_wrapper, log_add, log_exception
+
 from metadata import common
 from metadata.auth import Auth, check_auth
-from metadata.error import ResourceConflict, ValidationError
 from metadata.common import validate_input
+from metadata.dataset.code_examples import NoCodeExamples, code_examples
 from metadata.dataset.repository import DatasetRepository
+from metadata.error import ResourceConflict, ValidationError
 from metadata.validator import Validator
-from metadata.version.repository import VersionRepository
 from metadata.version.handler import add_self_url as add_version_url
+from metadata.version.repository import VersionRepository
 
 dataset_repository = DatasetRepository()
 version_repository = VersionRepository()
@@ -122,6 +123,23 @@ def get_dataset(event, context):
             add_version_url(version)
 
     return common.response(200, dataset)
+
+
+@logging_wrapper
+@xray_recorder.capture("get_code_examples")
+def get_code_examples(event, context):
+    """GET /datasets/:dataset-id/code-examples"""
+
+    dataset_id = event["pathParameters"]["dataset-id"]
+    log_add(dataset_id=dataset_id)
+
+    try:
+        return common.response(200, code_examples(dataset_id))
+    except NoCodeExamples as e:
+        return common.response(
+            400,
+            {"message": f"Couldn't give code examples for {dataset_id}: {str(e)}."},
+        )
 
 
 def add_self_url(dataset):
