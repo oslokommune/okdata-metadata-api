@@ -6,7 +6,7 @@ import isort
 import jinja2
 from black import FileMode, format_str
 
-templateLoader = jinja2.FileSystemLoader(searchpath="./template")
+templateLoader = jinja2.FileSystemLoader(searchpath="../templates")
 templateEnv = jinja2.Environment(
     loader=templateLoader,
     extensions=["jinja2.ext.do"],
