@@ -5,27 +5,78 @@ takes a dataset ID as a parameter and returns a suitable Python code example
 for it, if possible, otherwise it raises `NoCodeExamples`.
 """
 
+from pathlib import Path
+
+import isort
+import jinja2
+from black import FileMode, format_str
+
 from metadata.dataset.repository import DatasetRepository
 from metadata.distribution.repository import DistributionRepository
 from metadata.edition.repository import EditionRepository
 from metadata.version.repository import VersionRepository
 
+dataset_types = ["file", "api"]
+content_types = {
+    "application/geo+json": "geojson",
+    "application/json": "json",
+    "application/parquet": "parquet",
+    "application/vnd.ms-excel": "xls",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+    "text/csv": "csv",
+}
 
-def __mock_generate__(config):
-    """Return example code based on `config`.
-
-    TODO: Remove when the real generation code is on place.
-    """
-    return {
-        "content_type": config["content_type"],
-        "code": "print('hello, world')",
-    }
+template_env = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(
+        searchpath=f"{Path(__file__).parents[2]}/templates",
+    ),
+    extensions=["jinja2.ext.do"],
+    trim_blocks=True,
+)
+template = template_env.get_template("main.jinja")
 
 
 class NoCodeExamples(Exception):
     """Raised when sensible code examples can't be produced for a dataset."""
 
     pass
+
+
+def _code_example(config):
+    """Return a code example based on `config`."""
+
+    dataset_type = config["dataset_type"]
+    if not dataset_type:
+        raise NoCodeExamples("Missing dataset type")
+
+    if dataset_type not in dataset_types:
+        raise NoCodeExamples(f"Unknown dataset type {dataset_type}")
+
+    content_type = config["content_type"]
+    if not content_type:
+        raise NoCodeExamples("Missing content type")
+
+    if content_type not in content_types:
+        raise NoCodeExamples(f"Unknown content type {content_type}")
+
+    code_example = template.render(
+        **{
+            "dataset_id": config["dataset_id"],
+            "version": config["version"],
+            "dataset_type": dataset_type,
+            "content_type": content_types[content_type],
+            "delimiter": ",",  # TODO: Make dynamic based on dataset config.
+            "access_rights": config["access_rights"],
+            "api_url": config.get("api_url"),
+            "requirements": [],
+            "imports": [],
+        }
+    )
+
+    return {
+        "content_type": config["content_type"],
+        "code": format_str(isort.code(code_example), mode=FileMode()),
+    }
 
 
 def code_examples(dataset_id):
@@ -56,13 +107,14 @@ def code_examples(dataset_id):
         )
 
     return [
-        __mock_generate__(
+        _code_example(
             {
                 "dataset_id": dataset_id,
                 "version": version_id,
                 "dataset_type": distribution.get("distribution_type"),
                 "content_type": distribution.get("content_type"),
                 "access_rights": dataset["accessRights"],
+                "api_url": distribution.get("api_url"),
             }
         )
         for distribution in distributions

@@ -4,9 +4,9 @@ from unittest.mock import patch
 import pytest
 
 from metadata.dataset.code_examples import (
-    __mock_generate__,
-    code_examples,
     NoCodeExamples,
+    _code_example,
+    code_examples,
 )
 
 dataset_types = ["file", "api"]
@@ -28,7 +28,7 @@ def test_generate_code_example(dataset_type, content_type, access_rights):
     # Code example should parse as valid Python code. This raises `SyntaxError`
     # if not.
     ast.parse(
-        __mock_generate__(
+        _code_example(
             {
                 "dataset_id": "my-dataset",
                 "version": "1",

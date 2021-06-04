@@ -46,6 +46,7 @@ package:
   include:
     - '!./**'
     - './schema/**'
+    - './templates/**/*.jinja'
     - './metadata/*.py'
     - './metadata/dataset/*.py'
     - './metadata/version/*.py'
