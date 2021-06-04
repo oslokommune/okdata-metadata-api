@@ -10,5 +10,5 @@ workbook = load_workbook(filename=BytesIO(data))
 worksheet = workbook.active
 
 # Print a nice table.
-print(tabulate(list(ws.values)))
+print(tabulate(list(worksheet.values)))
 {% endmacro %}
