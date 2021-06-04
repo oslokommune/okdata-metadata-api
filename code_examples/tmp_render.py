@@ -18,8 +18,8 @@ content_types = {
     "application/geo+json": "geojson",
     "application/json": "json",
     "application/parquet": "parquet",
-    "application/vnd.ms-excel": "excel",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "excel",
+    "application/vnd.ms-excel": "xls",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
     "text/csv": "csv",
 }
 

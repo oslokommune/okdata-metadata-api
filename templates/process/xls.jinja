@@ -1,0 +1,15 @@
+{% do requirements.append("xlrd") %}
+{% do requirements.append("tabulate") %}
+{% do imports.append(("io", "BytesIO")) %}
+{% do imports.append(("xlrd", "open_workbook")) %}
+{% do imports.append(("tabulate", "tabulate")) %}
+
+{% macro code() %}
+# Open workbook.
+workbook = open_workbook(file_contents=data)
+worksheet = workbook.sheet_by_index(0)
+
+# Print a nice table.
+cell_values = [[cell.value for cell in row] for row in worksheet.get_rows()]
+print(tabulate(cell_values))
+{% endmacro %}
