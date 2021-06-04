@@ -43,7 +43,7 @@ def code_examples(dataset_id):
 
     edition = EditionRepository().get_edition(dataset_id, version_id, "latest")
     if not edition:
-        raise NoCodeExamples(f"No edition found for version {version}")
+        raise NoCodeExamples(f"No edition found for version {version_id}")
 
     edition_id = edition["Id"].split("/")[2]
 
@@ -51,7 +51,9 @@ def code_examples(dataset_id):
         dataset_id, version_id, edition_id
     )
     if not distributions:
-        raise NoCodeExamples(f"No distributions found for edition {version}/{edition}")
+        raise NoCodeExamples(
+            f"No distributions found for edition {version_id}/{edition_id}"
+        )
 
     return [
         __mock_generate__(
