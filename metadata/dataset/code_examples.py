@@ -65,7 +65,6 @@ def _code_example(config):
             "version": config["version"],
             "dataset_type": dataset_type,
             "content_type": content_types[content_type],
-            "delimiter": ",",  # TODO: Make dynamic based on dataset config.
             "access_rights": config["access_rights"],
             "api_url": config.get("api_url"),
             "requirements": [],

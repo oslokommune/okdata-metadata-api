@@ -4,5 +4,6 @@
 
 {% macro code() %}
 # Print a nice table.
-print(tabulate(csv.reader(data.splitlines(), delimiter="{{delimiter}}")))
+dialect = csv.Sniffer().sniff(data)
+print(tabulate(csv.reader(data.splitlines(), dialect)))
 {% endmacro %}
