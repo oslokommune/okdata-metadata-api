@@ -6,6 +6,8 @@
 api_url = "{{ api_url }}"
 {% if content_type in ["json"] %}
 data = requests.get(api_url).json()
+{% elif content_type in ["csv", "geojson"] %}
+data = requests.get(api_url).text
 {% else %}
 data = requests.get(api_url)
 {% endif %}

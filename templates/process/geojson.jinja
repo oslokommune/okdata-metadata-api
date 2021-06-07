@@ -4,14 +4,22 @@
 {% do imports.append(("tabulate", "tabulate")) %}
 
 {% macro code() %}
-geojson_data = geojson.loads(data{% if dataset_type == "api" %}.text{% endif %})
-features = [
-    list(feature.properties.values())[:1] # Include first property (if any)
-    + [
-        feature.geometry.type,
-        feature.geometry.coordinates,
-    ]
-    for feature in geojson_data.features
-]
+geojson_data = geojson.loads(data)
+
+# List features in a nice table.
+features = []
+
+for feature in geojson_data.features:
+    if not feature.geometry:
+        continue
+
+    features.append(
+        list(feature.properties.values()) # Include feature properties
+        + [
+            feature.geometry.type,
+            feature.geometry.coordinates,
+        ]
+    )
+
 print(tabulate(features))
 {% endmacro %}
