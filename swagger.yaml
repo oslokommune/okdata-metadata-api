@@ -1,7 +1,7 @@
 ---
 swagger: "2.0"
 info:
-  version: "2021-03-11T08:28:45Z"
+  version: "2021-06-07T10:48:35Z"
   title: "prod-metadata-api"
 host: "api.data.oslo.systems"
 basePath: "/metadata"
@@ -206,6 +206,32 @@ paths:
             $ref: "#/definitions/StandardResponse"
       security:
       - authenticate: []
+  /datasets/{dataset-id}/code-examples:
+    get:
+      summary: "Get code examples"
+      description: "Generates code examples dynamically based on the given dataset\
+        \ ID."
+      produces:
+      - "application/json"
+      parameters:
+      - name: "dataset-id"
+        in: "path"
+        description: "The ID of the dataset to generate code examples for."
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        "400":
+          description: "400 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
+        "500":
+          description: "500 response"
+          schema:
+            $ref: "#/definitions/StandardResponse"
   /datasets/{dataset-id}/versions:
     get:
       summary: "Get all versions"
