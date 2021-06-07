@@ -103,6 +103,7 @@ functions:
   create_dataset: ${file(serverless/functions/create_dataset.yaml)}
   get_datasets: ${file(serverless/functions/get_datasets.yaml)}
   get_dataset:  ${file(serverless/functions/get_dataset.yaml)}
+  get_code_examples: ${file(serverless/functions/get_code_examples.yaml)}
   patch_dataset: ${file(serverless/functions/patch_dataset.yaml)}
   update_dataset: ${file(serverless/functions/update_dataset.yaml)}
   create_version: ${file(serverless/functions/create_version.yaml)}

@@ -1,0 +1,25 @@
+summary: "Get code examples"
+description: "Generates code examples dynamically based on the given dataset ID."
+pathParams:
+  - name: "dataset-id"
+    description: "The ID of the dataset to generate code examples for."
+    required: true
+    schema:
+      type: "string"
+      pattern: "^[-a-z0-9_]+$"
+methodResponses:
+  - statusCode: "200"
+    responseBody:
+      description: "Code example retrieved successfully"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "400"
+    responseBody:
+      description: "Bad request"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "500"
+    responseBody:
+      description: "Internal server error"
+    responseModels:
+      application/json: "StandardResponse"
