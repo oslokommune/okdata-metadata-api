@@ -1,0 +1,12 @@
+{% do requirements.append("okdata-sdk") %}
+{% do imports.append("json") %}
+{% do imports.append(("okdata.sdk.elasticsearch.queries", "ElasticsearchQueries")) %}
+
+{% macro code() %}
+# Instantiate the ElasticSearch query client.
+client = ElasticsearchQueries()
+
+# Get and print event stream statistics (event count, last hour/day/week).
+statistics = client.event_stat("{{ dataset_id }}")
+print(json.dumps(statistics, indent=4))
+{% endmacro %}

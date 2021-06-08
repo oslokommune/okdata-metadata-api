@@ -10,7 +10,7 @@ auth = Authenticate(config=Config())
 
 # Connect to socket and print incoming events.
 ws = websocket.WebSocketApp(
-    "wss://ws.data-dev.oslo.systems/event-data-subscription?dataset_id={{ dataset_id }}",
+    "wss://ws.data.oslo.systems/event-data-subscription?dataset_id={{ dataset_id }}",
     header={"Authorization": f"Bearer {auth.access_token}"},
     on_open=lambda ws: print("Connected! Listening..."),
     on_message=lambda ws, event: print(event),
