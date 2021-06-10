@@ -16,6 +16,12 @@ ID_COLUMN = "Id"
 TYPE_COLUMN = "Type"
 
 
+class MissingParentError(KeyError):
+    """Raised when a parent doesn't exist."""
+
+    pass
+
+
 class CommonRepository:
     def __init__(self, table, type):
         self.table = table
@@ -105,7 +111,7 @@ class CommonRepository:
             if not parent_exists:
                 msg = f"Parent item with id {parent_id} does not exist"
                 log.error(msg)
-                raise KeyError(msg)
+                raise MissingParentError(msg)
 
         content[ID_COLUMN] = item_id
         content[TYPE_COLUMN] = self.type
