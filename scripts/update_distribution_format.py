@@ -53,7 +53,7 @@ if __name__ == "__main__":
         dataset, version, edition = dataset_uri.split("/")
         content = {
             "distribution_type": "file",
-            "filenames": list({entry["filename"] for entry in entries}),
+            "filenames": sorted(list({entry["filename"] for entry in entries})),
         }
 
         if args.apply:
