@@ -50,7 +50,10 @@ if __name__ == "__main__":
 
     for dataset_uri, entries in dataset_uri_map.items():
         dataset, version, edition = dataset_uri.split("/")
-        content = {"filenames": list({entry["filename"] for entry in entries})}
+        content = {
+            "distribution_type": "file",
+            "filenames": list({entry["filename"] for entry in entries}),
+        }
 
         if args.apply:
             distribution_id = distribution_repository.create_distribution(
