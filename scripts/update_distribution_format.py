@@ -6,6 +6,7 @@ from boto3.dynamodb.conditions import Attr, Key
 
 os.environ["AWS_XRAY_SDK_ENABLED"] = "false"  # Must be done before repository imports
 
+from metadata.CommonRepository import MissingParentError
 from metadata.distribution.repository import DistributionRepository  # noqa
 
 
@@ -56,10 +57,13 @@ if __name__ == "__main__":
         }
 
         if args.apply:
-            distribution_id = distribution_repository.create_distribution(
-                dataset, version, edition, content
-            )
-            print(f"Created distribution {distribution_id}")
+            try:
+                distribution_id = distribution_repository.create_distribution(
+                    dataset, version, edition, content
+                )
+                print(f"Created distribution {distribution_id}")
+            except MissingParentError:
+                print(f"Edition not found: {dataset_uri}, skipping creation")
         else:
             print("Should create:")
             print(f"  {content} for {dataset}/{version}/{edition}")
@@ -73,6 +77,7 @@ if __name__ == "__main__":
                         "Type": "Distribution",
                     }
                 )
+                print(f"Deleted distribution {entry['Id']}")
             else:
                 print(f"  {entry}")
 
