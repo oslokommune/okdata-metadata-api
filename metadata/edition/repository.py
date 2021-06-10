@@ -28,9 +28,14 @@ class EditionRepository(CommonRepository):
         edition_id = f"{dataset_id}/{version}/{edition}"
         return self.get_item(edition_id, consistent_read)
 
-    def get_editions(self, dataset_id, version):
+    def get_editions(self, dataset_id, version, exclude_latest=True):
         version_id = f"{dataset_id}/{version}"
-        return self.get_items(version_id)
+        editions = self.get_items(version_id)
+
+        if exclude_latest:
+            # Remove 'latest' edition
+            return list(filter(lambda i: "latest" not in i, editions))
+        return editions
 
     def create_edition(self, dataset_id, version, content):
         edition_ts = datetime.fromisoformat(content["edition"]).astimezone(timezone.utc)
@@ -73,3 +78,7 @@ class EditionRepository(CommonRepository):
         if self.is_latest_edition(dataset_id, version, edition):
             self.update_latest_edition(dataset_id, version, edition, content)
         return result
+
+    def delete_edition(self, dataset_id, version, edition):
+        edition_id = f"{dataset_id}/{version}/{edition}"
+        self.delete_item(edition_id)

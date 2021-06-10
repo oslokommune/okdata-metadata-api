@@ -1,7 +1,7 @@
 Metadata Scripts
 ===================
 
-Python scripts for enriching and migrating metadata. Files in this directory are NOT supposed to be included in deployment.
+Python scripts for enriching, migrating and deleting metadata. Files in this directory are NOT supposed to be included in deployment.
 Purpose of writing scripts here is to utilize existing code in the metadata module. Puspose of keeping the scripts, although they typically only need to be run once,
 is for traceability.
 
@@ -19,3 +19,5 @@ is for traceability.
   * Adds editions and API distributions for BYM's geo datasets.
 * `set_distribution_type`
   * Initializes distribitions' `distribution_type` to either `file` or `api`.
+* `delete_datasets`
+  * Deletes datasets. These datasets must be identified beforehand explicitly declared in a list in the script. This script is meant to be used for deleting unused datasets from the dev environment.

@@ -127,6 +127,9 @@ class DatasetRepository(CommonRepository):
     def patch_dataset(self, dataset_id, content):
         return self.patch_item(dataset_id, content)
 
+    def delete_dataset(self, dataset_id):
+        self.delete_item(dataset_id)
+
     # TODO: Consider not using this function in the dataset creation API, but
     # rather make clients smarter in guiding their users toward choosing unique
     # titles (resulting in unique IDs) for their datasets.

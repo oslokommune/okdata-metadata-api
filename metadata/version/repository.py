@@ -25,8 +25,13 @@ class VersionRepository(CommonRepository):
         version_id = f"{dataset_id}/{version}"
         return self.get_item(version_id, consistent_read)
 
-    def get_versions(self, dataset_id):
-        return self.get_items(dataset_id)
+    def get_versions(self, dataset_id, exclude_latest=True):
+        versions = self.get_items(dataset_id)
+
+        if exclude_latest:
+            # Remove 'latest' version/edition
+            return list(filter(lambda i: "latest" not in i, versions))
+        return versions
 
     def create_version(self, dataset_id, content):
         """Create a new version of `dataset_id` with `content` and return its ID.
@@ -79,3 +84,7 @@ class VersionRepository(CommonRepository):
         if self.is_latest_version(dataset_id, version):
             self.update_latest_version(dataset_id, version, content)
         return result
+
+    def delete_version(self, dataset_id, version):
+        version_id = f"{dataset_id}/{version}"
+        self.delete_item(version_id)

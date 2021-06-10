@@ -122,3 +122,7 @@ class DistributionRepository(CommonRepository):
 
         distribution_id = f"{dataset_id}/{version}/{edition}/{distribution}"
         return self.update_item(distribution_id, content)
+
+    def delete_distribution(self, dataset_id, version, edition, distribution):
+        distribution_id = f"{dataset_id}/{version}/{edition}/{distribution}"
+        self.delete_item(distribution_id)
