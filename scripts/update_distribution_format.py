@@ -46,8 +46,7 @@ if __name__ == "__main__":
     for item in items:
         dataset, version, edition, *_ = item["Id"].split("/")
         key = f"{dataset}/{version}/{edition}"
-        dataset_uri_map.setdefault(key, [])
-        dataset_uri_map[key].append(item)
+        dataset_uri_map.setdefault(key, []).append(item)
 
     for dataset_uri, entries in dataset_uri_map.items():
         dataset, version, edition = dataset_uri.split("/")
