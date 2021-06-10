@@ -77,7 +77,7 @@ if __name__ == "__main__":
                         "Type": "Distribution",
                     }
                 )
-                print(f"Deleted distribution {entry['Id']}")
+                print(f"  Deleted distribution {entry['Id']}")
             else:
                 print(f"  {entry}")
 
