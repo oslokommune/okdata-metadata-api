@@ -6,7 +6,7 @@ from boto3.dynamodb.conditions import Attr, Key
 
 os.environ["AWS_XRAY_SDK_ENABLED"] = "false"  # Must be done before repository imports
 
-from metadata.CommonRepository import MissingParentError
+from metadata.CommonRepository import MissingParentError  # noqa
 from metadata.distribution.repository import DistributionRepository  # noqa
 
 
