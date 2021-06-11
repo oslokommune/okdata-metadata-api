@@ -6,6 +6,7 @@ import pytest
 from metadata.dataset.code_examples import (
     NoCodeExamples,
     _code_example,
+    _extract_query,
     code_examples,
 )
 
@@ -19,6 +20,35 @@ content_types = [
     "text/csv",
 ]
 access_rights = ["public", "restricted", "non-public"]
+
+
+@pytest.mark.parametrize(
+    "url,base_url,query",
+    [
+        (
+            "https://example.org/no_query",
+            "https://example.org/no_query",
+            {},
+        ),
+        (
+            "https://example.org?single_param=value",
+            "https://example.org",
+            {"single_param": "value"},
+        ),
+        (
+            "https://example.org?multi_param_1=value_1&multi_param_2=value_2",
+            "https://example.org",
+            {"multi_param_1": "value_1", "multi_param_2": "value_2"},
+        ),
+        (
+            "https://example.org?param=value%3Awith%3Aencoding",
+            "https://example.org",
+            {"param": "value:with:encoding"},
+        ),
+    ],
+)
+def test_extract_query(url, base_url, query):
+    assert base_url, query == _extract_query(url)
 
 
 @pytest.mark.parametrize("dataset_type", dataset_types)
@@ -35,6 +65,7 @@ def test_generate_code_example(dataset_type, content_type, access_rights):
                 "dataset_type": dataset_type,
                 "content_type": content_type,
                 "access_rights": access_rights,
+                "api_url": "https://data.oslo.systems?foo=bar&bar=baz",
             }
         )["code"]
     )

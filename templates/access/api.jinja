@@ -3,12 +3,16 @@
 
 {% macro code() %}
 # Request data from API endpoint.
-api_url = "{{ api_url }}"
-{% if content_type in ["json"] %}
-data = requests.get(api_url).json()
+{% if api_query %}
+data = requests.get("{{ api_base_url }}", {{ api_query }})
+{%- else %}
+data = requests.get("{{ api_base_url }}")
+{%- endif %}
+{%- if content_type in ["json"] %}
+.json()
 {% elif content_type in ["csv", "geojson"] %}
-data = requests.get(api_url).text
+.text
 {% else %}
-data = requests.get(api_url)
+
 {% endif %}
 {% endmacro %}
