@@ -12,7 +12,7 @@ setuptools.setup(
     description="Api for managing metadata catalogue",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.oslo.kommune.no/origo-dataplatform/metadata-api",
+    url="https://github.com/oslokommune/okdata-metadata-api/",
     py_modules=[
         "metadata.common",
         "metadata.dataset.handler",
