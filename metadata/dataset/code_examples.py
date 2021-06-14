@@ -6,6 +6,7 @@ for it, if possible, otherwise it raises `NoCodeExamples`.
 """
 
 from pathlib import Path
+from urllib.parse import parse_qs, urlparse
 
 import isort
 import jinja2
@@ -42,6 +43,20 @@ class NoCodeExamples(Exception):
     pass
 
 
+def _extract_query(url):
+    """Return `url` decomposed into a tuple of base URL and query.
+
+    The base URL is the same URL as passed to the function, but with any query
+    string removed, while the query is a dictionary of decoded values from the
+    URL's query string.
+    """
+    u = urlparse(url)
+    base_url = u._replace(query=None).geturl()
+    query = {k: v[0] for k, v in parse_qs(u.query).items()}
+
+    return base_url, query
+
+
 def _code_example(config):
     """Return a code example based on `config`."""
 
@@ -59,18 +74,24 @@ def _code_example(config):
     if content_type not in content_types:
         raise NoCodeExamples(f"Unknown content type {content_type}")
 
-    code_example = template.render(
-        **{
-            "dataset_id": config["dataset_id"],
-            "version": config["version"],
-            "dataset_type": dataset_type,
-            "content_type": content_types[content_type],
-            "access_rights": config["access_rights"],
-            "api_url": config.get("api_url"),
-            "requirements": [],
-            "imports": [],
-        }
-    )
+    context = {
+        "dataset_id": config["dataset_id"],
+        "version": config["version"],
+        "dataset_type": dataset_type,
+        "content_type": content_types[content_type],
+        "access_rights": config["access_rights"],
+        "api_base_url": None,
+        "api_query": {},
+        "requirements": [],
+        "imports": [],
+    }
+
+    if config.get("api_url"):
+        context["api_base_url"], context["api_query"] = _extract_query(
+            config["api_url"]
+        )
+
+    code_example = template.render(**context)
 
     return {
         "content_type": config["content_type"],
