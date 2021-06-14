@@ -117,7 +117,7 @@ structlog==20.2.0
     # via okdata-aws
 toml==0.10.2
     # via black
-urllib3==1.26.2
+urllib3==1.26.5
     # via
     #   botocore
     #   okdata-sdk
