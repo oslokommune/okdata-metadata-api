@@ -319,7 +319,7 @@ class TestUpdateDataset:
         body = json.loads(response["body"])
         dataset_id = body["Id"]
         event_for_update = auth_event(common.updated_geo_dataset.copy(), dataset_id)
-        response = dataset_handler.update_dataset(event_for_update, None)
+        dataset_handler.update_dataset(event_for_update, None)
 
         db_response = metadata_table.query(
             KeyConditionExpression=Key(ID_COLUMN).eq(dataset_id)
@@ -452,8 +452,7 @@ class TestGetDataset:
         for i in range(0, 3):
             child_dataset = common.raw_dataset.copy()
             child_dataset["parent_id"] = dataset_id
-
-            response = dataset_handler.create_dataset(auth_event(child_dataset), None)
+            dataset_handler.create_dataset(auth_event(child_dataset), None)
 
         response = dataset_handler.get_datasets(event(), None)
         datasets = json.loads(response["body"])
@@ -472,8 +471,7 @@ class TestGetDataset:
         for i in range(0, 3):
             child_dataset = common.raw_dataset.copy()
             child_dataset["parent_id"] = dataset_id
-
-            response = dataset_handler.create_dataset(auth_event(child_dataset), None)
+            dataset_handler.create_dataset(auth_event(child_dataset), None)
 
         event_for_get = event(query_params={"parent_id": dataset_id})
         response = dataset_handler.get_datasets(event_for_get, None)
@@ -492,8 +490,7 @@ class TestGetDataset:
         for i in range(0, 3):
             child_dataset = common.raw_dataset.copy()
             child_dataset["parent_id"] = dataset_id
-
-            response = dataset_handler.create_dataset(auth_event(child_dataset), None)
+            dataset_handler.create_dataset(auth_event(child_dataset), None)
 
         event_for_get = event(query_params={"parent_id": "no-children"})
         response = dataset_handler.get_datasets(event_for_get, None)
