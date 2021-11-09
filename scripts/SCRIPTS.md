@@ -2,11 +2,15 @@ Metadata Scripts
 ===================
 
 Python scripts for enriching, migrating and deleting metadata. Files in this directory are NOT supposed to be included in deployment.
-Purpose of writing scripts here is to utilize existing code in the metadata module. Puspose of keeping the scripts, although they typically only need to be run once,
+Purpose of writing scripts here is to utilize existing code in the metadata module. Purpose of keeping the scripts, although they typically only need to be run once,
 is for traceability.
 
 ## Scripts
 
+* `migrate_dataset_processing_stage`
+  * This script was used to physically move from from one dataset processing stage to another.
+* `remove_processing_stage`
+  * This script was used to remove the `processing_stage` field from the dataset metadata.
 * `set_event_source`
   * This script was used to set source.type = event for all datasets with event streams.
 * `set_file_source`
