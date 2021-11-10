@@ -8,7 +8,7 @@ is for traceability.
 ## Scripts
 
 * `migrate_dataset_processing_stage`
-  * This script was used to physically move from from one dataset processing stage to another.
+  * This script was used to physically move from one dataset processing stage to another.
 * `remove_processing_stage`
   * This script was used to remove the `processing_stage` field from the dataset metadata.
 * `set_event_source`
