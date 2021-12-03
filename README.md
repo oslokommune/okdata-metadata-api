@@ -1,7 +1,7 @@
 Metadata-api
 ============
 
-API for posting, updating and retrieving metadata.
+REST API for managing dataset metadata, versions, editions and distributions.
 
 ## Setup
 
