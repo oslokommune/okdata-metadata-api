@@ -33,6 +33,10 @@ template_env = jinja2.Environment(
     ),
     extensions=["jinja2.ext.do"],
     trim_blocks=True,
+    autoescape=jinja2.select_autoescape(
+        disabled_extensions=("jinja",),
+        default=True,
+    ),
 )
 template = template_env.get_template("main.jinja")
 
