@@ -18,13 +18,15 @@ from metadata.distribution.repository import DistributionRepository  # noqa
 
 logger = logging.getLogger("delete_dataset")
 
+CONFIDENTIALITY_LEVELS = ["green", "yellow", "red"]
+
 
 def print_output(
     dataset_id,
     deleted_distributions,
     deleted_editions,
     deleted_versions,
-    deleted_objects,
+    deleted_s3_objects,
     output_dir_path=None,
 ):
     output = json.dumps(
@@ -33,7 +35,7 @@ def print_output(
                 "deleted_distributions": deleted_distributions,
                 "deleted_editions": deleted_editions,
                 "deleted_versions": deleted_versions,
-                "deleted_objects": deleted_objects,
+                "deleted_s3_objects": deleted_s3_objects,
             }
         ),
         indent=2,
@@ -69,7 +71,7 @@ def find_s3_objects(bucket, dataset_id):
     paginator = s3.get_paginator("list_objects_v2")
 
     for stage in stages:
-        for confidentiality in ["green", "yellow", "red"]:
+        for confidentiality in CONFIDENTIALITY_LEVELS:
             prefix = f"{stage}{confidentiality}/{dataset_id}"
             logger.debug(f"Looking for data in {prefix}")
             for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
@@ -135,7 +137,7 @@ if __name__ == "__main__":
     deleted_editions = []
     deleted_versions = []
     deleted_datasets = []
-    deleted_objects = []
+    deleted_s3_objects = []
 
     try:
         logger.info(f"Preparing to delete dataset {dataset_id}")
@@ -184,13 +186,6 @@ if __name__ == "__main__":
 
         logger.info(f"Found {len(distributions)} distributions")
 
-        # Find dataset data in S3
-        s3_objects = []
-        if delete_s3_data:
-            s3_objects = find_s3_objects(s3_bucket, dataset_id)
-
-            logger.info(f"Found {len(s3_objects)} S3 objects in {s3_bucket}")
-
         # Delete distributions and store in deleted_distributions
         for distribution in distributions:
             _dataset_id, _version, _edition, _distribution_id = distribution[
@@ -234,10 +229,16 @@ if __name__ == "__main__":
         deleted_datasets.append(dataset_id)
 
         # Delete S3 data
-        if apply_changes and len(s3_objects) > 0:
-            deleted_objects = delete_s3_objects(s3_bucket, s3_objects)
-        else:
-            deleted_objects = s3_objects
+        if delete_s3_data:
+            s3_objects = find_s3_objects(s3_bucket, dataset_id)
+
+            logger.info(f"Found {len(s3_objects)} S3 objects in {s3_bucket}")
+
+            if len(s3_objects) > 0:
+                if apply_changes:
+                    deleted_s3_objects = delete_s3_objects(s3_bucket, s3_objects)
+                else:
+                    deleted_s3_objects = s3_objects
 
     finally:
         print_output(
@@ -245,6 +246,6 @@ if __name__ == "__main__":
             deleted_distributions,
             deleted_editions,
             deleted_versions,
-            deleted_objects,
+            deleted_s3_objects,
             args.output,
         )
