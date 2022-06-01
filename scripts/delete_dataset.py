@@ -2,7 +2,6 @@ import argparse
 import json
 import logging
 import os
-import sys
 from datetime import datetime
 
 import boto3
@@ -141,12 +140,6 @@ if __name__ == "__main__":
 
     try:
         logger.info(f"Preparing to delete dataset {dataset_id}")
-
-        # Get dataset metadata
-        dataset = dataset_repository.get_dataset(dataset_id)
-
-        if not dataset:
-            sys.exit(f"Aborted: Dataset {dataset_id} does not exist")
 
         # Get version_ids that are to be deleted
         version_ids = [
