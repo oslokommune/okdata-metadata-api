@@ -71,7 +71,7 @@ def find_s3_objects(bucket, dataset_id):
 
     for stage in stages:
         for confidentiality in CONFIDENTIALITY_LEVELS:
-            prefix = f"{stage}{confidentiality}/{dataset_id}"
+            prefix = f"{stage}{confidentiality}/{dataset_id}/"
             logger.debug(f"Looking for data in {prefix}")
             for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
                 for obj in page.get("Contents", []):
