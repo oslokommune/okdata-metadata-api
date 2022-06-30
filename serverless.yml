@@ -1,4 +1,4 @@
-frameworkVersion: ">=2.10.0 <3.0.0"
+frameworkVersion: ">=3.14.0 <4.0.0"
 service: metadata-api
 
 provider:
@@ -11,13 +11,16 @@ provider:
     name: ${self:custom.deploymentBucket.${self:provider.stage}, self:custom.deploymentBucket.dev}
     serverSideEncryption: AES256
   deploymentPrefix: deploy
+  logRetentionInDays: 90
   tracing:
     lambda: true
     apiGateway: true
-  rolePermissionsBoundary: "arn:aws:iam::#{AWS::AccountId}:policy/oslokommune/oslokommune-boundary"
-  iamManagedPolicies:
-    - "arn:aws:iam::#{AWS::AccountId}:policy/metadata-api-policy"
-    - "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
+  iam:
+    role:
+      permissionsBoundary: "arn:aws:iam::${aws:accountId}:policy/oslokommune/oslokommune-boundary"
+      managedPolicies:
+        - 'arn:aws:iam::${aws:accountId}:policy/metadata-api-policy'
+        - 'arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess'
   tags:
     GIT_REV: ${git:branch}:${git:sha1}
   environment:
@@ -29,23 +32,19 @@ provider:
     KEYCLOAK_REALM: api-catalog
     RESOURCE_SERVER_CLIENT_ID: okdata-resource-server
     CLIENT_ID: metadata-api
-    CLIENT_SECRET: ${ssm:/dataplatform/${self:service}/keycloak-client-secret~true}
+    CLIENT_SECRET: ${ssm:/dataplatform/${self:service}/keycloak-client-secret}
     BASE_URL: ${self:custom.baseUrl.${self:provider.stage}, self:custom.baseUrl.dev}
 
 plugins:
-  - serverless-aws-documentation
+  - "@kakkuk/serverless-aws-apigateway-documentation"
   - serverless-python-requirements
   - serverless-scriptable-plugin
   - serverless-plugin-git-variables
   - serverless-prune-plugin
-  - serverless-pseudo-parameters
-  - serverless-es-logs
 
 package:
-  exclude:
-    - './**'
-  include:
-    - '!./**'
+  patterns:
+    - '!**/*'
     - './schema/**'
     - './templates/**/*.jinja'
     - './metadata/*.py'
@@ -63,10 +62,6 @@ custom:
   pythonRequirements:
     dockerizePip: non-linux
     usePoetry: false
-  esLogs:
-    endpoint: ${ssm:/dataplatform/shared/logs-elasticsearch-endpoint}
-    index: dataplatform-services
-    filterPattern: '{ $.function_name = "*" }'
   prune:
     automatic: true
     number: 3
@@ -97,8 +92,8 @@ custom:
     prod: https://dataplatform.api.oslo.kommune.no/metadata
     dev: https://api.data-dev.oslo.systems/metadata
   keycloakArn:
-    prod: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:keycloak-authorizer-prod-authenticate
-    dev: arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:keycloak-authorizer-dev-authenticate
+    prod: arn:aws:lambda:${aws:region}:${aws:accountId}:function:keycloak-authorizer-prod-authenticate
+    dev: arn:aws:lambda:${aws:region}:${aws:accountId}:function:keycloak-authorizer-dev-authenticate
 
 functions:
   create_dataset: ${file(serverless/functions/create_dataset.yaml)}
