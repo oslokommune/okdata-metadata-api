@@ -8,4 +8,3 @@ schema:
     description: ${file(schema/distribution.json):description}
     type: ${file(schema/distribution.json):type}
     properties: ${file(schema/distribution.json):properties}
-    required: ${file(schema/distribution.json):required}
