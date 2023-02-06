@@ -28,7 +28,6 @@ class Auth:
 
 def check_auth(scope: str, use_whitelist=False):
     def middle(func):
-
         resource_authorizer = ResourceAuthorizer()
 
         def wrapper(event, *args, **kwargs):
