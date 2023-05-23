@@ -85,7 +85,7 @@ python-keycloak==0.24.0
     #   okdata-sdk
 regex==2021.4.4
     # via black
-requests==2.25.1
+requests==2.31.0
     # via
     #   metadata-api (setup.py)
     #   okdata-resource-auth
