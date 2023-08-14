@@ -6,6 +6,8 @@ from datetime import datetime
 
 import boto3
 
+from scripts.util import chunk, confirm_to_continue
+
 # Must be done before repository import.
 os.environ["AWS_XRAY_SDK_ENABLED"] = "false"
 
@@ -79,14 +81,29 @@ def find_s3_objects(bucket, dataset_id):
     return objects
 
 
-def delete_s3_objects(bucket, objects):
-    objects = [{"Key": key} for key in objects]
-    s3 = boto3.client("s3", region_name="eu-west-1")
-    response = s3.delete_objects(
+def _delete_s3_objects(s3_client, bucket, objects):
+    response = s3_client.delete_objects(
         Bucket=bucket,
         Delete={"Objects": objects},
     )
     return [obj["Key"] for obj in response.get("Deleted", [])]
+
+
+def delete_s3_objects(bucket, objects):
+    objects = [{"Key": key} for key in objects]
+    n_objs = len(objects)
+    s3_client = boto3.client("s3", region_name="eu-west-1")
+    deleted_objs = []
+
+    if n_objs > 1000:
+        for i, c in enumerate(chunk(objects, 1000)):
+            logger.info("Deleting objects {}/{}...".format(len(c) + i * 1000, n_objs))
+            deleted_objs += _delete_s3_objects(s3_client, bucket, c)
+    else:
+        logger.info(f"Deleting {n_objs} objects...")
+        deleted_objs = _delete_s3_objects(s3_client, bucket, objects)
+
+    return deleted_objs
 
 
 if __name__ == "__main__":
@@ -137,6 +154,7 @@ if __name__ == "__main__":
     deleted_versions = []
     deleted_datasets = []
     deleted_s3_objects = []
+    s3_objects = []
 
     try:
         logger.info(f"Preparing to delete dataset {dataset_id}")
@@ -178,6 +196,15 @@ if __name__ == "__main__":
             )
 
         logger.info(f"Found {len(distributions)} distributions")
+
+        if delete_s3_data:
+            s3_objects = find_s3_objects(s3_bucket, dataset_id)
+            n_objs = len(s3_objects)
+
+            logger.info(f"Found {n_objs} S3 objects in {s3_bucket}")
+
+            if n_objs > 1000 and apply_changes:
+                confirm_to_continue(f"That's a lot of objects: {n_objs:,}")
 
         # Delete distributions and store in deleted_distributions
         for distribution in distributions:
@@ -222,16 +249,10 @@ if __name__ == "__main__":
         deleted_datasets.append(dataset_id)
 
         # Delete S3 data
-        if delete_s3_data:
-            s3_objects = find_s3_objects(s3_bucket, dataset_id)
-
-            logger.info(f"Found {len(s3_objects)} S3 objects in {s3_bucket}")
-
-            if len(s3_objects) > 0:
-                if apply_changes:
-                    deleted_s3_objects = delete_s3_objects(s3_bucket, s3_objects)
-                else:
-                    deleted_s3_objects = s3_objects
+        if delete_s3_data and n_objs > 0 and apply_changes:
+            deleted_s3_objects = delete_s3_objects(s3_bucket, s3_objects)
+        else:
+            deleted_s3_objects = s3_objects
 
     finally:
         print_output(
