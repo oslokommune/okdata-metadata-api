@@ -53,7 +53,9 @@ class TestCreateVersion:
         body = json.loads(res["body"])
         assert body == {
             "message": "Validation error",
-            "errors": ["version: {'enum': ['latest']} is not allowed for 'latest'"],
+            "errors": [
+                "version: 'latest' should not be valid under {'enum': ['latest']}"
+            ],
         }
 
     def test_create_duplicate_version_should_fail(
