@@ -36,6 +36,7 @@ provider:
     BASE_URL: ${self:custom.baseUrl.${self:provider.stage}, self:custom.baseUrl.dev}
 
 plugins:
+  - serverless-better-credentials # must be first
   - "@kakkuk/serverless-aws-apigateway-documentation"
   - serverless-python-requirements
   - serverless-scriptable-plugin
