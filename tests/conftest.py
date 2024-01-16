@@ -5,7 +5,7 @@ import re
 import boto3
 import jsonschema
 import pytest
-from moto import mock_dynamodb2
+from moto import mock_dynamodb
 from okdata.resource_auth import ResourceAuthorizer
 
 from metadata.auth import Auth
@@ -19,7 +19,7 @@ good_token = "Bjørnepollett"
 
 @pytest.fixture()
 def dynamodb():
-    with mock_dynamodb2():
+    with mock_dynamodb():
         yield boto3.resource("dynamodb", **BOTO_RESOURCE_COMMON_KWARGS)
 
 

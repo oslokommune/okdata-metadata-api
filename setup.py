@@ -29,8 +29,8 @@ setuptools.setup(
         "boto3",
         "black",
         "isort",
-        "jinja2<3.0.0",  # Required due to using moto<2
-        "markupsafe<2.0.0",
+        "jinja2",
+        "markupsafe",
         "aws-xray-sdk",
         "requests",
         "shortuuid",
