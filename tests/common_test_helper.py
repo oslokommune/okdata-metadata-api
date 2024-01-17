@@ -14,10 +14,12 @@ def create_metadata_table(dynamodb):
                 "index_name": "IdByTypeIndex",
                 "hash_key": TYPE_COLUMN,
                 "range_key": ID_COLUMN,
+                "projection_type": "ALL",
             },
             {
                 "index_name": "IdByApiIdSparseIndex",
                 "hash_key": "api_id",
+                "projection_type": "INCLUDE",
             },
         ],
     )
@@ -56,7 +58,7 @@ def create_table(dynamodb, table_name, hashkey, rangekey=None, gsis=[]):
                         else []
                     ),
                 ],
-                "Projection": {"ProjectionType": "INCLUDE"},
+                "Projection": {"ProjectionType": gsi["projection_type"]},
                 "ProvisionedThroughput": {
                     "ReadCapacityUnits": 5,
                     "WriteCapacityUnits": 5,
