@@ -1,6 +1,7 @@
 import os
 
 from keycloak import KeycloakOpenID
+from okdata.aws.ssm import get_secret
 from okdata.resource_auth import ResourceAuthorizer
 
 from metadata.dataset.repository import DatasetRepository
@@ -12,7 +13,9 @@ class Auth:
         self.KEYCLOAK_SERVER = "{}/auth/".format(os.environ["KEYCLOAK_SERVER"])
         self.KEYCLOAK_REALM = os.environ.get("KEYCLOAK_REALM", "api-catalog")
         self.CLIENT_ID = os.environ["CLIENT_ID"]
-        self.CLIENT_SECRET = os.environ["CLIENT_SECRET"]
+        self.CLIENT_SECRET = get_secret(
+            "/dataplatform/metadata-api/keycloak-client-secret"
+        )
 
     def service_client_authorization_header(self):
         client = KeycloakOpenID(

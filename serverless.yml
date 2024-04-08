@@ -32,7 +32,6 @@ provider:
     KEYCLOAK_REALM: api-catalog
     RESOURCE_SERVER_CLIENT_ID: okdata-resource-server
     CLIENT_ID: metadata-api
-    CLIENT_SECRET: ${ssm:/dataplatform/${self:service}/keycloak-client-secret}
     BASE_URL: ${self:custom.baseUrl.${self:provider.stage}, self:custom.baseUrl.dev}
 
 plugins:
