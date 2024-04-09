@@ -1,6 +1,7 @@
 import json
 import os
 import re
+from unittest import mock
 
 import boto3
 import jsonschema
@@ -44,6 +45,13 @@ def auth_mock(requests_mock, mocker, monkeypatch):
         "service_client_authorization_header",
         return_value=client_credentials_header,
     )
+
+
+@pytest.fixture(autouse=True)
+def mock_client_secret():
+    with mock.patch("metadata.auth.get_secret") as get_secret:
+        get_secret.return_value = "abc123"
+        yield get_secret
 
 
 @pytest.fixture(autouse=True)
