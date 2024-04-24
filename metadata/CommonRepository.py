@@ -1,11 +1,12 @@
-from boto3.dynamodb.conditions import Key
-from botocore.exceptions import ClientError
 import logging
-
-from metadata.error import ResourceConflict, ValidationError, DeleteConflict
-from okdata.aws.logging import log_add, log_duration
+from functools import reduce
 
 from aws_xray_sdk.core import patch_all
+from boto3.dynamodb.conditions import And, Attr, Key
+from botocore.exceptions import ClientError
+from okdata.aws.logging import log_add, log_duration
+
+from metadata.error import ResourceConflict, ValidationError, DeleteConflict
 
 patch_all()
 
@@ -55,24 +56,43 @@ class CommonRepository:
 
         return item
 
-    def get_items(self, parent_id=None):
+    def get_items(
+        self,
+        parent_id=None,
+        source_type=None,
+        source_name=None,
+    ):
         log_add(dynamodb_item_type=self.type)
-        cond = Key(TYPE_COLUMN).eq(self.type)
-        extra_query_args = {}
+        key_condition = Key(TYPE_COLUMN).eq(self.type)
+        filter_conditions = []
 
         if parent_id:
             log_add(dynamodb_parent_id=parent_id)
             if self.type == "Dataset":
-                extra_query_args["FilterExpression"] = Key("parent_id").eq(parent_id)
+                filter_conditions.append(Key("parent_id").eq(parent_id))
             else:
-                cond = cond & Key(ID_COLUMN).begins_with(f"{parent_id}/")
+                key_condition = key_condition & Key(ID_COLUMN).begins_with(
+                    f"{parent_id}/"
+                )
+
+        if source_type:
+            log_add(dynamodb_source_type=source_type)
+            filter_conditions.append(Attr("source.type").eq(source_type))
+
+        if source_name:
+            log_add(dynamodb_source_name=source_name)
+            filter_conditions.append(Attr("source.name").eq(source_name))
+
+        query_args = {
+            "IndexName": "IdByTypeIndex",
+            "KeyConditionExpression": key_condition,
+        }
+
+        if filter_conditions:
+            query_args["FilterExpression"] = reduce(And, filter_conditions)
 
         db_response = log_duration(
-            lambda: self.table.query(
-                IndexName="IdByTypeIndex",
-                KeyConditionExpression=cond,
-                **extra_query_args,
-            ),
+            lambda: self.table.query(**query_args),
             "dynamodb_duration_ms",
         )
 

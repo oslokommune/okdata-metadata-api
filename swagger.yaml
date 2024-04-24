@@ -25,6 +25,16 @@ paths:
         description: "Filter by parent dataset"
         required: false
         type: "string"
+      - name: "source_type"
+        in: "query"
+        description: "Filter by dataset source type"
+        required: false
+        type: "string"
+      - name: "source_name"
+        in: "query"
+        description: "Filter by dataset source name"
+        required: false
+        type: "string"
       responses:
         "200":
           description: "200 response"
