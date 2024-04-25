@@ -1,9 +1,13 @@
-frameworkVersion: ">=3.21.0 <4.0.0"
+frameworkVersion: ">=3.38.0 <4.0.0"
 service: metadata-api
 
 provider:
   name: aws
-  runtime: python3.11
+  ecr:
+    images:
+      okdata-metadata-api:
+        path: ./
+        platform: linux/amd64
   region: ${opt:region, 'eu-west-1'}
   endpointType: REGIONAL
   stage: ${opt:stage, 'dev'}
@@ -37,7 +41,6 @@ provider:
 plugins:
   - serverless-better-credentials # must be first
   - "@kakkuk/serverless-aws-apigateway-documentation"
-  - serverless-python-requirements
   - serverless-scriptable-plugin
   - serverless-plugin-git-variables
   - serverless-prune-plugin
@@ -59,9 +62,6 @@ resources:
     ${git:message}
 
 custom:
-  pythonRequirements:
-    dockerizePip: non-linux
-    usePoetry: false
   prune:
     automatic: true
     number: 3

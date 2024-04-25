@@ -1,4 +1,7 @@
-handler: metadata.version.handler.create_version
+image:
+  name: okdata-metadata-api
+  command:
+    - metadata.version.handler.create_version
 events:
   - http:
       path: "datasets/{dataset-id}/versions"

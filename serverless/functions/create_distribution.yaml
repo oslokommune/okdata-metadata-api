@@ -1,4 +1,7 @@
-handler: metadata.distribution.handler.create_distribution
+image:
+  name: okdata-metadata-api
+  command:
+    - metadata.distribution.handler.create_distribution
 events:
   - http:
       path: "datasets/{dataset-id}/versions/{version}/editions/{edition}/distributions"

@@ -1,4 +1,7 @@
-handler: metadata.dataset.handler.create_dataset
+image:
+  name: okdata-metadata-api
+  command:
+    - metadata.dataset.handler.create_dataset
 timeout: 15
 events:
   - http:

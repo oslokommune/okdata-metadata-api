@@ -1,4 +1,7 @@
-handler: metadata.dataset.handler.get_datasets
+image:
+  name: okdata-metadata-api
+  command:
+    - metadata.dataset.handler.get_datasets
 events:
   - http:
       path: "datasets"

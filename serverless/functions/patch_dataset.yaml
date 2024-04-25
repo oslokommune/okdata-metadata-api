@@ -1,4 +1,7 @@
-handler: metadata.dataset.handler.patch_dataset
+image:
+  name: okdata-metadata-api
+  command:
+    - metadata.dataset.handler.patch_dataset
 events:
   - http:
       path: "/datasets/{dataset-id}"
