@@ -519,6 +519,43 @@ class TestGetDataset:
         expected_href = "/datasets/akebakker-under-kommunal-forvaltning-i-oslo"
         assert dataset["_links"]["self"]["href"] == expected_href
 
+    @pytest.mark.parametrize(
+        "query_params,expected_result",
+        [
+            ({"source_type": "api"}, {"ssb-foo", "ssb-bar", "okr-foo", "foo-bar"}),
+            ({"source_type": "api", "source_name": "ssb"}, {"ssb-foo", "ssb-bar"}),
+            ({"source_type": "api", "source_name": "foo"}, set()),
+            ({"source_name": "okr"}, {"okr-foo"}),
+            ({"source_type": "database"}, {"geo-foo"}),
+            ({"source_type": "database", "source_name": "foo"}, set()),
+            ({"source_name": "fooo"}, set()),
+        ],
+    )
+    def test_get_datasets_by_source(
+        self,
+        event,
+        auth_event,
+        metadata_table,
+        query_params,
+        expected_result,
+    ):
+        import metadata.dataset.handler as dataset_handler
+
+        for distribution_id, source in [
+            ("ssb-foo", {"type": "api", "name": "ssb", "id": "1052"}),
+            ("ssb-bar", {"type": "api", "name": "ssb", "id": "1052"}),
+            ("okr-foo", {"type": "api", "name": "okr", "id": "X1y2Za"}),
+            ("foo-bar", {"type": "api"}),
+            ("geo-foo", {"type": "database", "database": "geo", "table": "foo"}),
+        ]:
+            dataset_item = {"Id": distribution_id, "Type": "Dataset", "source": source}
+            metadata_table.put_item(Item=dataset_item)
+
+        res = dataset_handler.get_datasets(event(query_params=query_params), None)
+        assert res["statusCode"] == 200
+        datasets = json.loads(res["body"])
+        assert set(ds["Id"] for ds in datasets) == expected_result
+
     def test_get_datasets_by_api(self, event, auth_event, metadata_table):
         import metadata.dataset.handler as dataset_handler
 
