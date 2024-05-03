@@ -1013,6 +1013,7 @@ definitions:
               type: "string"
               maxLength: 255
               enum:
+              - "api"
               - "database"
               - "event"
               - "file"
@@ -1241,6 +1242,7 @@ definitions:
             type: "string"
             maxLength: 255
             enum:
+            - "api"
             - "database"
             - "event"
             - "file"

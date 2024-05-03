@@ -148,6 +148,7 @@
           "type": "string",
           "maxLength": 255,
           "enum": [
+            "api",
             "database",
             "event",
             "file",
