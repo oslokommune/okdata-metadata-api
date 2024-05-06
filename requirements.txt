@@ -27,14 +27,16 @@ botocore==1.31.50
     #   s3transfer
 certifi==2023.7.22
     # via requests
+cffi==1.16.0
+    # via cryptography
 charset-normalizer==3.2.0
     # via requests
 click==8.1.7
     # via black
+cryptography==42.0.5
+    # via jwcrypto
 deprecation==2.1.0
     # via python-keycloak
-ecdsa==0.18.0
-    # via python-jose
 fqdn==1.5.1
     # via jsonschema
 idna==3.7
@@ -60,17 +62,19 @@ jsonschema[format]==4.19.0
     #   okdata-sdk
 jsonschema-specifications==2023.7.1
     # via jsonschema
+jwcrypto==1.5.6
+    # via python-keycloak
 markupsafe==2.1.3
     # via
     #   jinja2
     #   metadata-api (setup.py)
 mypy-extensions==1.0.0
     # via black
-okdata-aws==4.0.0
+okdata-aws==4.1.0
     # via metadata-api (setup.py)
 okdata-resource-auth==0.1.4
     # via metadata-api (setup.py)
-okdata-sdk==3.1.0
+okdata-sdk==3.1.1
     # via okdata-aws
 packaging==23.1
     # via
@@ -80,21 +84,13 @@ pathspec==0.11.2
     # via black
 platformdirs==3.10.0
     # via black
-pyasn1==0.5.0
-    # via
-    #   python-jose
-    #   rsa
-pyjwt==2.8.0
-    # via okdata-sdk
+pycparser==2.22
+    # via cffi
 python-dateutil==2.8.2
     # via
     #   arrow
     #   botocore
-python-jose==3.3.0
-    # via
-    #   okdata-sdk
-    #   python-keycloak
-python-keycloak==3.3.0
+python-keycloak==3.12.0
     # via
     #   metadata-api (setup.py)
     #   okdata-sdk
@@ -120,8 +116,6 @@ rpds-py==0.10.3
     # via
     #   jsonschema
     #   referencing
-rsa==4.9
-    # via python-jose
 s3transfer==0.6.2
     # via boto3
 shortuuid==1.0.11
@@ -130,17 +124,18 @@ simplejson==3.19.1
     # via metadata-api (setup.py)
 six==1.16.0
     # via
-    #   ecdsa
     #   python-dateutil
     #   rfc3339-validator
 sniffio==1.3.0
     # via anyio
-starlette==0.36.2
+starlette==0.37.2
     # via okdata-aws
 strict-rfc3339==0.7
     # via metadata-api (setup.py)
 structlog==23.1.0
     # via okdata-aws
+typing-extensions==4.11.0
+    # via jwcrypto
 uri-template==1.3.0
     # via jsonschema
 urllib3==1.26.18
