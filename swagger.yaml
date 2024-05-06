@@ -1013,13 +1013,24 @@ definitions:
               type: "string"
               maxLength: 255
               enum:
-              - "api"
               - "database"
               - "event"
               - "file"
               - "none"
           required:
           - "type"
+        wasDerivedFrom:
+          type: "object"
+          description: "Data provenance information"
+          properties:
+            name:
+              type: "string"
+              maxLength: 255
+            id:
+              type: "string"
+              maxLength: 255
+          required:
+            - "name"
         title:
           type: "string"
           description: "The dataset title"
@@ -1242,13 +1253,24 @@ definitions:
             type: "string"
             maxLength: 255
             enum:
-            - "api"
             - "database"
             - "event"
             - "file"
             - "none"
         required:
         - "type"
+      wasDerivedFrom:
+        type: "object"
+        description: "Data provenance information"
+        properties:
+          name:
+            type: "string"
+            maxLength: 255
+          id:
+            type: "string"
+            maxLength: 255
+        required:
+          - "name"
       title:
         type: "string"
         description: "The dataset title"

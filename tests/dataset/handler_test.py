@@ -522,16 +522,12 @@ class TestGetDataset:
     @pytest.mark.parametrize(
         "query_params,expected_result",
         [
-            ({"source_type": "api"}, {"ssb-foo", "ssb-bar", "okr-foo", "foo-bar"}),
-            ({"source_type": "api", "source_name": "ssb"}, {"ssb-foo", "ssb-bar"}),
-            ({"source_type": "api", "source_name": "foo"}, set()),
-            ({"source_name": "okr"}, {"okr-foo"}),
-            ({"source_type": "database"}, {"geo-foo"}),
-            ({"source_type": "database", "source_name": "foo"}, set()),
-            ({"source_name": "fooo"}, set()),
+            ({"was_derived_from_name": "ssb"}, {"ssb-foo", "ssb-bar"}),
+            ({"was_derived_from_name": "okr"}, {"okr-foo"}),
+            ({"was_derived_from_name": "bar"}, set()),
         ],
     )
-    def test_get_datasets_by_source(
+    def test_get_datasets_by_provenance(
         self,
         event,
         auth_event,
@@ -541,14 +537,17 @@ class TestGetDataset:
     ):
         import metadata.dataset.handler as dataset_handler
 
-        for distribution_id, source in [
-            ("ssb-foo", {"type": "api", "name": "ssb", "id": "1052"}),
-            ("ssb-bar", {"type": "api", "name": "ssb", "id": "1052"}),
-            ("okr-foo", {"type": "api", "name": "okr", "id": "X1y2Za"}),
-            ("foo-bar", {"type": "api"}),
-            ("geo-foo", {"type": "database", "database": "geo", "table": "foo"}),
+        for distribution_id, was_derived_from in [
+            ("ssb-foo", {"name": "ssb", "id": "1052"}),
+            ("ssb-bar", {"name": "ssb", "id": "1053"}),
+            ("okr-foo", {"name": "okr", "id": "X1y2Za"}),
+            ("foo-bar", {"name": "foo"}),
         ]:
-            dataset_item = {"Id": distribution_id, "Type": "Dataset", "source": source}
+            dataset_item = {
+                "Id": distribution_id,
+                "Type": "Dataset",
+                "wasDerivedFrom": was_derived_from,
+            }
             metadata_table.put_item(Item=dataset_item)
 
         res = dataset_handler.get_datasets(event(query_params=query_params), None)
