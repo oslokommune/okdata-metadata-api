@@ -148,12 +148,28 @@
           "type": "string",
           "maxLength": 255,
           "enum": [
-            "api",
             "database",
             "event",
             "file",
             "none"
           ]
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "wasDerivedFrom": {
+      "description": "Data provenance information",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "id": {
+          "type": "string",
+          "maxLength": 255
         }
       },
       "required": [

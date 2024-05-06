@@ -50,18 +50,8 @@ class DatasetRepository(CommonRepository):
     def get_dataset(self, dataset_id, consistent_read=False):
         return self.get_item(dataset_id, consistent_read)
 
-    def get_datasets(
-        self,
-        parent_id=None,
-        api_id=None,
-        source_type=None,
-        source_name=None,
-    ):
-        datasets = self.get_items(
-            parent_id,
-            source_type,
-            source_name,
-        )
+    def get_datasets(self, parent_id=None, api_id=None, was_derived_from_name=None):
+        datasets = self.get_items(parent_id, was_derived_from_name)
 
         if api_id:
             db_response = log_dynamodb(

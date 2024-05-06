@@ -56,12 +56,7 @@ class CommonRepository:
 
         return item
 
-    def get_items(
-        self,
-        parent_id=None,
-        source_type=None,
-        source_name=None,
-    ):
+    def get_items(self, parent_id=None, was_derived_from_name=None):
         log_add(dynamodb_item_type=self.type)
         key_condition = Key(TYPE_COLUMN).eq(self.type)
         filter_conditions = []
@@ -75,13 +70,11 @@ class CommonRepository:
                     f"{parent_id}/"
                 )
 
-        if source_type:
-            log_add(dynamodb_source_type=source_type)
-            filter_conditions.append(Attr("source.type").eq(source_type))
-
-        if source_name:
-            log_add(dynamodb_source_name=source_name)
-            filter_conditions.append(Attr("source.name").eq(source_name))
+        if was_derived_from_name:
+            log_add(dynamodb_was_derived_from_name=was_derived_from_name)
+            filter_conditions.append(
+                Attr("wasDerivedFrom.name").eq(was_derived_from_name)
+            )
 
         query_args = {
             "IndexName": "IdByTypeIndex",

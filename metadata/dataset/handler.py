@@ -90,8 +90,7 @@ def get_datasets(event, context):
     datasets = dataset_repository.get_datasets(
         parent_id=query_params.get("parent_id"),
         api_id=query_params.get("api_id"),
-        source_type=query_params.get("source_type"),
-        source_name=query_params.get("source_name"),
+        was_derived_from_name=query_params.get("was_derived_from_name"),
     )
     log_add(num_datasets=len(datasets))
 
