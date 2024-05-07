@@ -163,7 +163,7 @@
       "description": "Data provenance information",
       "type": "object",
       "properties": {
-        "type": {
+        "name": {
           "type": "string",
           "maxLength": 255
         },
@@ -173,7 +173,7 @@
         }
       },
       "required": [
-        "type"
+        "name"
       ]
     },
     "spatial": {
