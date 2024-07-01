@@ -37,6 +37,8 @@ provider:
     RESOURCE_SERVER_CLIENT_ID: okdata-resource-server
     CLIENT_ID: metadata-api
     BASE_URL: ${self:custom.baseUrl.${self:provider.stage}, self:custom.baseUrl.dev}
+    DATA_BUCKET_NAME: TODO
+    LOGS_BUCKET_NAME: TODO
 
 plugins:
   - serverless-better-credentials # must be first
