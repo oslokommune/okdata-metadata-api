@@ -41,4 +41,5 @@ setuptools.setup(
         "python-keycloak",
         "okdata-resource-auth",
     ],
+    python_requires="==3.12.*",
 )

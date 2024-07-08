@@ -2,7 +2,7 @@ import argparse
 import json
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 import boto3
 
@@ -47,7 +47,7 @@ def print_output(
 
 
 def write_output(output_dir_path, dataset_id, output_json):
-    dt_now_iso = datetime.utcnow().strftime("%Y-%m-%d-%H.%M.%S")
+    dt_now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%d-%H.%M.%S")
     output_file_path = os.path.join(
         output_dir_path, f"{dt_now_iso}_deleted_dataset_{dataset_id}.json"
     )

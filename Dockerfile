@@ -1,4 +1,4 @@
-FROM public.ecr.aws/lambda/python:3.11
+FROM public.ecr.aws/lambda/python:3.12
 
 COPY metadata ${LAMBDA_TASK_ROOT}/metadata
 COPY schema ${LAMBDA_TASK_ROOT}/schema
