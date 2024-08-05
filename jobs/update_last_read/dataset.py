@@ -14,8 +14,8 @@ class DatasetEntry:
     confidentiality: str
     dataset_id: str
     version: str
-    edition_path: str
-    filename: str
+    edition: str
+    filepath: str
 
     @classmethod
     def from_s3_key(cls, key):
@@ -34,8 +34,8 @@ class DatasetEntry:
                 r"(?P<confidentiality>[^/]+)",  # Confidentiality
                 r"(?P<dataset>\S+)",            # Dataset
                 r"version=(?P<version>[^/]+)",  # Version
-                r"(?P<edition_path>\S+)",       # Edition path
-                r"(?P<filename>.+)$",           # Filename
+                r"edition=(?P<edition>[^/]+)",  # Edition
+                r"(?P<filepath>.+)$",           # Filepath
             ]))
             # fmt: on
 
@@ -44,12 +44,12 @@ class DatasetEntry:
                 confidentiality = match.group("confidentiality")
                 dataset = match.group("dataset").split("/")[-1]
                 version = match.group("version")
-                edition_path = match.group("edition_path")
-                filename = match.group("filename")
+                edition = match.group("edition")
+                filepath = match.group("filepath")
 
                 if stage in STAGES and confidentiality in CONFIDENTIALITIES:
                     return cls(
-                        stage, confidentiality, dataset, version, edition_path, filename
+                        stage, confidentiality, dataset, version, edition, filepath
                     )
 
         return None
