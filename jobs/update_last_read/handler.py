@@ -1,6 +1,6 @@
 import logging
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from operator import itemgetter
 
 import boto3
@@ -18,9 +18,9 @@ logger.setLevel(os.environ.get("LOG_LEVEL", logging.INFO))
 patch_all()
 
 
-def _yesterday():
-    """Return yesterday's date on the format YYYY-MM-DD."""
-    return (datetime.now() - timedelta(days=1)).isoformat()[:10]
+def _two_hours_ago():
+    """Return a UTC timestamp of two hours ago on the format YYYY-MM-DD-HH."""
+    return (datetime.now(timezone.utc) - timedelta(hours=2)).strftime("%Y-%m-%d-%H")
 
 
 @logging_wrapper
@@ -29,7 +29,7 @@ def handler(event, context):
     s3 = boto3.resource("s3")
     data_bucket_name = getenv("DATA_BUCKET_NAME")
     logs_bucket_name = getenv("LOGS_BUCKET_NAME")
-    timestamp = _yesterday()
+    timestamp = _two_hours_ago()
     prefix = f"logs/s3/{data_bucket_name}/{timestamp}"
 
     datasets_read = {}

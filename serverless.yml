@@ -128,8 +128,5 @@ functions:
       command:
         - jobs.update_last_read.handler.handler
     events:
-      # We collect logs from the previous day. S3 can take a long time
-      # to finish populating the access logs, so give it good time
-      # after midnight to finish before we run this.
-      - schedule: cron(0 5 ? * SUN *)
-    timeout: 20
+      - schedule: cron(30 * * * ? *)
+    timeout: 300

@@ -1,16 +1,16 @@
 from boto3.dynamodb.conditions import Key
 from freezegun import freeze_time
 
-from jobs.update_last_read.handler import handler, _yesterday
+from jobs.update_last_read.handler import handler, _two_hours_ago
 from metadata.CommonRepository import ID_COLUMN
 
 
-@freeze_time("2020-01-02")
-def test_yesterday():
-    assert _yesterday() == "2020-01-01"
+@freeze_time("2020-01-02-12")
+def test_two_hours_ago():
+    assert _two_hours_ago() == "2020-01-02-10"
 
 
-@freeze_time("2020-01-02")
+@freeze_time("2020-01-01-02")
 def test_handler(s3_client, s3_bucket, metadata_table):
     metadata_table.put_item(Item={"Id": "renovasjonsbiler-status", "Type": "Dataset"})
     metadata_table.put_item(Item={"Id": "pipeline-ng-test", "Type": "Dataset"})
