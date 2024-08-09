@@ -37,6 +37,8 @@ provider:
     RESOURCE_SERVER_CLIENT_ID: okdata-resource-server
     CLIENT_ID: metadata-api
     BASE_URL: ${self:custom.baseUrl.${self:provider.stage}, self:custom.baseUrl.dev}
+    DATA_BUCKET_NAME: ${self:custom.dataBucket.${self:provider.stage}, self:custom.dataBucket.dev}
+    LOGS_BUCKET_NAME: ${self:custom.logsBucket.${self:provider.stage}, self:custom.logsBucket.dev}
 
 plugins:
   - serverless-better-credentials # must be first
@@ -88,6 +90,12 @@ custom:
   deploymentBucket:
     prod: ok-origo-dataplatform-config-prod
     dev: ok-origo-dataplatform-config-dev
+  dataBucket:
+    prod: ok-origo-dataplatform-prod
+    dev: ok-origo-dataplatform-dev
+  logsBucket:
+    prod: ok-origo-dataplatform-logs-prod
+    dev: ok-origo-dataplatform-logs-dev
   baseUrl:
     prod: https://dataplatform.api.oslo.kommune.no/metadata
     dev: https://api.data-dev.oslo.systems/metadata
@@ -114,3 +122,11 @@ functions:
   update_distribution: ${file(serverless/functions/update_distribution.yaml)}
   get_distributions: ${file(serverless/functions/get_distributions.yaml)}
   get_distribution: ${file(serverless/functions/get_distribution.yaml)}
+  update-last-read:
+    image:
+      name: okdata-metadata-api
+      command:
+        - jobs.update_last_read.handler.handler
+    events:
+      - schedule: cron(30 * * * ? *)
+    timeout: 300
