@@ -76,13 +76,12 @@ class TestCreateVersion:
         body = json.loads(response["body"])
         assert str.startswith(body[0]["message"], "Resource Conflict")
 
-    def test_forbidden(self, event, metadata_table):
+    def test_forbidden(self, event, metadata_table, raw_dataset):
         import metadata.version.handler as version_handler
 
-        dataset = common_test_helper.raw_dataset.copy()
-        dataset[ID_COLUMN] = "dataset-id"
-        dataset[TYPE_COLUMN] = "Dataset"
-        metadata_table.put_item(Item=dataset)
+        raw_dataset[ID_COLUMN] = "dataset-id"
+        raw_dataset[TYPE_COLUMN] = "Dataset"
+        metadata_table.put_item(Item=raw_dataset)
 
         version = common_test_helper.raw_version
         create_event = event(version, "dataset-id")
@@ -91,7 +90,7 @@ class TestCreateVersion:
         assert response["statusCode"] == 403
         assert json.loads(response["body"]) == [
             {
-                "message": f"You are not authorized to access dataset {dataset[ID_COLUMN]}"
+                "message": f"You are not authorized to access dataset {raw_dataset[ID_COLUMN]}"
             }
         ]
 

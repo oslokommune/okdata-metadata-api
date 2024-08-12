@@ -144,12 +144,30 @@ def auth_event(*args, **kwargs):
     return lambda_event_factory(good_token)
 
 
+@pytest.fixture
+def raw_dataset():
+    return {
+        "title": "Antall besøkende på gjenbruksstasjoner",
+        "description": "Sensordata fra tellere på gjenbruksstasjonene",
+        "keywords": ["avfall", "besøkende", "gjenbruksstasjon"],
+        "accrualPeriodicity": "hourly",
+        "accessRights": "non-public",
+        "objective": "Formålsbeskrivelse",
+        "license": "http://data.norge.no/nlod/no/1.0/",
+        "contactPoint": {
+            "name": "Tim",
+            "email": "tim@oslo.kommune.no",
+            "phone": "98765432",
+        },
+        "publisher": "REN",
+    }
+
+
 @pytest.fixture()
-def put_dataset(auth_event):
+def put_dataset(auth_event, raw_dataset):
     from metadata.dataset import handler as dataset_handler
 
-    dataset = common_test_helper.raw_dataset.copy()
-    response = dataset_handler.create_dataset(auth_event(dataset), None)
+    response = dataset_handler.create_dataset(auth_event(raw_dataset), None)
     body = json.loads(response["body"])
     return body["Id"]
 
