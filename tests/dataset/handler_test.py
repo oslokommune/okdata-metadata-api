@@ -15,11 +15,10 @@ def metadata_table(dynamodb):
 
 
 class TestCreateDataset:
-    def test_create(self, auth_event, metadata_table):
+    def test_create(self, auth_event, metadata_table, raw_dataset):
         import metadata.dataset.handler as dataset_handler
 
-        create_event = auth_event(common.raw_dataset.copy())
-        response = dataset_handler.create_dataset(create_event, None)
+        response = dataset_handler.create_dataset(auth_event(raw_dataset), None)
         body = json.loads(response["body"])
         dataset_id = body["Id"]
         assert response["statusCode"] == 201
@@ -60,12 +59,11 @@ class TestCreateDataset:
         assert item["version"] == "1"
         assert item["latest"] == version_id
 
-    def test_create_invalid(self, auth_event, metadata_table):
+    def test_create_invalid(self, auth_event, metadata_table, raw_dataset):
         import metadata.dataset.handler as dataset_handler
 
-        invalid_dataset = common.raw_dataset.copy()
-        invalid_dataset["accessRights"] = "foo"
-        create_event = auth_event(invalid_dataset)
+        raw_dataset["accessRights"] = "foo"
+        create_event = auth_event(raw_dataset)
         response = dataset_handler.create_dataset(create_event, None)
         error_message = json.loads(response["body"])
         assert response["statusCode"] == 400
@@ -76,15 +74,31 @@ class TestCreateDataset:
             ],
         }
 
-    def test_create_with_parent(self, auth_event, metadata_table):
+    def test_create_with_invalid_json(self, auth_event, metadata_table, raw_dataset):
         import metadata.dataset.handler as dataset_handler
 
-        parent = common.raw_dataset.copy()
+        create_event = auth_event(raw_dataset)
+
+        # Drop that last closing bracket in the JSON body.
+        create_event["body"] = create_event["body"][:-1]
+
+        response = dataset_handler.create_dataset(create_event, None)
+
+        assert response["statusCode"] == 400
+
+        body = json.loads(response["body"])
+        assert body["message"] == "JSON parse error"
+        assert isinstance(body["errors"][0], str)
+
+    def test_create_with_parent(self, auth_event, metadata_table, raw_dataset):
+        import metadata.dataset.handler as dataset_handler
+
+        parent = raw_dataset.copy()
         parent["source"] = {"type": "none"}
         res = dataset_handler.create_dataset(auth_event(parent), None)
         parent_id = json.loads(res["body"])["Id"]
 
-        child = common.raw_dataset.copy()
+        child = raw_dataset.copy()
         child["parent_id"] = parent_id
         res = dataset_handler.create_dataset(auth_event(child), None)
 
@@ -100,28 +114,29 @@ class TestCreateDataset:
         assert item["title"] == "Antall besøkende på gjenbruksstasjoner"
         assert item["parent_id"] == parent_id
 
-    def test_create_with_missing_parent(self, auth_event, metadata_table):
+    def test_create_with_missing_parent(self, auth_event, metadata_table, raw_dataset):
         import metadata.dataset.handler as dataset_handler
 
-        child = common.raw_dataset.copy()
-        child["parent_id"] = "non-existing"
+        raw_dataset["parent_id"] = "non-existing"
 
-        res = dataset_handler.create_dataset(auth_event(child), None)
+        res = dataset_handler.create_dataset(auth_event(raw_dataset), None)
         assert res["statusCode"] == 400
         assert (
             json.loads(res["body"])[0]["message"]
             == "Parent dataset 'non-existing' doesn't exist."
         )
 
-    def test_create_with_wrong_parent_source_type(self, auth_event, metadata_table):
+    def test_create_with_wrong_parent_source_type(
+        self, auth_event, metadata_table, raw_dataset
+    ):
         import metadata.dataset.handler as dataset_handler
 
-        parent = common.raw_dataset.copy()
+        parent = raw_dataset.copy()
         parent["source"] = {"type": "file"}
         res = dataset_handler.create_dataset(auth_event(parent), None)
         parent_id = json.loads(res["body"])["Id"]
 
-        child = common.raw_dataset.copy()
+        child = raw_dataset.copy()
         child["parent_id"] = parent_id
 
         res = dataset_handler.create_dataset(auth_event(child), None)
@@ -195,11 +210,10 @@ class TestCreateDataset:
 
 
 class TestUpdateDataset:
-    def test_update_dataset(self, auth_event, metadata_table):
+    def test_update_dataset(self, auth_event, metadata_table, raw_dataset):
         import metadata.dataset.handler as dataset_handler
 
-        dataset = common.raw_dataset.copy()
-        response = dataset_handler.create_dataset(auth_event(dataset), None)
+        response = dataset_handler.create_dataset(auth_event(raw_dataset), None)
 
         body = json.loads(response["body"])
         dataset_id = body["Id"]
@@ -221,11 +235,10 @@ class TestUpdateDataset:
         assert item["accrualPeriodicity"] == "daily"
         assert item["license"] == "http://data.norge.no/nlod/no/2.0/"
 
-    def test_forbidden(self, event, metadata_table, auth_event):
+    def test_forbidden(self, event, metadata_table, auth_event, raw_dataset):
         import metadata.dataset.handler as dataset_handler
 
-        dataset = common.raw_dataset.copy()
-        response = dataset_handler.create_dataset(auth_event(dataset), None)
+        response = dataset_handler.create_dataset(auth_event(raw_dataset), None)
 
         body = json.loads(response["body"])
         dataset_id = body["Id"]
@@ -237,17 +250,14 @@ class TestUpdateDataset:
             {"message": f"You are not authorized to access dataset {dataset_id}"}
         ]
 
-    def test_update_invalid(self, auth_event, metadata_table):
+    def test_update_invalid(self, auth_event, metadata_table, raw_dataset):
         import metadata.dataset.handler as dataset_handler
 
-        dataset = common.raw_dataset.copy()
-        dataset_handler.create_dataset(auth_event(dataset), None)
+        dataset_handler.create_dataset(auth_event(raw_dataset), None)
 
-        invalid_dataset = dataset.copy()
-        invalid_dataset["accessRights"] = "foo"
-        update_event = auth_event(invalid_dataset)
+        raw_dataset["accessRights"] = "foo"
 
-        response = dataset_handler.update_dataset(update_event, None)
+        response = dataset_handler.update_dataset(auth_event(raw_dataset), None)
         error_message = json.loads(response["body"])
         assert response["statusCode"] == 400
         assert error_message == {
@@ -257,18 +267,16 @@ class TestUpdateDataset:
             ],
         }
 
-    def test_update_invalid_change(self, auth_event, metadata_table):
+    def test_update_invalid_change(self, auth_event, metadata_table, raw_dataset):
         import metadata.dataset.handler as dataset_handler
 
-        dataset = common.raw_dataset.copy()
-        response = dataset_handler.create_dataset(auth_event(dataset), None)
+        response = dataset_handler.create_dataset(auth_event(raw_dataset), None)
 
         body = json.loads(response["body"])
         dataset_id = body["Id"]
 
-        invalid_dataset = dataset.copy()
-        invalid_dataset["parent_id"] = "dataset-42"
-        update_event = auth_event(invalid_dataset, dataset_id)
+        raw_dataset["parent_id"] = "dataset-42"
+        update_event = auth_event(raw_dataset, dataset_id)
 
         response = dataset_handler.update_dataset(update_event, None)
         error_message = json.loads(response["body"])
@@ -289,15 +297,17 @@ class TestUpdateDataset:
             {"message": f"Dataset {dataset_id} does not exist"}
         ]
 
-    def test_generate_unique_id_based_on_title(self, auth_event, metadata_table):
+    def test_generate_unique_id_based_on_title(
+        self, auth_event, metadata_table, raw_dataset
+    ):
         import metadata.dataset.handler as dataset_handler
 
-        response = dataset_handler.create_dataset(auth_event(common.raw_dataset), None)
+        response = dataset_handler.create_dataset(auth_event(raw_dataset), None)
         old_dataset_id = json.loads(response["body"])["Id"]
 
         dataset_repo = dataset_repository.DatasetRepository()
         new_dataset_id = dataset_repo.generate_unique_id_based_on_title(
-            common.raw_dataset["title"]
+            raw_dataset["title"]
         )
 
         assert old_dataset_id != new_dataset_id
@@ -361,11 +371,10 @@ class TestUpdateDataset:
 
 
 class TestPatchDataset:
-    def test_patch_dataset(self, auth_event, metadata_table):
+    def test_patch_dataset(self, auth_event, metadata_table, raw_dataset):
         import metadata.dataset.handler as dataset_handler
 
-        dataset = common.raw_dataset.copy()
-        response = dataset_handler.create_dataset(auth_event(dataset), None)
+        response = dataset_handler.create_dataset(auth_event(raw_dataset), None)
 
         body = json.loads(response["body"])
         dataset_id = body["Id"]
@@ -391,11 +400,10 @@ class TestPatchDataset:
         assert item["accrualPeriodicity"] == "hourly"
         assert item["objective"] == "Formålsbeskrivelse"
 
-    def test_forbidden(self, event, metadata_table, auth_event):
+    def test_forbidden(self, event, metadata_table, auth_event, raw_dataset):
         import metadata.dataset.handler as dataset_handler
 
-        dataset = common.raw_dataset.copy()
-        response = dataset_handler.create_dataset(auth_event(dataset), None)
+        response = dataset_handler.create_dataset(auth_event(raw_dataset), None)
 
         body = json.loads(response["body"])
         dataset_id = body["Id"]
@@ -407,11 +415,10 @@ class TestPatchDataset:
             {"message": f"You are not authorized to access dataset {dataset_id}"}
         ]
 
-    def test_update_invalid(self, auth_event, metadata_table):
+    def test_update_invalid(self, auth_event, metadata_table, raw_dataset):
         import metadata.dataset.handler as dataset_handler
 
-        dataset = common.raw_dataset.copy()
-        dataset_handler.create_dataset(auth_event(dataset), None)
+        dataset_handler.create_dataset(auth_event(raw_dataset), None)
 
         invalid_dataset = common.dataset_patched.copy()
         invalid_dataset["foo"] = "bar"
@@ -441,16 +448,16 @@ class TestPatchDataset:
 
 
 class TestGetDataset:
-    def test_get_all_datasets(self, event, auth_event, metadata_table):
+    def test_get_all_datasets(self, event, auth_event, metadata_table, raw_dataset):
         import metadata.dataset.handler as dataset_handler
 
-        dataset = common.raw_dataset.copy()
+        dataset = raw_dataset.copy()
         dataset["source"] = {"type": "none"}
         response = dataset_handler.create_dataset(auth_event(dataset), None)
         dataset_id = json.loads(response["body"])["Id"]
 
         for i in range(0, 3):
-            child_dataset = common.raw_dataset.copy()
+            child_dataset = raw_dataset.copy()
             child_dataset["parent_id"] = dataset_id
             dataset_handler.create_dataset(auth_event(child_dataset), None)
 
@@ -460,16 +467,18 @@ class TestGetDataset:
         assert response["statusCode"] == 200
         assert len(datasets) == 4  # Including parent dataset
 
-    def test_get_datasets_by_parent(self, event, auth_event, metadata_table):
+    def test_get_datasets_by_parent(
+        self, event, auth_event, metadata_table, raw_dataset
+    ):
         import metadata.dataset.handler as dataset_handler
 
-        dataset = common.raw_dataset.copy()
+        dataset = raw_dataset.copy()
         dataset["source"] = {"type": "none"}
         response = dataset_handler.create_dataset(auth_event(dataset), None)
         dataset_id = json.loads(response["body"])["Id"]
 
         for i in range(0, 3):
-            child_dataset = common.raw_dataset.copy()
+            child_dataset = raw_dataset.copy()
             child_dataset["parent_id"] = dataset_id
             dataset_handler.create_dataset(auth_event(child_dataset), None)
 
@@ -480,15 +489,17 @@ class TestGetDataset:
         assert response["statusCode"] == 200
         assert len(datasets) == 3
 
-    def test_get_datasets_by_parent_none_found(self, event, auth_event, metadata_table):
+    def test_get_datasets_by_parent_none_found(
+        self, event, auth_event, metadata_table, raw_dataset
+    ):
         import metadata.dataset.handler as dataset_handler
 
-        dataset = common.raw_dataset.copy()
+        dataset = raw_dataset.copy()
         response = dataset_handler.create_dataset(auth_event(dataset), None)
         dataset_id = json.loads(response["body"])["Id"]
 
         for i in range(0, 3):
-            child_dataset = common.raw_dataset.copy()
+            child_dataset = raw_dataset.copy()
             child_dataset["parent_id"] = dataset_id
             dataset_handler.create_dataset(auth_event(child_dataset), None)
 

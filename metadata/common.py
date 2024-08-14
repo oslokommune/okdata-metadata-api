@@ -1,6 +1,7 @@
-import simplejson as json
+import json
 from functools import wraps
 
+import simplejson
 from botocore.config import Config
 
 
@@ -20,8 +21,16 @@ def validate_input(validator):
     def inner(func):
         @wraps(func)
         def wrapper(event, *args, **kwargs):
-            errors = validator.validate(json.loads(event["body"]))
+            try:
+                errors = validator.validate(json.loads(event["body"]))
+            except json.decoder.JSONDecodeError as e:
+                return response(
+                    400, {"message": "JSON parse error", "errors": [str(e)]}
+                )
+
             if errors:
+                # TODO: A 422 response is probably more accurate here (correct
+                # syntax, but invalid content).
                 return response(400, {"message": "Validation error", "errors": errors})
             return func(event, *args, **kwargs)
 
@@ -39,7 +48,7 @@ def response(statusCode, body, headers=None):
     return {
         "statusCode": statusCode,
         "headers": headers,
-        "body": json.dumps(body, use_decimal=True),
+        "body": simplejson.dumps(body, use_decimal=True),
     }
 
 

@@ -69,22 +69,6 @@ def create_table(dynamodb, table_name, hashkey, rangekey=None, gsis=[]):
     )
 
 
-raw_dataset = {
-    "title": "Antall besøkende på gjenbruksstasjoner",
-    "description": "Sensordata fra tellere på gjenbruksstasjonene",
-    "keywords": ["avfall", "besøkende", "gjenbruksstasjon"],
-    "accrualPeriodicity": "hourly",
-    "accessRights": "non-public",
-    "objective": "Formålsbeskrivelse",
-    "license": "http://data.norge.no/nlod/no/1.0/",
-    "contactPoint": {
-        "name": "Tim",
-        "email": "tim@oslo.kommune.no",
-        "phone": "98765432",
-    },
-    "publisher": "REN",
-}
-
 dataset_updated = {
     "title": "UPDATED TITLE",
     "description": "Sensordata fra tellere på gamle gjenbruksstasjoner",
