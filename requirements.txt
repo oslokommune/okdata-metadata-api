@@ -118,8 +118,6 @@ rpds-py==0.18.1
     #   referencing
 s3transfer==0.10.2
     # via boto3
-shortuuid==1.0.13
-    # via metadata-api (setup.py)
 simplejson==3.19.2
     # via metadata-api (setup.py)
 six==1.16.0

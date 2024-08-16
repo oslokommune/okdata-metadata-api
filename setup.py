@@ -33,7 +33,6 @@ setuptools.setup(
         "markupsafe",
         "aws-xray-sdk",
         "requests",
-        "shortuuid",
         "simplejson",
         "jsonschema[format]",
         "strict-rfc3339",
