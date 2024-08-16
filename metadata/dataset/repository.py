@@ -1,11 +1,11 @@
+import random
 import re
+import string
 
 import boto3
-import shortuuid
 from aws_xray_sdk.core import patch
 from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
-from difflib import SequenceMatcher
 from okdata.aws.logging import log_dynamodb, log_exception
 
 from metadata.CommonRepository import CommonRepository, TYPE_COLUMN, ID_COLUMN
@@ -138,7 +138,7 @@ class DatasetRepository(CommonRepository):
         uid = base
 
         while self.dataset_exists(uid):
-            uid = f"{base}-{shortuuid.ShortUUID().random(length=5)}"
+            uid = f"{base}-{''.join(random.choices(string.ascii_letters, k=5))}"
 
         return uid
 
@@ -153,7 +153,3 @@ def slugify(title):
     if t[-1] == "-":
         t = t[0:-1]
     return t
-
-
-def similar(a, b):
-    return SequenceMatcher(None, a, b).ratio()
