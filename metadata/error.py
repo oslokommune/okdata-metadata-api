@@ -14,3 +14,7 @@ class ValidationError(Exception):
 
 class DeleteConflict(Exception):
     pass
+
+
+class ResourceNotFoundError(Exception):
+    pass

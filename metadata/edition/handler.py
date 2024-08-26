@@ -4,15 +4,12 @@ import simplejson as json
 from aws_xray_sdk.core import xray_recorder
 from okdata.aws.logging import logging_wrapper, log_add, log_exception
 
-from metadata import common
-from metadata.error import ResourceConflict
 from metadata.auth import check_auth
-from metadata.common import validate_input
+from metadata.common import error_response, response, validate_input
 from metadata.edition.repository import EditionRepository
+from metadata.error import DeleteConflict, ResourceConflict, ResourceNotFoundError
 from metadata.validator import Validator
 
-
-edition_repository = EditionRepository()
 validator = Validator("edition")
 BASE_URL = os.environ.get("BASE_URL", "")
 
@@ -31,6 +28,7 @@ def create_edition(event, context):
     log_add(dataset_id=dataset_id, version=version)
 
     try:
+        edition_repository = EditionRepository()
         edition_id = edition_repository.create_edition(dataset_id, version, content)
 
         edition = edition_id.split("/")[-1]
@@ -42,15 +40,15 @@ def create_edition(event, context):
             dataset_id, version, edition, consistent_read=True
         )
         add_self_url(body)
-        return common.response(201, body, headers)
+        return response(201, body, headers)
     except ResourceConflict as d:
-        return common.error_response(409, f"Resource Conflict: {d}")
+        return error_response(409, f"Resource Conflict: {d}")
     except KeyError as ke:
-        return common.error_response(404, str(ke))
+        return error_response(404, str(ke))
     except Exception as e:
         log_exception(e)
         message = f"Error creating edition. RequestId: {context.aws_request_id}"
-        return common.response(500, {"message": message})
+        return response(500, {"message": message})
 
 
 @logging_wrapper
@@ -68,18 +66,19 @@ def update_edition(event, context):
     log_add(dataset_id=dataset_id, version=version, edition=edition)
 
     try:
+        edition_repository = EditionRepository()
         edition_repository.update_edition(dataset_id, version, edition, content)
         body = edition_repository.get_edition(
             dataset_id, version, edition, consistent_read=True
         )
         add_self_url(body)
-        return common.response(200, body)
+        return response(200, body)
     except KeyError as ke:
-        return common.error_response(404, str(ke))
+        return error_response(404, str(ke))
     except ValueError as e:
         log_exception(e)
         message = f"Error updating edition. RequestId: {context.aws_request_id}"
-        return common.response(500, {"message": message})
+        return response(500, {"message": message})
 
 
 @logging_wrapper
@@ -91,12 +90,12 @@ def get_editions(event, context):
     version = event["pathParameters"]["version"]
     log_add(dataset_id=dataset_id, version=version)
 
-    editions = edition_repository.get_editions(dataset_id, version)
+    editions = EditionRepository().get_editions(dataset_id, version)
     log_add(num_editions=len(editions))
     for edition in editions:
         add_self_url(edition)
 
-    return common.response(200, editions)
+    return response(200, editions)
 
 
 @logging_wrapper
@@ -109,13 +108,43 @@ def get_edition(event, context):
     edition = event["pathParameters"]["edition"]
     log_add(dataset_id=dataset_id, version=version, edition=edition)
 
-    content = edition_repository.get_edition(dataset_id, version, edition)
+    content = EditionRepository().get_edition(dataset_id, version, edition)
     if content:
         add_self_url(content)
-        return common.response(200, content)
+        return response(200, content)
     else:
         message = "Edition not found."
-        return common.response(404, {"message": message})
+        return response(404, {"message": message})
+
+
+@logging_wrapper
+@check_auth("okdata:dataset:write", use_whitelist=True)
+@xray_recorder.capture("delete_edition")
+def delete_edition(event, context):
+    """DELETE /datasets/:dataset-id/versions/:version/editions/:edition"""
+
+    params = event["pathParameters"]
+    query_params = event.get("queryStringParameters") or {}
+    dataset_id = params["dataset-id"]
+    version = params["version"]
+    edition = params["edition"]
+    log_add(dataset_id=dataset_id, version=version, edition=edition)
+
+    try:
+        EditionRepository().delete_item(
+            f"{dataset_id}/{version}/{edition}", query_params.get("cascade") == "true"
+        )
+        return response(200, None)
+    except DeleteConflict as e:
+        return response(400, {"message": str(e)})
+    except ResourceNotFoundError as e:
+        return response(404, {"message": str(e)})
+    except ValueError as e:
+        log_exception(e)
+        return response(
+            500,
+            {"message": f"Error deleting edition. RequestId: {context.aws_request_id}"},
+        )
 
 
 def add_self_url(edition):

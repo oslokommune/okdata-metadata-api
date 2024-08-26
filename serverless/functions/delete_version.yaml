@@ -1,0 +1,10 @@
+image:
+  name: okdata-metadata-api
+  command:
+    - metadata.version.handler.delete_version
+events:
+  - http:
+      path: "datasets/{dataset-id}/versions/{version}"
+      method: "delete"
+      authorizer: ${file(serverless/kc-authorizer.yaml)}
+      documentation: ${file(serverless/documentation/delete_version.yaml)}

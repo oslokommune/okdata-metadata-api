@@ -2,8 +2,7 @@ import re
 from dataclasses import dataclass
 from urllib.parse import unquote
 
-STAGES = ["raw", "intermediate", "processed"]
-CONFIDENTIALITIES = ["green", "yellow", "red"]
+from metadata.common import CONFIDENTIALITIES, STAGES
 
 
 @dataclass

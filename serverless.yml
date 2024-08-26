@@ -112,14 +112,17 @@ functions:
   update_dataset: ${file(serverless/functions/update_dataset.yaml)}
   create_version: ${file(serverless/functions/create_version.yaml)}
   update_version: ${file(serverless/functions/update_version.yaml)}
+  delete-version: ${file(serverless/functions/delete_version.yaml)}
   get_versions: ${file(serverless/functions/get_versions.yaml)}
   get_version: ${file(serverless/functions/get_version.yaml)}
   create_edition: ${file(serverless/functions/create_edition.yaml)}
   update_edition: ${file(serverless/functions/update_edition.yaml)}
+  delete-edition: ${file(serverless/functions/delete_edition.yaml)}
   get_editions: ${file(serverless/functions/get_editions.yaml)}
   get_edition: ${file(serverless/functions/get_edition.yaml)}
   create_distribution: ${file(serverless/functions/create_distribution.yaml)}
   update_distribution: ${file(serverless/functions/update_distribution.yaml)}
+  delete-distribution: ${file(serverless/functions/delete_distribution.yaml)}
   get_distributions: ${file(serverless/functions/get_distributions.yaml)}
   get_distribution: ${file(serverless/functions/get_distribution.yaml)}
   update-last-read:

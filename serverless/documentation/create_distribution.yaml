@@ -26,7 +26,7 @@ pathParams:
 methodResponses:
   - statusCode: "201"
     responseModels:
-      application/json: "Version"
+      application/json: "Distribution"
   - statusCode: "400"
     responseBody:
       description: "User error"

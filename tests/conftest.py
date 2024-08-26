@@ -11,6 +11,7 @@ from okdata.resource_auth import ResourceAuthorizer
 
 from metadata.auth import Auth
 from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
+from metadata.util import getenv
 from tests import common_test_helper
 
 
@@ -22,6 +23,22 @@ good_token = "Bjørnepollett"
 def dynamodb():
     with mock_aws():
         yield boto3.resource("dynamodb", **BOTO_RESOURCE_COMMON_KWARGS)
+
+
+@pytest.fixture(scope="function")
+def s3_client():
+    with mock_aws():
+        yield boto3.client("s3")
+
+
+@pytest.fixture
+def s3_bucket(s3_client):
+    bucket_name = getenv("DATA_BUCKET_NAME")
+    s3_client.create_bucket(
+        Bucket=bucket_name,
+        CreateBucketConfiguration={"LocationConstraint": getenv("AWS_REGION")},
+    )
+    return bucket_name
 
 
 @pytest.fixture(autouse=True)

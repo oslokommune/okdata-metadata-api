@@ -9,8 +9,8 @@ from okdata.aws.logging import logging_wrapper
 
 from jobs.update_last_read.dataset import DatasetEntry
 from jobs.update_last_read.logrec import LogRecord
-from jobs.update_last_read.util import getenv
 from metadata.dataset.repository import DatasetRepository
+from metadata.util import getenv
 
 logger = logging.getLogger()
 logger.setLevel(os.environ.get("LOG_LEVEL", logging.INFO))

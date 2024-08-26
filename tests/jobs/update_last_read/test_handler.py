@@ -11,13 +11,13 @@ def test_two_hours_ago():
 
 
 @freeze_time("2020-01-01-02")
-def test_handler(s3_client, s3_bucket, metadata_table):
+def test_handler(s3_client, s3_logs_bucket, metadata_table):
     metadata_table.put_item(Item={"Id": "renovasjonsbiler-status", "Type": "Dataset"})
     metadata_table.put_item(Item={"Id": "pipeline-ng-test", "Type": "Dataset"})
 
     with open("tests/jobs/update_last_read/data/s3_access_log.txt", "rb") as f:
         s3_client.put_object(
-            Bucket=s3_bucket,
+            Bucket=s3_logs_bucket,
             Key="logs/s3/test-data-bucket/2020-01-01-00-00-00-E3257304837D19F5",
             Body=f,
         )

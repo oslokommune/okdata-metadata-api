@@ -1,0 +1,34 @@
+summary: "Delete a version"
+description: "Deletes an existing version"
+pathParams:
+  - name: "dataset-id"
+    description: "The ID of the dataset which the version to delete belongs to"
+    required: true
+    schema:
+      type: "string"
+      pattern: "^[-a-z0-9]+$"
+  - name: "version"
+    description: "The version to delete"
+    required: true
+    schema:
+      type: "string"
+      pattern: "^[-a-z0-9]+$"
+methodResponses:
+  - statusCode: "200"
+    responseBody:
+      description: "Version was successfully deleted"
+  - statusCode: "403"
+    responseBody:
+      description: "Authorization failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "404"
+    responseBody:
+      description: "Version wasn't found"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "500"
+    responseBody:
+      description: "Internal server error"
+    responseModels:
+      application/json: "StandardResponse"

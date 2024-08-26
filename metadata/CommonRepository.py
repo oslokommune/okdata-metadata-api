@@ -6,7 +6,12 @@ from boto3.dynamodb.conditions import And, Attr, Key
 from botocore.exceptions import ClientError
 from okdata.aws.logging import log_add, log_duration
 
-from metadata.error import ResourceConflict, ValidationError, DeleteConflict
+from metadata.error import (
+    DeleteConflict,
+    ResourceConflict,
+    ResourceNotFoundError,
+    ValidationError,
+)
 
 patch_all()
 
@@ -210,32 +215,52 @@ class CommonRepository:
         log.exception(msg)
         raise ValueError(msg)
 
-    def delete_item(self, item_id):
+    def delete_item(self, item_id, cascade=False):
+        """Delete item with ID `item_id`.
+
+        Delete every child item as well if `cascade` is true, otherwise skip
+        deletion and raise `DeleteConflict` if the item has any children.
+        """
         log_add(dynamodb_item_id=item_id, dynamodb_item_type=self.type)
         key = {ID_COLUMN: item_id, TYPE_COLUMN: self.type}
+        children = self.children(item_id)
 
-        if self.can_delete(item_id):
+        if children:
+            if cascade:
+                child_repo = self.child_repository()
+
+                for child in children:
+                    child_repo.delete_item(child["Id"], True)
+            else:
+                raise DeleteConflict(f"Item '{item_id}' has children; cannot delete.")
+
+        try:
             log_duration(
-                lambda: self.table.delete_item(Key=key),
+                lambda: self.table.delete_item(
+                    Key=key, ConditionExpression="attribute_exists(Id)"
+                ),
                 "dynamodb_duration_ms",
             )
-        else:
-            raise DeleteConflict(f"Item with id {item_id} has children. Cannot delete")
+        except ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            if error_code == "ConditionalCheckFailedException":
+                msg = f"Item with id '{item_id}' not found"
+                log.error(msg)
+                raise ResourceNotFoundError(msg)
+            else:
+                msg = e.response["Error"]["Message"]
+                log.error(msg)
+                raise ValueError(f"Error deleting item ({error_code}): {msg}")
 
-    def can_delete(self, item_id):
-        if self.type == "Dataset":
-            child_type = "Version"
-        elif self.type == "Version":
-            child_type = "Edition"
-        elif self.type == "Edition":
-            child_type = "Distribution"
-        else:
-            return True
-
-        children = self.table.query(
+    def _query_children(self, item_id, child_type):
+        return self.table.query(
             IndexName="IdByTypeIndex",
             KeyConditionExpression=Key(TYPE_COLUMN).eq(child_type)
             & Key(ID_COLUMN).begins_with(f"{item_id}/"),
         )["Items"]
 
-        return len(children) == 0
+    def children(self, item_id):
+        raise NotImplementedError
+
+    def child_repository(self):
+        raise NotImplementedError

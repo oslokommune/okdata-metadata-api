@@ -4,6 +4,13 @@ import json
 from boto3.dynamodb.conditions import Key
 
 from metadata.CommonRepository import ID_COLUMN, TYPE_COLUMN
+from metadata.version.handler import (
+    create_version,
+    delete_version,
+    get_version,
+    get_versions,
+    update_version,
+)
 from tests import common_test_helper
 
 
@@ -14,14 +21,12 @@ def metadata_table(dynamodb):
 
 class TestCreateVersion:
     def test_create_version(self, metadata_table, auth_event, put_dataset):
-        import metadata.version.handler as version_handler
-
         dataset_id = put_dataset
 
         version = common_test_helper.raw_version
         create_event = auth_event(version, dataset=dataset_id)
 
-        response = version_handler.create_version(create_event, None)
+        response = create_version(create_event, None)
         body = json.loads(response["body"])
         version_id = body["Id"]
 
@@ -42,13 +47,11 @@ class TestCreateVersion:
         assert version_from_db[TYPE_COLUMN] == "Version"
 
     def test_create_version_invalid_version_latest(self, auth_event):
-        import metadata.version.handler as version_handler
-
         dataset_id = "my-dataset"
         version = {}
         version["version"] = "latest"
         create_event = auth_event(version, dataset=dataset_id)
-        res = version_handler.create_version(create_event, None)
+        res = create_version(create_event, None)
         assert res["statusCode"] == 400
         body = json.loads(res["body"])
         assert body == {
@@ -61,24 +64,20 @@ class TestCreateVersion:
     def test_create_duplicate_version_should_fail(
         self, metadata_table, auth_event, put_dataset
     ):
-        import metadata.version.handler as version_handler
-
         dataset_id = put_dataset
 
         version = common_test_helper.raw_version
         create_event = auth_event(version, dataset_id)
 
-        response = version_handler.create_version(create_event, None)
+        response = create_version(create_event, None)
         assert response["statusCode"] == 201
 
-        response = version_handler.create_version(create_event, None)
+        response = create_version(create_event, None)
         assert response["statusCode"] == 409
         body = json.loads(response["body"])
         assert str.startswith(body[0]["message"], "Resource Conflict")
 
     def test_forbidden(self, event, metadata_table, raw_dataset):
-        import metadata.version.handler as version_handler
-
         raw_dataset[ID_COLUMN] = "dataset-id"
         raw_dataset[TYPE_COLUMN] = "Dataset"
         metadata_table.put_item(Item=raw_dataset)
@@ -86,7 +85,7 @@ class TestCreateVersion:
         version = common_test_helper.raw_version
         create_event = event(version, "dataset-id")
 
-        response = version_handler.create_version(create_event, None)
+        response = create_version(create_event, None)
         assert response["statusCode"] == 403
         assert json.loads(response["body"]) == [
             {
@@ -95,12 +94,10 @@ class TestCreateVersion:
         ]
 
     def test_daset_id_not_exist(self, auth_event, metadata_table):
-        import metadata.version.handler as version_handler
-
         dataset_id = "dataset-id"
         create_event = auth_event(common_test_helper.raw_version, dataset=dataset_id)
 
-        response = version_handler.create_version(create_event, None)
+        response = create_version(create_event, None)
         assert response["statusCode"] == 404
         assert json.loads(response["body"]) == [
             {"message": f"Dataset {dataset_id} does not exist"}
@@ -109,10 +106,8 @@ class TestCreateVersion:
 
 class TestUpdateVersion:
     def test_update_version(self, metadata_table, auth_event, put_dataset):
-        import metadata.version.handler as version_handler
-
         dataset_id = put_dataset
-        version_handler.create_version(
+        create_version(
             auth_event(common_test_helper.raw_version.copy(), dataset=dataset_id), None
         )
         version_name = common_test_helper.raw_version["version"]
@@ -121,7 +116,7 @@ class TestUpdateVersion:
             common_test_helper.version_updated, dataset=dataset_id, version=version_name
         )
 
-        response = version_handler.update_version(update_event, None)
+        response = update_version(update_event, None)
         body = json.loads(response["body"])
         version_id = body["Id"]
 
@@ -137,8 +132,6 @@ class TestUpdateVersion:
     def test_update_version_invalid_version_latest_in_body(
         self, auth_event, put_dataset
     ):
-        import metadata.version.handler as version_handler
-
         dataset_id = put_dataset
         version_name = common_test_helper.raw_version["version"]
         update_event = auth_event(
@@ -147,25 +140,23 @@ class TestUpdateVersion:
         body = json.loads(update_event["body"])
         body["version"] = "this-is-not-the-same-version"
         update_event["body"] = json.dumps(body)
-        res = version_handler.update_version(update_event, None)
+        res = update_version(update_event, None)
         assert res["statusCode"] == 409
 
     def test_update_edition_latest_is_updated(
         self, metadata_table, auth_event, put_dataset
     ):
-        import metadata.version.handler as version_handler
-
         dataset_id = put_dataset
         version_name = common_test_helper.raw_version["version"]
         create_event = auth_event(
             common_test_helper.raw_version, dataset=dataset_id, version=version_name
         )
         # Insert parent first:
-        version_handler.create_version(create_event, None)
+        create_version(create_event, None)
         update_event = auth_event(
             common_test_helper.version_updated, dataset=dataset_id, version=version_name
         )
-        version_handler.update_version(update_event, None)
+        update_version(update_event, None)
 
         version_id = "antall-besokende-pa-gjenbruksstasjoner/latest"
 
@@ -177,8 +168,6 @@ class TestUpdateVersion:
         assert version_from_db["latest"] == "antall-besokende-pa-gjenbruksstasjoner/6"
 
     def test_forbidden(self, event, metadata_table, put_dataset):
-        import metadata.version.handler as version_handler
-
         version = common_test_helper.raw_version.copy()
         version[ID_COLUMN] = f"{put_dataset}/{version['version']}"
         version[TYPE_COLUMN] = "version"
@@ -190,7 +179,7 @@ class TestUpdateVersion:
         update_event = event(
             common_test_helper.version_updated, dataset=dataset_id, version=version_name
         )
-        response = version_handler.update_version(update_event, None)
+        response = update_version(update_event, None)
 
         assert response["statusCode"] == 403
         assert json.loads(response["body"]) == [
@@ -198,13 +187,11 @@ class TestUpdateVersion:
         ]
 
     def test_daset_id_not_exist(self, auth_event, metadata_table):
-        import metadata.version.handler as version_handler
-
         dataset_id = "dataset-id"
         update_event = auth_event(
             common_test_helper.version_updated, dataset=dataset_id, version="1"
         )
-        response = version_handler.update_version(update_event, None)
+        response = update_version(update_event, None)
         assert response["statusCode"] == 404
         assert json.loads(response["body"]) == [
             {"message": f"Dataset {dataset_id} does not exist"}
@@ -213,20 +200,18 @@ class TestUpdateVersion:
 
 class TestVersion:
     def test_get_all_versions(self, metadata_table, auth_event, put_dataset):
-        import metadata.version.handler as version_handler
-
         dataset_id = put_dataset
 
         version_1 = common_test_helper.raw_version.copy()
         version_2 = common_test_helper.raw_version.copy()
         version_2["version"] = "extra-version"
 
-        version_handler.create_version(auth_event(version_1, dataset=dataset_id), None)
-        version_handler.create_version(auth_event(version_2, dataset=dataset_id), None)
+        create_version(auth_event(version_1, dataset=dataset_id), None)
+        create_version(auth_event(version_2, dataset=dataset_id), None)
 
         get_all_versions_event = auth_event({}, dataset=dataset_id)
 
-        response = version_handler.get_versions(get_all_versions_event, None)
+        response = get_versions(get_all_versions_event, None)
 
         versions = json.loads(response["body"])
 
@@ -234,11 +219,37 @@ class TestVersion:
         assert len(versions) == 3  # Including initial version
 
     def test_version_not_found(self, event):
-        import metadata.version.handler as version_handler
-
         get_event = event({}, "1234", "1")
 
-        response = version_handler.get_version(get_event, None)
+        response = get_version(get_event, None)
 
         assert response["statusCode"] == 404
         assert json.loads(response["body"]) == {"message": "Version not found."}
+
+
+class TestDeleteVersion:
+    def test_delete_ok(self, metadata_table, auth_event, put_version):
+        dataset_id, version = put_version
+
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(ID_COLUMN).eq("/".join(put_version))
+        )
+        assert db_response["Count"] == 1
+
+        response = delete_version(auth_event(dataset=dataset_id, version=version), None)
+        assert response["statusCode"] == 200
+
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(ID_COLUMN).eq("/".join(put_version))
+        )
+        assert db_response["Count"] == 0
+
+    def test_forbidden(self, metadata_table, auth_event, event, put_version):
+        dataset_id, version = put_version
+
+        response = delete_version(event(dataset=dataset_id, version=version), None)
+        assert response["statusCode"] == 403
+
+    def test_delete_not_found(self, auth_event):
+        response = delete_version(auth_event(dataset="foo", version="1"), None)
+        assert response["statusCode"] == 404

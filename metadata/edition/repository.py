@@ -4,8 +4,9 @@ import boto3
 from aws_xray_sdk.core import patch
 from botocore.exceptions import ClientError
 
-from metadata.CommonRepository import CommonRepository
 from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
+from metadata.CommonRepository import CommonRepository
+from metadata.distribution.repository import DistributionRepository
 
 patch(["boto3"])
 
@@ -79,6 +80,8 @@ class EditionRepository(CommonRepository):
             self.update_latest_edition(dataset_id, version, edition, content)
         return result
 
-    def delete_edition(self, dataset_id, version, edition):
-        edition_id = f"{dataset_id}/{version}/{edition}"
-        self.delete_item(edition_id)
+    def children(self, item_id):
+        return self._query_children(item_id, "Distribution")
+
+    def child_repository(self):
+        return DistributionRepository()

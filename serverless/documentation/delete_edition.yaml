@@ -1,0 +1,40 @@
+summary: "Delete an edition"
+description: "Deletes an existing edition"
+pathParams:
+  - name: "dataset-id"
+    description: "The ID of the dataset which the edition to delete belongs to"
+    required: true
+    schema:
+      type: "string"
+      pattern: "^[-a-z0-9]+$"
+  - name: "version"
+    description: "The version which the edition to delete belongs to"
+    required: true
+    schema:
+      type: "string"
+      pattern: "^[-a-z0-9]+$"
+  - name: "edition"
+    description: "The edition to delete"
+    required: true
+    schema:
+      type: "string"
+      pattern: "^[-a-z0-9]+$"
+methodResponses:
+  - statusCode: "200"
+    responseBody:
+      description: "Edition was successfully deleted"
+  - statusCode: "403"
+    responseBody:
+      description: "Authorization failed"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "404"
+    responseBody:
+      description: "Edition wasn't found"
+    responseModels:
+      application/json: "StandardResponse"
+  - statusCode: "500"
+    responseBody:
+      description: "Internal server error"
+    responseModels:
+      application/json: "StandardResponse"
