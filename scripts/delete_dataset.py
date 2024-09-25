@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 
 import boto3
 
+from metadata.common import CONFIDENTIALITIES
 from scripts.util import chunk, confirm_to_continue
 
 # Must be done before repository import.
@@ -18,8 +19,6 @@ from metadata.distribution.repository import DistributionRepository  # noqa
 
 
 logger = logging.getLogger("delete_dataset")
-
-CONFIDENTIALITY_LEVELS = ["green", "yellow", "red"]
 
 
 def print_output(
@@ -72,7 +71,7 @@ def find_s3_objects(bucket, dataset_id):
     paginator = s3.get_paginator("list_objects_v2")
 
     for stage in stages:
-        for confidentiality in CONFIDENTIALITY_LEVELS:
+        for confidentiality in CONFIDENTIALITIES:
             prefix = f"{stage}{confidentiality}/{dataset_id}/"
             logger.debug(f"Looking for data in {prefix}")
             for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
@@ -208,14 +207,8 @@ if __name__ == "__main__":
 
         # Delete distributions and store in deleted_distributions
         for distribution in distributions:
-            _dataset_id, _version, _edition, _distribution_id = distribution[
-                "Id"
-            ].split("/")
-
             if apply_changes:
-                distribution_repository.delete_distribution(
-                    _dataset_id, _version, _edition, _distribution_id
-                )
+                distribution_repository.delete_item(distribution["Id"])
 
             deleted_distributions.append(
                 {
@@ -227,24 +220,21 @@ if __name__ == "__main__":
 
         # Delete editions and store in deleted_editions
         for edition_id in edition_ids:
-            _dataset_id, _version, _edition = edition_id.split("/")
-
             if apply_changes:
-                edition_repository.delete_edition(_dataset_id, _version, _edition)
+                edition_repository.delete_item(edition_id)
 
             deleted_editions.append(edition_id)
 
         # Delete versions and store in deleted_versions
         for version_id in version_ids:
-            _dataset_id, _version = version_id.split("/")
-
             if apply_changes:
-                version_repository.delete_version(_dataset_id, _version)
+                version_repository.delete_item(version_id)
+
             deleted_versions.append(version_id)
 
         # Delete dataset and store in deleted_datasets
         if apply_changes:
-            dataset_repository.delete_dataset(dataset_id)
+            dataset_repository.delete_item(dataset_id)
 
         deleted_datasets.append(dataset_id)
 

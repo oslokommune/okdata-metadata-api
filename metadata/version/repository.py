@@ -2,8 +2,9 @@ import boto3
 from aws_xray_sdk.core import patch
 from botocore.exceptions import ClientError
 
-from metadata.CommonRepository import CommonRepository
 from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
+from metadata.CommonRepository import CommonRepository
+from metadata.edition.repository import EditionRepository
 from metadata.error import InvalidVersionError
 
 patch(["boto3"])
@@ -85,6 +86,8 @@ class VersionRepository(CommonRepository):
             self.update_latest_version(dataset_id, version, content)
         return result
 
-    def delete_version(self, dataset_id, version):
-        version_id = f"{dataset_id}/{version}"
-        self.delete_item(version_id)
+    def children(self, item_id):
+        return self._query_children(item_id, "Edition")
+
+    def child_repository(self):
+        return EditionRepository()

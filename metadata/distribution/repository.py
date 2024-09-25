@@ -1,12 +1,18 @@
+import logging
 import mimetypes
+import os
 import uuid
 
 import boto3
 from aws_xray_sdk.core import patch
 
+from metadata.common import BOTO_RESOURCE_COMMON_KWARGS, CONFIDENTIALITY_MAP, STAGES
 from metadata.CommonRepository import CommonRepository
-from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
-from metadata.error import ValidationError
+from metadata.error import ResourceNotFoundError, ValidationError
+from metadata.util import getenv
+
+logger = logging.getLogger()
+logger.setLevel(os.environ.get("LOG_LEVEL", logging.INFO))
 
 patch(["boto3"])
 
@@ -89,6 +95,53 @@ class DistributionRepository(CommonRepository):
         if mime_type:
             item["content_type"] = mime_type
 
+    def _delete_data(self, dataset_id, version, edition, distribution):
+        """Delete data from S3 belonging to the given distribution."""
+        from metadata.dataset.repository import DatasetRepository
+
+        distribution_id = f"{dataset_id}/{version}/{edition}/{distribution}"
+        distribution_ = self.get_item(distribution_id)
+
+        if not distribution_:
+            raise ResourceNotFoundError
+
+        bucket = getenv("DATA_BUCKET_NAME")
+        dataset = DatasetRepository().get_dataset(dataset_id)
+        access_rights = dataset.get("accessRights")
+        confidentiality = CONFIDENTIALITY_MAP.get(access_rights)
+        filenames = distribution_.get("filenames")
+
+        if not confidentiality:
+            logger.info(
+                f"Unknown confidentiality for dataset '{dataset_id}'; skipping data deletion"
+            )
+            return
+
+        if not filenames:
+            logger.info(
+                f"No filenames listed for distribution '{distribution_id}'; skipping data deletion"
+            )
+            return
+
+        s3 = boto3.client("s3", region_name=getenv("AWS_REGION"))
+
+        for stage in STAGES:
+            for filename in filenames:
+                prefix = f"{stage}/{confidentiality}/{dataset_id}/version={version}/edition={edition}/{filename}"
+                logger.debug(f"Looking for {prefix}")
+                objects = s3.list_objects_v2(Bucket=bucket, Prefix=prefix)
+
+                if not objects or "Contents" not in objects:
+                    logger.debug(f"No data to delete for stage '{stage}'")
+                    continue
+
+                s3_keys = [c["Key"] for c in objects["Contents"]]
+                logger.debug(f"To delete: {s3_keys}")
+                response = s3.delete_objects(
+                    Bucket=bucket, Delete={"Objects": [{"Key": k for k in s3_keys}]}
+                )
+                logger.debug(f"Deleted: {response.get('Deleted')}")
+
     def get_distribution(
         self, dataset_id, version, edition, distribution, consistent_read=False
     ):
@@ -123,6 +176,13 @@ class DistributionRepository(CommonRepository):
         distribution_id = f"{dataset_id}/{version}/{edition}/{distribution}"
         return self.update_item(distribution_id, content)
 
-    def delete_distribution(self, dataset_id, version, edition, distribution):
-        distribution_id = f"{dataset_id}/{version}/{edition}/{distribution}"
-        self.delete_item(distribution_id)
+    def delete_item(self, item_id, cascade=False):
+        dataset_id, version, edition, distribution = item_id.split("/")
+        self._delete_data(dataset_id, version, edition, distribution)
+        return super().delete_item(item_id, cascade)
+
+    def children(self, item_id):
+        return []
+
+    def child_repository(self):
+        return None

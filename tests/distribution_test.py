@@ -1,10 +1,18 @@
 import pytest
 import json
 import re
+from unittest.mock import patch
 
 from boto3.dynamodb.conditions import Key
 
 from metadata.CommonRepository import ID_COLUMN
+from metadata.distribution.handler import (
+    create_distribution,
+    delete_distribution,
+    get_distribution,
+    get_distributions,
+    update_distribution,
+)
 from metadata.distribution.repository import DistributionRepository
 from tests import common_test_helper
 
@@ -16,8 +24,6 @@ def metadata_table(dynamodb):
 
 class TestCreateDistribution:
     def test_create_distribution(self, metadata_table, auth_event, put_edition):
-        import metadata.distribution.handler as distribution_handler
-
         dataset_id, version, edition = put_edition
         create_event = auth_event(
             common_test_helper.raw_file_distribution,
@@ -26,7 +32,7 @@ class TestCreateDistribution:
             edition=edition,
         )
 
-        response = distribution_handler.create_distribution(create_event, None)
+        response = create_distribution(create_event, None)
         body = json.loads(response["body"])
 
         distribution_id = body["Id"]
@@ -43,8 +49,6 @@ class TestCreateDistribution:
     def test_create_distribution_set_default_type(
         self, metadata_table, auth_event, put_edition
     ):
-        import metadata.distribution.handler as distribution_handler
-
         content = common_test_helper.raw_file_distribution.copy()
         content.pop("distribution_type")
         dataset_id, version, edition = put_edition
@@ -55,15 +59,13 @@ class TestCreateDistribution:
             edition=edition,
         )
 
-        response = distribution_handler.create_distribution(create_event, None)
+        response = create_distribution(create_event, None)
         body = json.loads(response["body"])
 
         assert response["statusCode"] == 201
         assert body["distribution_type"] == "file"
 
     def test_create_api_distribution(self, metadata_table, auth_event, put_edition):
-        import metadata.distribution.handler as distribution_handler
-
         content = common_test_helper.raw_api_distribution.copy()
         dataset_id, version, edition = put_edition
         create_event = auth_event(
@@ -73,7 +75,7 @@ class TestCreateDistribution:
             edition=edition,
         )
 
-        response = distribution_handler.create_distribution(create_event, None)
+        response = create_distribution(create_event, None)
         body = json.loads(response["body"])
 
         assert response["statusCode"] == 201
@@ -82,8 +84,6 @@ class TestCreateDistribution:
     def test_create_distribution_non_existing_edition(
         self, metadata_table, auth_event, put_edition
     ):
-        import metadata.distribution.handler as distribution_handler
-
         dataset_id, version, edition = put_edition
         bad_create_event = auth_event(
             common_test_helper.raw_file_distribution,
@@ -93,7 +93,7 @@ class TestCreateDistribution:
         )
 
         context = common_test_helper.Context("1234")
-        response = distribution_handler.create_distribution(bad_create_event, context)
+        response = create_distribution(bad_create_event, context)
 
         assert response["statusCode"] == 500
         assert json.loads(response["body"]) == {
@@ -103,8 +103,6 @@ class TestCreateDistribution:
     def test_create_distribution_wrong_type(
         self, metadata_table, auth_event, put_edition
     ):
-        import metadata.distribution.handler as distribution_handler
-
         bad_content = common_test_helper.raw_file_distribution.copy()
         bad_content["distribution_type"] = "foo"
         dataset_id, version, edition = put_edition
@@ -115,7 +113,7 @@ class TestCreateDistribution:
             edition=edition,
         )
 
-        response = distribution_handler.create_distribution(bad_create_event, None)
+        response = create_distribution(bad_create_event, None)
         body = json.loads(response["body"])
 
         assert response["statusCode"] == 400
@@ -127,8 +125,6 @@ class TestCreateDistribution:
     def test_create_file_distribution_missing_filenames(
         self, metadata_table, auth_event, put_edition
     ):
-        import metadata.distribution.handler as distribution_handler
-
         bad_content = common_test_helper.raw_file_distribution.copy()
         del bad_content["filename"]
         del bad_content["filenames"]
@@ -140,7 +136,7 @@ class TestCreateDistribution:
             edition=edition,
         )
 
-        response = distribution_handler.create_distribution(bad_create_event, None)
+        response = create_distribution(bad_create_event, None)
         body = json.loads(response["body"])
 
         assert response["statusCode"] == 400
@@ -152,8 +148,6 @@ class TestCreateDistribution:
     def test_create_distribution_wrong_type_for_filenames(
         self, metadata_table, auth_event, put_edition
     ):
-        import metadata.distribution.handler as distribution_handler
-
         bad_content = common_test_helper.raw_api_distribution.copy()
         bad_content["filenames"] = ["foo.json"]
         dataset_id, version, edition = put_edition
@@ -164,7 +158,7 @@ class TestCreateDistribution:
             edition=edition,
         )
 
-        response = distribution_handler.create_distribution(bad_create_event, None)
+        response = create_distribution(bad_create_event, None)
         body = json.loads(response["body"])
 
         assert response["statusCode"] == 400
@@ -176,8 +170,6 @@ class TestCreateDistribution:
     def test_create_distribution_missing_api_url(
         self, metadata_table, auth_event, put_edition
     ):
-        import metadata.distribution.handler as distribution_handler
-
         bad_content = common_test_helper.raw_api_distribution.copy()
         del bad_content["api_url"]
         dataset_id, version, edition = put_edition
@@ -188,7 +180,7 @@ class TestCreateDistribution:
             edition=edition,
         )
 
-        response = distribution_handler.create_distribution(bad_create_event, None)
+        response = create_distribution(bad_create_event, None)
         body = json.loads(response["body"])
 
         assert response["statusCode"] == 400
@@ -200,8 +192,6 @@ class TestCreateDistribution:
     def test_create_distribution_wrong_type_for_api_url(
         self, metadata_table, auth_event, put_edition
     ):
-        import metadata.distribution.handler as distribution_handler
-
         bad_content = common_test_helper.raw_file_distribution.copy()
         bad_content["api_url"] = "https://example.org"
         dataset_id, version, edition = put_edition
@@ -212,7 +202,7 @@ class TestCreateDistribution:
             edition=edition,
         )
 
-        response = distribution_handler.create_distribution(bad_create_event, None)
+        response = create_distribution(bad_create_event, None)
         body = json.loads(response["body"])
 
         assert response["statusCode"] == 400
@@ -224,8 +214,6 @@ class TestCreateDistribution:
     def test_create_distribution_wrong_type_for_api_id(
         self, metadata_table, auth_event, put_edition
     ):
-        import metadata.distribution.handler as distribution_handler
-
         bad_content = common_test_helper.raw_file_distribution.copy()
         bad_content["api_id"] = "foo:123"
         dataset_id, version, edition = put_edition
@@ -236,7 +224,7 @@ class TestCreateDistribution:
             edition=edition,
         )
 
-        response = distribution_handler.create_distribution(bad_create_event, None)
+        response = create_distribution(bad_create_event, None)
         body = json.loads(response["body"])
 
         assert response["statusCode"] == 400
@@ -248,8 +236,6 @@ class TestCreateDistribution:
     def test_create_distribution_unknown_api_namespace(
         self, metadata_table, auth_event, put_edition
     ):
-        import metadata.distribution.handler as distribution_handler
-
         bad_content = common_test_helper.raw_api_distribution.copy()
         bad_content["api_id"] = "foo:123"
         dataset_id, version, edition = put_edition
@@ -260,7 +246,7 @@ class TestCreateDistribution:
             edition=edition,
         )
 
-        response = distribution_handler.create_distribution(bad_create_event, None)
+        response = create_distribution(bad_create_event, None)
         body = json.loads(response["body"])
 
         assert response["statusCode"] == 400
@@ -270,8 +256,6 @@ class TestCreateDistribution:
         )
 
     def test_forbidden(self, metadata_table, event, put_edition):
-        import metadata.distribution.handler as distribution_handler
-
         dataset_id, version, edition = put_edition
         create_event = event(
             common_test_helper.raw_file_distribution,
@@ -279,15 +263,13 @@ class TestCreateDistribution:
             version=version,
             edition=edition,
         )
-        response = distribution_handler.create_distribution(create_event, None)
+        response = create_distribution(create_event, None)
         assert response["statusCode"] == 403
         assert json.loads(response["body"]) == [
             {"message": f"You are not authorized to access dataset {dataset_id}"}
         ]
 
     def test_dataset_not_exist(self, metadata_table, auth_event):
-        import metadata.distribution.handler as distribution_handler
-
         dataset_id = "some-dataset_id"
         create_event = auth_event(
             common_test_helper.raw_file_distribution,
@@ -296,7 +278,7 @@ class TestCreateDistribution:
             edition="20190603T092711",
         )
 
-        response = distribution_handler.create_distribution(create_event, None)
+        response = create_distribution(create_event, None)
 
         assert response["statusCode"] == 404
         assert json.loads(response["body"]) == [
@@ -306,8 +288,6 @@ class TestCreateDistribution:
 
 class TestUpdateDistribution:
     def test_update_distribution(self, metadata_table, auth_event, put_edition):
-        import metadata.distribution.handler as distribution_handler
-
         dataset_id, version, edition = put_edition
         create_event = auth_event(
             common_test_helper.raw_file_distribution,
@@ -315,7 +295,7 @@ class TestUpdateDistribution:
             version=version,
             edition=edition,
         )
-        response = distribution_handler.create_distribution(create_event, None)
+        response = create_distribution(create_event, None)
         body = json.loads(response["body"])
         distribution_id = body["Id"]
 
@@ -327,7 +307,7 @@ class TestUpdateDistribution:
             distribution=distribution_id.split("/")[-1],
         )
 
-        response = distribution_handler.update_distribution(update_event, None)
+        response = update_distribution(update_event, None)
         assert response["statusCode"] == 200
         body = json.loads(response["body"])
         assert body["Id"] == distribution_id
@@ -340,8 +320,6 @@ class TestUpdateDistribution:
         assert item["filename"] == "UPDATED.csv"
 
     def test_forbidden(self, metadata_table, event, put_edition):
-        import metadata.distribution.handler as distribution_handler
-
         # auth_denied will return Forbidden, and then no edition will be created....
         edition = "my-edition"
         dataset_id, version, _ = put_edition
@@ -354,15 +332,13 @@ class TestUpdateDistribution:
             distribution="52ee4425-3a3c-4a9f-b599-869de889d30c",
         )
 
-        response = distribution_handler.update_distribution(update_event, None)
+        response = update_distribution(update_event, None)
         assert response["statusCode"] == 403
         assert json.loads(response["body"]) == [
             {"message": f"You are not authorized to access dataset {dataset_id}"}
         ]
 
     def test_dataset_not_exist(self, metadata_table, auth_event):
-        import metadata.distribution.handler as distribution_handler
-
         dataset_id = "some-dataset_id"
         update_event = auth_event(
             common_test_helper.distribution_updated,
@@ -372,7 +348,7 @@ class TestUpdateDistribution:
             distribution="52ee4425-3a3c-4a9f-b599-869de889d30c",
         )
 
-        response = distribution_handler.update_distribution(update_event, None)
+        response = update_distribution(update_event, None)
 
         assert response["statusCode"] == 404
         assert json.loads(response["body"]) == [
@@ -382,18 +358,14 @@ class TestUpdateDistribution:
 
 class TestGetDistribution:
     def test_distribution_not_found(self, event):
-        import metadata.distribution.handler as distribution_handler
-
         event_for_get = event(
             {}, "1234", "1", "20190401T133700", "6f563c62-8fe4-4591-a999-5fbf0798e268"
         )
-        response = distribution_handler.get_distribution(event_for_get, None)
+        response = get_distribution(event_for_get, None)
         assert response["statusCode"] == 404
         assert json.loads(response["body"]) == {"message": "Distribution not found."}
 
     def test_get_distribution(self, event, metadata_table):
-        import metadata.distribution.handler as distribution_handler
-
         distribution_id = "1234/1/20190401T133700/6f563c62-8fe4-4591-a999-5fbf0798e268"
         metadata_table.put_item(
             Item={
@@ -407,7 +379,7 @@ class TestGetDistribution:
         event_for_get = event(
             {}, "1234", "1", "20190401T133700", "6f563c62-8fe4-4591-a999-5fbf0798e268"
         )
-        response = distribution_handler.get_distribution(event_for_get, None)
+        response = get_distribution(event_for_get, None)
 
         assert response["statusCode"] == 200
 
@@ -421,17 +393,13 @@ class TestGetDistribution:
 
 class TestGetDistributions:
     def test_no_distributions(self, event):
-        import metadata.distribution.handler as distribution_handler
-
         event_for_get = event({}, "1234", "1", "20190401T133700")
-        response = distribution_handler.get_distributions(event_for_get, None)
+        response = get_distributions(event_for_get, None)
 
         assert response["statusCode"] == 200
         assert json.loads(response["body"]) == []
 
     def test_get_distributions(self, event, metadata_table):
-        import metadata.distribution.handler as distribution_handler
-
         distribution_id = "1234/1/20190401T133700/6f563c62-8fe4-4591-a999-5fbf0798e268"
         metadata_table.put_item(
             Item={
@@ -443,7 +411,7 @@ class TestGetDistributions:
         )
 
         event_for_get = event({}, "1234", "1", "20190401T133700")
-        response = distribution_handler.get_distributions(event_for_get, None)
+        response = get_distributions(event_for_get, None)
 
         assert response["statusCode"] == 200
 
@@ -456,6 +424,65 @@ class TestGetDistributions:
         assert distribution["distribution_type"] == "file"
         assert distribution["content_type"] == "text/csv"
         assert distribution["filenames"] == ["file.csv"]
+
+
+class TestDeleteDistribution:
+    def test_delete_ok(self, metadata_table, auth_event, put_edition):
+        dataset_id, version, edition = put_edition
+        create_event = auth_event(
+            common_test_helper.raw_file_distribution,
+            dataset=dataset_id,
+            version=version,
+            edition=edition,
+        )
+        response = create_distribution(create_event, None)
+        distribution_id = json.loads(response["body"])["Id"]
+
+        with patch("metadata.distribution.handler.DistributionRepository._delete_data"):
+            response = delete_distribution(
+                auth_event(
+                    dataset=dataset_id,
+                    version=version,
+                    edition=edition,
+                    distribution=distribution_id.split("/")[-1],
+                ),
+                None,
+            )
+        assert response["statusCode"] == 200
+
+        db_response = metadata_table.query(
+            KeyConditionExpression=Key(ID_COLUMN).eq(distribution_id)
+        )
+        assert db_response["Count"] == 0
+
+    def test_forbidden(self, metadata_table, auth_event, event, put_edition):
+        dataset_id, version, edition = put_edition
+        create_event = auth_event(
+            common_test_helper.raw_file_distribution,
+            dataset=dataset_id,
+            version=version,
+            edition=edition,
+        )
+        response = create_distribution(create_event, None)
+        distribution_id = json.loads(response["body"])["Id"]
+
+        response = delete_distribution(
+            event(
+                dataset=dataset_id,
+                version=version,
+                edition=edition,
+                distribution=distribution_id.split("/")[-1],
+            ),
+            None,
+        )
+        assert response["statusCode"] == 403
+
+    def test_delete_not_found(self, auth_event):
+        response = delete_distribution(
+            auth_event(dataset="foo", version="1", edition="bar", distribution="baz"),
+            None,
+        )
+        assert response["statusCode"] == 404
 
 
 class TestDeriveContentType:
@@ -524,3 +551,30 @@ class TestDeriveContentType:
         item = {"filenames": [f"foo.{ext}"], "distribution_type": "file"}
         DistributionRepository._derive_content_type(item)
         assert item["content_type"] == mime_type
+
+
+class TestDeleteData:
+    def test_delete_data(self, s3_client, s3_bucket, metadata_table):
+        key = "raw/red/foo/version=1/edition=latest/bar.txt"
+
+        metadata_table.put_item(
+            Item={"Id": "foo", "Type": "Dataset", "accessRights": "non-public"}
+        )
+        metadata_table.put_item(Item={"Id": "foo/1", "Type": "Version"})
+        metadata_table.put_item(Item={"Id": "foo/1/latest", "Type": "Edition"})
+        metadata_table.put_item(
+            Item={
+                "Id": "foo/1/latest/bar",
+                "Type": "Distribution",
+                "filenames": "bar.txt",
+            }
+        )
+        s3_client.put_object(Bucket=s3_bucket, Key=key, Body="baz")
+
+        objs = s3_client.list_objects_v2(Bucket=s3_bucket, Prefix=key)
+        assert objs["KeyCount"] == 1
+
+        DistributionRepository()._delete_data("foo", "1", "latest", "bar")
+
+        objs = s3_client.list_objects_v2(Bucket=s3_bucket, Prefix=key)
+        assert objs["KeyCount"] == 0

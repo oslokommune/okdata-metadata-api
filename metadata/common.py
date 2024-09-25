@@ -16,6 +16,21 @@ BOTO_RESOURCE_COMMON_KWARGS = {
     ),
 }
 
+# The three standard processing stages in the dataplatform. Corresponds to what
+# is called "bronze", "silver", and "gold" in the medallion architecture.
+STAGES = ["raw", "intermediate", "processed"]
+
+# The three standard confidentiality levels in the dataplatform. "Green" is
+# open/public data, "yellow" is Origo internal, while "red" has restricted
+# access.
+CONFIDENTIALITY_MAP = {
+    "public": "green",
+    "restricted": "yellow",
+    "non-public": "red",
+}
+
+CONFIDENTIALITIES = list(CONFIDENTIALITY_MAP.values())
+
 
 def validate_input(validator):
     def inner(func):

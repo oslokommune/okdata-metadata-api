@@ -8,9 +8,10 @@ from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 from okdata.aws.logging import log_dynamodb, log_exception
 
-from metadata.CommonRepository import CommonRepository, TYPE_COLUMN, ID_COLUMN
 from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
+from metadata.CommonRepository import CommonRepository, TYPE_COLUMN, ID_COLUMN
 from metadata.error import ValidationError
+from metadata.version.repository import VersionRepository
 
 patch(["boto3"])
 
@@ -127,8 +128,11 @@ class DatasetRepository(CommonRepository):
     def patch_dataset(self, dataset_id, content):
         return self.patch_item(dataset_id, content)
 
-    def delete_dataset(self, dataset_id):
-        self.delete_item(dataset_id)
+    def children(self, item_id):
+        return self._query_children(item_id, "Version")
+
+    def child_repository(self):
+        return VersionRepository()
 
     # TODO: Consider not using this function in the dataset creation API, but
     # rather make clients smarter in guiding their users toward choosing unique
