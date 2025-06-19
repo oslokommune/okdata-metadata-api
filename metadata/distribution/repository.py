@@ -107,18 +107,23 @@ class DistributionRepository(CommonRepository):
 
         bucket = getenv("DATA_BUCKET_NAME")
         dataset = DatasetRepository().get_dataset(dataset_id)
+
+        if not dataset:
+            logger.warning(f"Unknown dataset '{dataset_id}'; skipping data deletion")
+            return
+
         access_rights = dataset.get("accessRights")
         confidentiality = CONFIDENTIALITY_MAP.get(access_rights)
         filenames = distribution_.get("filenames")
 
         if not confidentiality:
-            logger.info(
+            logger.warning(
                 f"Unknown confidentiality for dataset '{dataset_id}'; skipping data deletion"
             )
             return
 
         if not filenames:
-            logger.info(
+            logger.warning(
                 f"No filenames listed for distribution '{distribution_id}'; skipping data deletion"
             )
             return
