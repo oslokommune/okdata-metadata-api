@@ -36,7 +36,7 @@ setuptools.setup(
         "simplejson",
         "jsonschema[format]",
         "strict-rfc3339",
-        "okdata-aws>=4.1",
+        "okdata-aws>=5",
         "python-keycloak",
         "okdata-resource-auth",
     ],
