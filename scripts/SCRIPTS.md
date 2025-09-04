@@ -25,3 +25,5 @@ is for traceability.
   * Initializes distribitions' `distribution_type` to either `file` or `api`.
 * `delete_datasets`
   * Deletes datasets. These datasets must be identified beforehand explicitly declared in a list in the script. This script is meant to be used for deleting unused datasets from the dev environment.
+* `update_metadata`
+  * A generalized script useful for mass-updating dataset metadata.
