@@ -270,13 +270,25 @@ class TestUpdateDataset:
     def test_update_invalid_change(self, auth_event, metadata_table, raw_dataset):
         import metadata.dataset.handler as dataset_handler
 
-        response = dataset_handler.create_dataset(auth_event(raw_dataset), None)
+        # Parent dataset, source type "none"
+        parent_dataset = raw_dataset.copy()
+        parent_dataset["source"] = {"type": "none"}
+        parent_response = dataset_handler.create_dataset(
+            auth_event(parent_dataset), None
+        )
+        parent_id = json.loads(parent_response["body"])["Id"]
+
+        # Create a dataset with parent_id already set
+        child_dataset = raw_dataset.copy()
+        child_dataset["parent_id"] = parent_id
+        response = dataset_handler.create_dataset(auth_event(child_dataset), None)
 
         body = json.loads(response["body"])
         dataset_id = body["Id"]
 
-        raw_dataset["parent_id"] = "dataset-42"
-        update_event = auth_event(raw_dataset, dataset_id)
+        # Try to change the parent_id (should fail)
+        child_dataset["parent_id"] = "different-parent"
+        update_event = auth_event(child_dataset, dataset_id)
 
         response = dataset_handler.update_dataset(update_event, None)
         error_message = json.loads(response["body"])
