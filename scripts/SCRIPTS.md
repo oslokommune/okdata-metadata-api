@@ -27,3 +27,5 @@ is for traceability.
   * Deletes datasets. These datasets must be identified beforehand explicitly declared in a list in the script. This script is meant to be used for deleting unused datasets from the dev environment.
 * `update_metadata`
   * A generalized script useful for mass-updating dataset metadata.
+* `set_parent_id`
+  * Sets the `parent_id` field for a list of datasets and migrates their S3 data to the parent dataset's folder structure. Validates that the parent dataset exists and has source type 'none'.

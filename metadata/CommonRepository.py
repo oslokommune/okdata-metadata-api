@@ -198,7 +198,10 @@ class CommonRepository:
         new_content[TYPE_COLUMN] = self.type
 
         for key in ["accessRights", "confidentiality", "parent_id"]:
-            if old_item.get(key) != new_content.get(key):
+            old_value = old_item.get(key)
+            new_value = new_content.get(key)
+            # Allow setting a value if it was previously None, but don't allow changing existing values
+            if old_value is not None and old_value != new_value:
                 raise ValidationError(f"The value of {key} cannot be changed.")
 
         db_response = log_duration(
