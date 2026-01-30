@@ -182,6 +182,6 @@ def delete_distribution(event, context):
 
 def add_self_url(distribution):
     if "Id" in distribution:
-        (dataset_id, version, edition, distribution_id) = distribution["Id"].split("/")
+        dataset_id, version, edition, distribution_id = distribution["Id"].split("/")
         self_url = f"{BASE_URL}/datasets/{dataset_id}/versions/{version}/editions/{edition}/distributions/{distribution_id}"
         distribution["_links"] = {"self": {"href": self_url}}

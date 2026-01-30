@@ -149,6 +149,6 @@ def delete_edition(event, context):
 
 def add_self_url(edition):
     if "Id" in edition:
-        (dataset_id, version, edition_name) = edition["Id"].split("/")
+        dataset_id, version, edition_name = edition["Id"].split("/")
         self_url = f"{BASE_URL}/datasets/{dataset_id}/versions/{version}/editions/{edition_name}"
         edition["_links"] = {"self": {"href": self_url}}

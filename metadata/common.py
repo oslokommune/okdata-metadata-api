@@ -4,7 +4,6 @@ from functools import wraps
 import simplejson
 from botocore.config import Config
 
-
 BOTO_RESOURCE_COMMON_KWARGS = {
     "region_name": "eu-west-1",
     "config": Config(
