@@ -140,6 +140,6 @@ def delete_version(event, context):
 
 def add_self_url(version):
     if "Id" in version:
-        (dataset_id, version_name) = version["Id"].split("/")
+        dataset_id, version_name = version["Id"].split("/")
         self_url = f"{BASE_URL}/datasets/{dataset_id}/versions/{version_name}"
         version["_links"] = {"self": {"href": self_url}}

@@ -12,7 +12,6 @@ from metadata.version.repository import VersionRepository  # noqa
 from metadata.edition.repository import EditionRepository  # noqa
 from metadata.distribution.repository import DistributionRepository  # noqa
 
-
 logger = logging.getLogger("delete_dataset")
 
 

@@ -14,7 +14,6 @@ from metadata.common import BOTO_RESOURCE_COMMON_KWARGS
 from metadata.util import getenv
 from tests import common_test_helper
 
-
 OKDATA_PERMISSION_API_URL = os.environ["OKDATA_PERMISSION_API_URL"]
 good_token = "Bjørnepollett"
 
