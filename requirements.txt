@@ -33,7 +33,7 @@ charset-normalizer==3.4.2
     # via requests
 click==8.2.1
     # via black
-cryptography==45.0.6
+cryptography==46.0.5
     # via jwcrypto
 deprecation==2.1.0
     # via python-keycloak
