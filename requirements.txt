@@ -14,7 +14,7 @@ attrs==25.3.0
     #   referencing
 aws-xray-sdk==2.14.0
     # via metadata-api (setup.py)
-black==25.1.0
+black==26.3.1
     # via metadata-api (setup.py)
 boto3==1.40.4
     # via
