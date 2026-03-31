@@ -14,7 +14,7 @@ attrs==25.3.0
     #   referencing
 aws-xray-sdk==2.14.0
     # via metadata-api (setup.py)
-black==25.1.0
+black==26.3.1
     # via metadata-api (setup.py)
 boto3==1.40.4
     # via
@@ -80,7 +80,7 @@ packaging==25.0
     # via
     #   black
     #   deprecation
-pathspec==0.12.1
+pathspec==1.0.4
     # via black
 platformdirs==4.3.8
     # via black
@@ -94,6 +94,8 @@ python-keycloak==3.12.0
     # via
     #   metadata-api (setup.py)
     #   okdata-sdk
+pytokens==0.4.1
+    # via black
 referencing==0.36.2
     # via
     #   jsonschema
