@@ -125,6 +125,9 @@ functions:
   delete-distribution: ${file(serverless/functions/delete_distribution.yaml)}
   get_distributions: ${file(serverless/functions/get_distributions.yaml)}
   get_distribution: ${file(serverless/functions/get_distribution.yaml)}
+  #
+  # Jobs
+  #
   update-last-read:
     image:
       name: okdata-metadata-api
@@ -132,4 +135,12 @@ functions:
         - jobs.update_last_read.handler.handler
     events:
       - schedule: cron(30 * * * ? *)
+    timeout: 300
+  delete-obsolete-editions:
+    image:
+      name: okdata-metadata-api
+      command:
+        - jobs.delete_obsolete_editions.handler.handler
+    events:
+      - schedule: cron(0 3 * * ? *)
     timeout: 300

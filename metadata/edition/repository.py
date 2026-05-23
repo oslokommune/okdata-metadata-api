@@ -29,9 +29,18 @@ class EditionRepository(CommonRepository):
         edition_id = f"{dataset_id}/{version}/{edition}"
         return self.get_item(edition_id, consistent_read)
 
-    def get_editions(self, dataset_id, version, exclude_latest=True):
-        version_id = f"{dataset_id}/{version}"
-        editions = self.get_items(version_id)
+    def get_editions(self, dataset_id=None, version=None, exclude_latest=True):
+        """Return editions belonging to `dataset_id`/`version`.
+
+        If `dataset_id` and `version` aren't both provided, return every
+        edition instead.
+
+        When `exclude_latest` is true, the `latest` edition is removed from the
+        results.
+        """
+        editions = self.get_items(
+            f"{dataset_id}/{version}" if dataset_id and version else None
+        )
 
         if exclude_latest:
             # Remove 'latest' edition
