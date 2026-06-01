@@ -1,3 +1,5 @@
+import sys
+
 import boto3
 import requests
 from boto3.dynamodb.conditions import Attr, Key
@@ -80,7 +82,7 @@ class MigrateDatasetProcessingStage:
             status_code = response["ResponseMetadata"]["HTTPStatusCode"]
             if status_code != 200 or "Error" in response:
                 print(f"Error copying file: {response}")
-                exit(1)
+                sys.exit(1)
 
     def delete_file(self, key):
         print(f"Deleting {key}")
@@ -89,7 +91,7 @@ class MigrateDatasetProcessingStage:
             status_code = response["ResponseMetadata"]["HTTPStatusCode"]
             if status_code != 204 or "Error" in response:
                 print(f"Error deleting file: {response}")
-                exit(1)
+                sys.exit(1)
 
     def update_output_stage(self, dataset, stage):
         print(f"Update dataset '{dataset}' output stage to '{stage}'")
